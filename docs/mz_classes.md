@@ -575,26 +575,26 @@ Web Audio APIのオーディオオブジェクト。
 
 #### 静的プロパティ
 
-- `alwaysDash`
-- `commandRemember` — 「Remember」コマンドのハンドラ。
-- `touchUI`
+- `alwaysDash` — 常時ダッシュが有効かどうか。
+- `commandRemember` — コマンド記憶が有効かどうか。
+- `touchUI` — タッチUI表示が有効かどうか。
 
 #### 静的メソッド
 
-- `load()` — 設定データを読み込む。
-- `save()` — 設定データを保存する。
+- `load()` — 設定データをストレージから読み込む。
+- `save()` — 設定データをストレージに保存する。
 - `isLoaded()` — 設定データの読み込みが完了したかを確認する。
-- `makeData()` — 設定データオブジェクトを作成する。
-- `applyData(config)` — 設定データを適用する。
-- `readFlag(config, name, defaultValue)` — 設定データからフラグ値を読み取る。
-- `readVolume(config, name)` — 設定データから音量値を読み取る。
+- `makeData()` — 保存用の設定データオブジェクトを作成する。
+- `applyData(config)` — 読み込んだ設定データを各プロパティに適用する。
+- `readFlag(config, name, defaultValue)` — 設定データからブール値を読み取る。
+- `readVolume(config, name)` — 設定データから音量値（0〜100）を読み取る。
 
 #### プロパティ
 
-- `bgmVolume`
-- `bgsVolume`
-- `meVolume`
-- `seVolume`
+- `bgmVolume` — BGMの音量（0〜100）。AudioManagerと連動。
+- `bgsVolume` — BGSの音量（0〜100）。AudioManagerと連動。
+- `meVolume` — MEの音量（0〜100）。AudioManagerと連動。
+- `seVolume` — SEの音量（0〜100）。AudioManagerと連動。
 
 ### StorageManager
 
@@ -760,16 +760,16 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 - `makeEmptyAudioObject()` — 空のオーディオオブジェクトを作成する。
 - `createBuffer(folder, name)` — WebAudioバッファを作成する。
 - `updateBufferParameters(buffer, configVolume, audio)` — バッファの音量・ピッチ・パンを更新する。
-- `audioFileExt()`
+- `audioFileExt()` — オーディオファイルの拡張子（".ogg" または ".m4a"）を返す。
 - `checkErrors()` — オーディオの読み込みエラーをチェックする。
 - `throwLoadError(webAudio)` — オーディオ読み込みエラーを投げる。
 
 #### プロパティ
 
-- `bgmVolume`
-- `bgsVolume`
-- `meVolume`
-- `seVolume`
+- `bgmVolume` — BGMの音量（0〜100）。設定時にBGMバッファのパラメータも更新する。
+- `bgsVolume` — BGSの音量（0〜100）。設定時にBGSバッファのパラメータも更新する。
+- `meVolume` — MEの音量（0〜100）。設定時にMEバッファのパラメータも更新する。
+- `seVolume` — SEの音量（0〜100）。
 
 ### SoundManager
 
@@ -825,7 +825,7 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 
 #### プロパティ
 
-- `currencyUnit`
+- `currencyUnit` — 通貨単位の文字列（$dataSystem.currencyUnit を返す）。
 
 ### ColorManager ⭐
 
@@ -905,10 +905,10 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 - `changeScene()` — 次のシーンへの切り替え処理。
 - `updateScene()` — 現在のシーンのupdate()を呼び出す。
 - `isGameActive()` — ゲームウィンドウがアクティブかを確認する。
-- `onSceneTerminate()` — Scene Terminate時のコールバック。
-- `onSceneCreate()` — Scene Create時のコールバック。
+- `onSceneTerminate()` — シーン終了時のコールバック。
+- `onSceneCreate()` — シーン作成時のコールバック。
 - `onBeforeSceneStart()` — シーン開始前のコールバック。
-- `onSceneStart()` — Scene Start時のコールバック。
+- `onSceneStart()` — シーン開始時のコールバック。
 - `isSceneChanging()` — シーン遷移中かどうかを確認する。
 - `isCurrentSceneBusy()` — 現在のシーンがビジー状態かを確認する。
 - `isNextScene(sceneClass)` — 次のシーンが指定されたクラスかを確認する。
@@ -943,100 +943,100 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 - `setEventCallback(callback)` — 戦闘終了時のイベントコールバックを設定する。
 - `setLogWindow(logWindow)` — 戦闘ログウィンドウを設定する。
 - `setSpriteset(spriteset)` — 戦闘スプライトセットを設定する。
-- `onEncounter()` — Encounter時のコールバック。
-- `ratePreemptive()`
-- `rateSurprise()`
-- `saveBgmAndBgs()` — Bgm And Bgsを保存する。
-- `playBattleBgm()` — 戦闘BGMを再生する。
-- `playVictoryMe()` — Victory Meを再生する。
-- `playDefeatMe()` — Defeat Meを再生する。
-- `replayBgmAndBgs()`
-- `makeEscapeRatio()` — Escape Ratioを作成する。
+- `onEncounter()` — エンカウント時に先制攻撃・不意打ちの判定を行う。
+- `ratePreemptive()` — 先制攻撃の確率を返す。
+- `rateSurprise()` — 不意打ちの確率を返す。
+- `saveBgmAndBgs()` — 現在のBGMとBGSをマップ用として保存する。
+- `playBattleBgm()` — 戦闘BGMを再生し、BGSを停止する。
+- `playVictoryMe()` — 勝利MEを再生する。
+- `playDefeatMe()` — 敗北MEを再生する。
+- `replayBgmAndBgs()` — 保存したマップのBGMとBGSを再生する。
+- `makeEscapeRatio()` — 逃走成功率を計算・設定する（パーティと敵の敏捷性に基づく）。
 - `update(timeActive)` — 戦闘進行を毎フレーム更新する。
-- `updatePhase(timeActive)` — 現在のフェーズに応じた更新処理。
-- `updateEvent()` — 戦闘イベントの更新処理。
-- `updateEventMain()` — 戦闘イベントのメイン更新処理。
-- `isBusy()` — 戦闘がビジー状態（アニメーションやメッセージ表示中等）かを確認する。
-- `updateTpbInput()` — Tpb Inputを更新する。
-- `checkTpbInputClose()` — Tpb Input Closeをチェックする。
-- `checkTpbInputOpen()` — Tpb Input Openをチェックする。
-- `isPartyTpbInputtable()` — Party Tpb Inputtableかどうかを確認する。
-- `needsActorInputCancel()` — Actor Input Cancelが必要かを確認する。
-- `isTpbMainPhase()` — Tpb Main Phaseかどうかを確認する。
-- `isInputting()` — Inputtingかどうかを確認する。
-- `isInTurn()` — In Turnかどうかを確認する。
-- `isTurnEnd()` — Turn Endかどうかを確認する。
-- `isAborting()` — Abortingかどうかを確認する。
-- `isBattleEnd()` — Battle Endかどうかを確認する。
-- `canEscape()` — Escapeが可能かを確認する。
-- `canLose()` — Loseが可能かを確認する。
+- `updatePhase(timeActive)` — 現在のフェーズ（start/turn/action/turnEnd/battleEnd）に応じた更新処理を行う。
+- `updateEvent()` — 戦闘中のイベント処理を更新する。強制アクションがあれば処理する。
+- `updateEventMain()` — 戦闘イベントのメイン更新。インタプリタ更新・戦闘終了チェック・戦闘イベントのセットアップを行う。
+- `isBusy()` — 戦闘がビジー状態（メッセージ・スプライト・ログ表示中）かを確認する。
+- `updateTpbInput()` — TPBモードの入力状態を更新する。
+- `checkTpbInputClose()` — TPBの入力受付を閉じるべきかチェックする。
+- `checkTpbInputOpen()` — TPBの入力受付を開くべきかチェックする。
+- `isPartyTpbInputtable()` — パーティがTPBモードで入力可能かを確認する。
+- `needsActorInputCancel()` — 現在のアクターの入力をキャンセルする必要があるかを確認する。
+- `isTpbMainPhase()` — TPBのメインフェーズ（turn/turnEnd/action）かを確認する。
+- `isInputting()` — コマンド入力中かどうかを確認する。
+- `isInTurn()` — ターン実行中フェーズかを確認する。
+- `isTurnEnd()` — ターン終了フェーズかを確認する。
+- `isAborting()` — 戦闘中断中かを確認する。
+- `isBattleEnd()` — 戦闘終了フェーズかを確認する。
+- `canEscape()` — 逃走可能かを確認する。
+- `canLose()` — 敗北可能（敗北してもゲームオーバーにならない）かを確認する。
 - `isEscaped()` — 逃走済みかを確認する。
-- `actor()` — アクターオブジェクトを返す。
-- `startBattle()` — 戦闘を開始する。
-- `displayStartMessages()` — Start Messagesを表示する。
-- `startInput()` — 入力フェーズを開始する。
-- `inputtingAction()`
-- `selectNextCommand()` — Next Commandを選択する。
-- `selectNextActor()` — Next Actorを選択する。
-- `selectPreviousCommand()` — Previous Commandを選択する。
-- `selectPreviousActor()` — Previous Actorを選択する。
-- `changeCurrentActor(forward)` — Current Actorを変更する。
-- `startActorInput()` — Actor Inputを開始する。
-- `finishActorInput()`
-- `cancelActorInput()`
-- `updateStart()` — Startを更新する。
-- `startTurn()` — ターンを開始する。
-- `updateTurn(timeActive)` — ターンの更新処理。
-- `updateTpb()` — Tpbを更新する。
-- `updateAllTpbBattlers()` — All Tpb Battlersを更新する。
-- `updateTpbBattler(battler)` — Tpb Battlerを更新する。
-- `checkTpbTurnEnd()` — Tpb Turn Endをチェックする。
-- `processTurn()` — Turnを処理する。
-- `endBattlerActions(battler)` — Battler Actionsを終了する。
-- `endTurn()` — ターンを終了する。
-- `updateTurnEnd()` — ターン終了の更新処理。
-- `endAllBattlersTurn()` — All Battlers Turnを終了する。
-- `displayBattlerStatus(battler, current)` — Battler Statusを表示する。
-- `getNextSubject()` — 次にアクションを実行するバトラーを取得する。
-- `allBattleMembers()` — 戦闘に参加する全バトラーの配列を返す。
-- `makeActionOrders()` — アクションの実行順序を決定する。
-- `startAction()` — アクション実行を開始する。
-- `updateAction()` — アクション実行の更新処理。
-- `endAction()` — アクションを終了する。
-- `invokeAction(subject, target)` — 対象にアクションを適用する。
-- `invokeNormalAction(subject, target)` — 通常アクションを実行する。
-- `invokeCounterAttack(subject, target)` — 反撃を実行する。
-- `invokeMagicReflection(subject, target)` — 魔法反射を実行する。
-- `applySubstitute(target)` — 身代わりを適用する。
-- `checkSubstitute(target)` — 身代わり発動条件を確認する。
-- `isActionForced()` — Action Forcedかどうかを確認する。
-- `forceAction(battler)`
-- `processForcedAction()` — Forced Actionを処理する。
-- `abort()` — 戦闘を中断する。
-- `checkBattleEnd()` — 戦闘終了条件を確認する。
-- `checkAbort()` — 戦闘中断条件を確認する。
-- `processVictory()` — 勝利処理を実行する。
-- `processEscape()` — 逃走処理を実行する。
-- `onEscapeSuccess()` — 逃走成功時の処理。
-- `onEscapeFailure()` — 逃走失敗時の処理。
-- `processPartyEscape()` — Party Escapeを処理する。
-- `processAbort()` — 戦闘中断処理を実行する。
-- `processDefeat()` — 敗北処理を実行する。
-- `endBattle(result)` — Battleを終了する。
-- `updateBattleEnd()` — Battle Endを更新する。
-- `makeRewards()` — 戦闘報酬を作成する。
+- `actor()` — 現在コマンド入力中のアクターを返す。
+- `startBattle()` — 戦闘を開始し、開始メッセージを表示する。
+- `displayStartMessages()` — 戦闘開始メッセージ（敵出現・先制攻撃・不意打ち）を表示する。
+- `startInput()` — コマンド入力フェーズを開始する。不意打ち時は即ターン開始。
+- `inputtingAction()` — 現在入力中のアクターのアクションを返す。
+- `selectNextCommand()` — 次のコマンド入力へ進む。全コマンド入力完了なら次のアクターへ。
+- `selectNextActor()` — 次の入力可能なアクターを選択する。
+- `selectPreviousCommand()` — 前のコマンド入力に戻る。
+- `selectPreviousActor()` — 前のアクターの入力に戻る。
+- `changeCurrentActor(forward)` — 現在のアクターを前後に切り替える。入力可能なアクターを検索する。
+- `startActorInput()` — アクターのコマンド入力を開始する。
+- `finishActorInput()` — アクターのコマンド入力を完了する。TPBではキャスト開始。
+- `cancelActorInput()` — アクターのコマンド入力をキャンセルする。
+- `updateStart()` — startフェーズの更新。TPBならturnフェーズへ、そうでなければ入力開始。
+- `startTurn()` — ターンを開始する。ターン数を増加し、アクション順序を決定する。
+- `updateTurn(timeActive)` — ターンの更新処理。次のアクション実行対象を取得して処理する。
+- `updateTpb()` — TPBモードのパーティと敵グループの時間経過を更新する。
+- `updateAllTpbBattlers()` — 全バトラーのTPB状態を更新する。
+- `updateTpbBattler(battler)` — 個別バトラーのTPB状態（ターン終了・アクション準備完了・タイムアウト）を更新する。
+- `checkTpbTurnEnd()` — TPBモードのターン終了条件をチェックする。
+- `processTurn()` — 現在の行動主体のアクションを処理する。
+- `endBattlerActions(battler)` — バトラーの全アクションを終了し、TPBチャージタイムをクリアする。
+- `endTurn()` — ターンを終了し、turnEndフェーズに移行する。
+- `updateTurnEnd()` — ターン終了フェーズの更新。TPBなら次のターンへ、そうでなければ全バトラーのターン終了処理。
+- `endAllBattlersTurn()` — 全バトラーのターン終了コールバック(onTurnEnd)を呼び出し、ステータスを表示する。
+- `displayBattlerStatus(battler, current)` — バトラーの自動付与ステート・現在ステート・回復量をログに表示する。
+- `getNextSubject()` — アクション実行順リストから次の生存バトラーを取得する。
+- `allBattleMembers()` — 戦闘に参加する全バトラー（味方+敵）の配列を返す。
+- `makeActionOrders()` — 敏捷性に基づいてアクションの実行順序を決定する。
+- `startAction()` — アクションの実行を開始する。アイテム使用・ログ表示を行う。
+- `updateAction()` — アクション実行を更新する。ターゲットリストから順に適用する。
+- `endAction()` — アクション実行を終了する。全アクション完了でバトラーの行動を終了。
+- `invokeAction(subject, target)` — 対象にアクションを適用する。反撃・魔法反射の判定も行う。
+- `invokeNormalAction(subject, target)` — 通常アクションを実行する。身代わり適用後にダメージ計算。
+- `invokeCounterAttack(subject, target)` — 反撃を実行する（対象が行動主体に通常攻撃）。
+- `invokeMagicReflection(subject, target)` — 魔法反射を実行する（魔法が行動主体に跳ね返る）。
+- `applySubstitute(target)` — 身代わり可能なバトラーがいれば身代わりを適用し、実際の対象を返す。
+- `checkSubstitute(target)` — 身代わり発動条件を確認する（瀕死かつ必中でない場合）。
+- `isActionForced()` — 強制アクション待ちのバトラーがいるかを確認する。
+- `forceAction(battler)` — バトラーの強制アクションを予約する。
+- `processForcedAction()` — 予約された強制アクションを実行する。
+- `abort()` — 戦闘を中断（aborting）状態にする。
+- `checkBattleEnd()` — 戦闘終了条件（逃走済み・全滅・敵全滅）をチェックする。
+- `checkAbort()` — 戦闘中断状態かチェックし、中断なら中断処理を実行する。
+- `processVictory()` — 勝利処理（ステート解除・ME再生・報酬・経験値獲得等）を実行する。
+- `processEscape()` — 逃走処理を実行する。成功率に基づいて判定し、失敗時は成功率を上げる。
+- `onEscapeSuccess()` — 逃走成功時の処理（メッセージ表示・戦闘中断）。
+- `onEscapeFailure()` — 逃走失敗時の処理（メッセージ表示・逃走成功率+10%・ターン開始）。
+- `processPartyEscape()` — パーティ逃走処理（イベントコマンドによる逃走）。
+- `processAbort()` — 戦闘中断処理（ステート解除・ログクリア・BGM復帰）を実行する。
+- `processDefeat()` — 敗北処理（メッセージ表示・ME再生）を実行する。
+- `endBattle(result)` — 戦闘を終了する。result: 0=勝利, 1=中断/逃走, 2=敗北。
+- `updateBattleEnd()` — 戦闘終了フェーズの更新。結果に応じてシーン遷移やゲームオーバーへ。
+- `makeRewards()` — 戦闘報酬（経験値・ゴールド・ドロップアイテム）を作成する。
 - `displayVictoryMessage()` — 勝利メッセージを表示する。
 - `displayDefeatMessage()` — 敗北メッセージを表示する。
 - `displayEscapeSuccessMessage()` — 逃走成功メッセージを表示する。
 - `displayEscapeFailureMessage()` — 逃走失敗メッセージを表示する。
-- `displayRewards()` — 報酬（経験値、ゴールド、アイテム）を表示する。
-- `displayExp()` — 獲得経験値を表示する。
-- `displayGold()` — 獲得ゴールドを表示する。
-- `displayDropItems()` — 獲得アイテムを表示する。
-- `gainRewards()` — 報酬を実際に獲得する。
-- `gainExp()` — 経験値を獲得する。
-- `gainGold()` — ゴールドを獲得する。
-- `gainDropItems()` — ドロップアイテムをパーティに追加する。
+- `displayRewards()` — 報酬（経験値・ゴールド・アイテム）のメッセージを表示する。
+- `displayExp()` — 獲得経験値をメッセージ表示する。
+- `displayGold()` — 獲得ゴールドをメッセージ表示する。
+- `displayDropItems()` — ドロップアイテムをメッセージ表示する。
+- `gainRewards()` — 報酬（経験値・ゴールド・アイテム）を実際にパーティに付与する。
+- `gainExp()` — パーティ全員に経験値を付与する。
+- `gainGold()` — パーティにゴールドを付与する。
+- `gainDropItems()` — ドロップアイテムをパーティのインベントリに追加する。
 
 ### PluginManager ⭐
 
