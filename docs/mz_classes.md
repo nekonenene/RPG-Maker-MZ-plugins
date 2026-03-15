@@ -2121,78 +2121,78 @@ Game_PartyとGame_Troopのスーパークラス。
 #### インスタンスメソッド
 
 - `initialize()` — 初期化する。
-- `initAllItems()` — All Itemsを初期化する。
-- `exists()`
-- `size()`
-- `isEmpty()` — Emptyかどうかを確認する。
-- `members()` — メンバーの配列を返す。
-- `allMembers()`
-- `battleMembers()`
-- `hiddenBattleMembers()`
-- `allBattleMembers()`
-- `maxBattleMembers()`
-- `leader()` — リーダーを返す。
-- `removeInvalidMembers()` — Invalid Membersを削除する。
-- `reviveBattleMembers()`
-- `items()` — アイテムの配列を返す。
-- `weapons()` — 装備中の武器の配列を返す。
-- `armors()` — 装備中の防具の配列を返す。
-- `equipItems()`
-- `allItems()`
-- `itemContainer(item)`
-- `setupStartingMembers()` — Starting Membersをセットアップする。
-- `name()` — 名前を返す。
-- `setupBattleTest()` — Battle Testをセットアップする。
-- `setupBattleTestMembers()` — Battle Test Membersをセットアップする。
-- `setupBattleTestItems()` — Battle Test Itemsをセットアップする。
-- `highestLevel()`
-- `addActor(actorId)` — Actorを追加する。
-- `removeActor(actorId)` — Actorを削除する。
-- `gold()`
-- `gainGold(amount)` — Goldを獲得する。
-- `loseGold(amount)` — Goldを失う。
-- `maxGold()`
-- `steps()`
-- `increaseSteps()`
-- `numItems(item)`
-- `maxItems(/*item*/)` — 項目の最大数を返す。
-- `hasMaxItems(item)` — Max Itemsを持っているかを確認する。
-- `hasItem(item, includeEquip)` — Itemを持っているかを確認する。
-- `isAnyMemberEquipped(item)` — Any Member Equippedかどうかを確認する。
-- `gainItem(item, amount, includeEquip)` — Itemを獲得する。
-- `discardMembersEquip(item, amount)`
-- `loseItem(item, amount, includeEquip)` — Itemを失う。
-- `consumeItem(item)`
-- `canUse(item)` — Useが可能かを確認する。
-- `canInput()` — 入力可能かを確認する。
-- `isAllDead()` — All Deadかどうかを確認する。
-- `isEscaped()` — Escapedかどうかを確認する。
-- `onPlayerWalk()` — Player Walk時のコールバック。
-- `menuActor()`
-- `setMenuActor(actor)` — Menu Actorを設定する。
-- `makeMenuActorNext()` — Menu Actor Nextを作成する。
-- `makeMenuActorPrevious()` — Menu Actor Previousを作成する。
-- `targetActor()`
-- `setTargetActor(actor)` — Target Actorを設定する。
-- `lastItem()`
-- `setLastItem(item)` — Last Itemを設定する。
-- `swapOrder(index1, index2)`
-- `charactersForSavefile()`
-- `facesForSavefile()`
-- `partyAbility(abilityId)`
-- `hasEncounterHalf()` — Encounter Halfを持っているかを確認する。
-- `hasEncounterNone()` — Encounter Noneを持っているかを確認する。
-- `hasCancelSurprise()` — Cancel Surpriseを持っているかを確認する。
-- `hasRaisePreemptive()` — Raise Preemptiveを持っているかを確認する。
-- `hasGoldDouble()` — Gold Doubleを持っているかを確認する。
-- `hasDropItemDouble()` — Drop Item Doubleを持っているかを確認する。
-- `ratePreemptive(troopAgi)`
-- `rateSurprise(troopAgi)`
-- `performVictory()` — Victoryの演出を実行する。
-- `performEscape()` — Escapeの演出を実行する。
-- `removeBattleStates()` — Battle Statesを削除する。
-- `requestMotionRefresh()` — Motion Refreshを要求する。
-- `onEscapeFailure()` — Escape Failure時のコールバック。
+- `initAllItems()` — 全アイテム・武器・防具の所持数を初期化する。
+- `exists()` — パーティが存在する（メンバーがいる）かを確認する。
+- `size()` — パーティの人数を返す。
+- `isEmpty()` — パーティが空かを確認する。
+- `members()` — 全メンバーの配列を返す。
+- `allMembers()` — 控え含む全メンバーの配列を返す。
+- `battleMembers()` — 戦闘メンバーの配列を返す。
+- `hiddenBattleMembers()` — 非表示の戦闘メンバーの配列を返す。
+- `allBattleMembers()` — 非表示含む全戦闘メンバーの配列を返す。
+- `maxBattleMembers()` — 戦闘メンバーの最大数を返す（デフォルト: 4）。
+- `leader()` — リーダー（先頭メンバー）を返す。
+- `removeInvalidMembers()` — 無効なメンバーを削除する。
+- `reviveBattleMembers()` — 戦闘不能の戦闘メンバーをHP1で復活させる。
+- `items()` — 所持アイテムの配列を返す。
+- `weapons()` — 所持武器の配列を返す。
+- `armors()` — 所持防具の配列を返す。
+- `equipItems()` — 所持装備品（武器+防具）の配列を返す。
+- `allItems()` — 全所持品（アイテム+装備品）の配列を返す。
+- `itemContainer(item)` — アイテムの種類に応じた所持コンテナを返す。
+- `setupStartingMembers()` — 初期メンバーをセットアップする。
+- `name()` — パーティ名（リーダー名）を返す。
+- `setupBattleTest()` — 戦闘テスト用のセットアップを行う。
+- `setupBattleTestMembers()` — 戦闘テスト用メンバーをセットアップする。
+- `setupBattleTestItems()` — 戦闘テスト用アイテムをセットアップする。
+- `highestLevel()` — パーティ内の最高レベルを返す。
+- `addActor(actorId)` — アクターをパーティに追加する。
+- `removeActor(actorId)` — アクターをパーティから削除する。
+- `gold()` — 所持金を返す。
+- `gainGold(amount)` — ゴールドを獲得する。
+- `loseGold(amount)` — ゴールドを失う。
+- `maxGold()` — 所持金の最大値を返す。
+- `steps()` — 累計歩数を返す。
+- `increaseSteps()` — 歩数を1増やす。
+- `numItems(item)` — 指定アイテムの所持数を返す。
+- `maxItems(/*item*/)` — アイテムの最大所持数を返す（デフォルト: 99）。
+- `hasMaxItems(item)` — アイテムが最大所持数かを確認する。
+- `hasItem(item, includeEquip)` — アイテムを所持しているかを確認する（装備含むオプション）。
+- `isAnyMemberEquipped(item)` — いずれかのメンバーが装備中かを確認する。
+- `gainItem(item, amount, includeEquip)` — アイテムを獲得する。
+- `discardMembersEquip(item, amount)` — メンバーの装備からアイテムを破棄する。
+- `loseItem(item, amount, includeEquip)` — アイテムを失う。
+- `consumeItem(item)` — 消耗アイテムを1つ消費する。
+- `canUse(item)` — アイテムを使用可能かを確認する。
+- `canInput()` — コマンド入力可能かを確認する。
+- `isAllDead()` — 全メンバーが戦闘不能かを確認する。
+- `isEscaped()` — 逃走済みかを確認する。
+- `onPlayerWalk()` — プレイヤー移動時のコールバック。
+- `menuActor()` — メニューで選択中のアクターを返す。
+- `setMenuActor(actor)` — メニューで選択中のアクターを設定する。
+- `makeMenuActorNext()` — メニューの次のアクターに切り替える。
+- `makeMenuActorPrevious()` — メニューの前のアクターに切り替える。
+- `targetActor()` — 対象アクターを返す。
+- `setTargetActor(actor)` — 対象アクターを設定する。
+- `lastItem()` — 最後に使用したアイテムを返す。
+- `setLastItem(item)` — 最後に使用したアイテムを設定する。
+- `swapOrder(index1, index2)` — 2人のメンバーの順序を入れ替える。
+- `charactersForSavefile()` — セーブファイル用のキャラクター情報を返す。
+- `facesForSavefile()` — セーブファイル用の顔画像情報を返す。
+- `partyAbility(abilityId)` — パーティアビリティが有効かを確認する。
+- `hasEncounterHalf()` — エンカウント半減アビリティを持つかを確認する。
+- `hasEncounterNone()` — エンカウント無効アビリティを持つかを確認する。
+- `hasCancelSurprise()` — 不意打ち無効アビリティを持つかを確認する。
+- `hasRaisePreemptive()` — 先制攻撃率アップアビリティを持つかを確認する。
+- `hasGoldDouble()` — 獲得ゴールド2倍アビリティを持つかを確認する。
+- `hasDropItemDouble()` — ドロップアイテム2倍アビリティを持つかを確認する。
+- `ratePreemptive(troopAgi)` — 先制攻撃率を計算する。
+- `rateSurprise(troopAgi)` — 不意打ち率を計算する。
+- `performVictory()` — 勝利演出を実行する。
+- `performEscape()` — 逃走演出を実行する。
+- `removeBattleStates()` — 戦闘終了時に解除されるステートを削除する。
+- `requestMotionRefresh()` — 全メンバーのモーションリフレッシュを要求する。
+- `onEscapeFailure()` — 逃走失敗時のコールバック。
 
 ### Game_Troop ⭐
 
@@ -2205,25 +2205,25 @@ Game_PartyとGame_Troopのスーパークラス。
 #### インスタンスメソッド
 
 - `initialize()` — 初期化する。
-- `isEventRunning()` — Event Runningかどうかを確認する。
-- `updateInterpreter()` — Interpreterを更新する。
-- `turnCount()`
-- `members()` — メンバーの配列を返す。
-- `clear()` — クリアする。
-- `troop()`
-- `setup(troopId)` — セットアップする。
-- `makeUniqueNames()` — Unique Namesを作成する。
-- `updatePluralFlags()` — Plural Flagsを更新する。
-- `letterTable()`
-- `enemyNames()`
-- `meetsConditions(page)`
-- `setupBattleEvent()` — Battle Eventをセットアップする。
-- `increaseTurn()`
-- `expTotal()`
-- `goldTotal()`
-- `goldRate()` — goldの倍率を返す。
-- `makeDropItems()` — Drop Itemsを作成する。
-- `isTpbTurnEnd()` — Tpb Turn Endかどうかを確認する。
+- `isEventRunning()` — 戦闘イベントが実行中かを確認する。
+- `updateInterpreter()` — 戦闘イベントのインタプリタを更新する。
+- `turnCount()` — ターン数を返す。
+- `members()` — 敵メンバーの配列を返す。
+- `clear()` — 敵グループをクリアする。
+- `troop()` — データベースの敵グループオブジェクトを返す。
+- `setup(troopId)` — 敵グループIDでセットアップする。
+- `makeUniqueNames()` — 同名の敵に識別英字（A, B等）を付ける。
+- `updatePluralFlags()` — 同名敵複数フラグを更新する。
+- `letterTable()` — 識別用英字テーブルを返す。
+- `enemyNames()` — 敵の名前配列を返す（重複なし）。
+- `meetsConditions(page)` — バトルイベントページの条件を満たすかを確認する。
+- `setupBattleEvent()` — バトルイベントをセットアップする。
+- `increaseTurn()` — ターン数を1増加させる。
+- `expTotal()` — 敵グループの総経験値を返す。
+- `goldTotal()` — 敵グループの総ゴールドを返す。
+- `goldRate()` — ゴールド倍率を返す。
+- `makeDropItems()` — 全敵のドロップアイテムをまとめて返す。
+- `isTpbTurnEnd()` — TPBターンが終了したかを確認する。
 
 ### Game_Map ⭐
 
