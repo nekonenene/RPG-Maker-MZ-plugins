@@ -1302,34 +1302,34 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 - `weatherPower()` — 天候の強さを返す。
 - `picture(pictureId)` — 指定されたIDのピクチャを返す。
 - `realPictureId(pictureId)` — 実際のピクチャIDを返す（戦闘時はオフセット付き）。
-- `clearFade()` — Fadeをクリアする。
-- `clearTone()` — Toneをクリアする。
-- `clearFlash()` — Flashをクリアする。
-- `clearShake()` — Shakeをクリアする。
-- `clearZoom()` — Zoomをクリアする。
-- `clearWeather()` — Weatherをクリアする。
-- `clearPictures()` — Picturesをクリアする。
-- `eraseBattlePictures()` — Battle Picturesを消去する。
-- `maxPictures()`
-- `startFadeOut(duration)` — フェードアウトを開始する。
-- `startFadeIn(duration)` — フェードインを開始する。
+- `clearFade()` — フェード状態をクリアする。
+- `clearTone()` — 色調をクリアする。
+- `clearFlash()` — フラッシュをクリアする。
+- `clearShake()` — 画面の揺れをクリアする。
+- `clearZoom()` — ズームをクリアする（等倍に戻す）。
+- `clearWeather()` — 天候をクリアする（天候なしに戻す）。
+- `clearPictures()` — 全ピクチャをクリアする。
+- `eraseBattlePictures()` — 戦闘用ピクチャ（IDオフセット付き）を全て消去する。
+- `maxPictures()` — ピクチャの最大数を返す（デフォルト: 100）。
+- `startFadeOut(duration)` — フェードアウトを開始する（指定フレーム数で暗転）。
+- `startFadeIn(duration)` — フェードインを開始する（指定フレーム数で明転）。
 - `startTint(tone, duration)` — 画面の色調変更を開始する。
 - `startFlash(color, duration)` — 画面フラッシュを開始する。
 - `startShake(power, speed, duration)` — 画面の揺れを開始する。
-- `startZoom(x, y, scale, duration)` — ズームを開始する。
-- `setZoom(x, y, scale)` — ズームを即座に設定する。
-- `changeWeather(type, power, duration)` — 天候を変更する。
-- `update()` — 毎フレーム画面エフェクトを更新する。
-- `updateFadeOut()` — フェードアウトを更新する。
-- `updateFadeIn()` — フェードインを更新する。
-- `updateTone()` — 色調変更を更新する。
-- `updateFlash()` — フラッシュを更新する。
-- `updateShake()` — 画面の揺れを更新する。
-- `updateZoom()` — ズームを更新する。
-- `updateWeather()` — 天候を更新する。
-- `updatePictures()` — ピクチャを更新する。
-- `startFlashForDamage()` — ダメージ用のフラッシュを開始する。
-- `rotatePicture(pictureId, speed)` — ピクチャを回転する。
+- `startZoom(x, y, scale, duration)` — 指定座標・拡大率へのズームを開始する。
+- `setZoom(x, y, scale)` — ズームを即座に設定する（アニメーションなし）。
+- `changeWeather(type, power, duration)` — 天候を変更する（type: none/rain/storm/snow）。
+- `update()` — 毎フレーム全画面エフェクトを更新する。
+- `updateFadeOut()` — フェードアウトの進行を更新する。
+- `updateFadeIn()` — フェードインの進行を更新する。
+- `updateTone()` — 色調変更の進行を更新する。
+- `updateFlash()` — フラッシュの進行を更新する。
+- `updateShake()` — 画面の揺れの進行を更新する。
+- `updateZoom()` — ズームの進行を更新する。
+- `updateWeather()` — 天候の進行を更新する。
+- `updatePictures()` — 全ピクチャの毎フレーム更新を行う。
+- `startFlashForDamage()` — ダメージ用の赤フラッシュを開始する。
+- `rotatePicture(pictureId, speed)` — ピクチャの回転速度を設定する。
 - `tintPicture(pictureId, tone, duration)` — ピクチャの色調を変更する。
 - `erasePicture(pictureId)` — ピクチャを消去する。
 
@@ -1343,31 +1343,33 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 #### インスタンスメソッド
 
 - `initialize()` — 初期化する。
-- `name()` — 名前を返す。
-- `origin()`
-- `x()`
-- `y()`
-- `scaleX()`
-- `scaleY()`
-- `opacity()`
-- `blendMode()`
-- `tone()`
-- `angle()`
-- `initBasic()` — Basicを初期化する。
-- `initTarget()` — Targetを初期化する。
-- `initTone()` — Toneを初期化する。
-- `initRotation()` — Rotationを初期化する。
-- `rotate(speed)`
-- `tint(tone, duration)`
-- `update()` — 毎フレーム更新する。
-- `updateMove()` — Moveを更新する。
-- `updateTone()` — Toneを更新する。
-- `updateRotation()` — Rotationを更新する。
-- `applyEasing(current, target)` — Easingを適用する。
-- `calcEasing(t)` — Easingを計算する。
-- `easeIn(t, exponent)`
-- `easeOut(t, exponent)`
-- `easeInOut(t, exponent)`
+- `name()` — ピクチャのファイル名を返す。
+- `origin()` — 原点タイプ（0:左上, 1:中央）を返す。
+- `x()` — X座標を返す。
+- `y()` — Y座標を返す。
+- `scaleX()` — X方向の拡大率（%）を返す。
+- `scaleY()` — Y方向の拡大率（%）を返す。
+- `opacity()` — 不透明度（0〜255）を返す。
+- `blendMode()` — ブレンドモードを返す。
+- `tone()` — 色調を返す。
+- `angle()` — 回転角度を返す。
+- `show(name, origin, x, y, scaleX, scaleY, opacity, blendMode)` — ピクチャを表示する。
+- `move(origin, x, y, scaleX, scaleY, opacity, blendMode, duration, easingType)` — ピクチャを移動する（指定フレーム数でイージング付き）。
+- `initBasic()` — 基本プロパティ（名前・座標・拡大率・不透明度・ブレンドモード）を初期化する。
+- `initTarget()` — 移動先のターゲット値とイージング設定を初期化する。
+- `initTone()` — 色調と色調変更の目標値を初期化する。
+- `initRotation()` — 回転角度と回転速度を初期化する。
+- `rotate(speed)` — 回転速度を設定する（毎フレーム speed/2 度ずつ回転）。
+- `tint(tone, duration)` — 色調変更を開始する（指定フレーム数で目標色調へ遷移）。
+- `update()` — 毎フレーム移動・色調・回転を更新する。
+- `updateMove()` — 移動アニメーション（座標・拡大率・不透明度）を更新する。
+- `updateTone()` — 色調変更アニメーションを更新する。
+- `updateRotation()` — 回転アニメーションを更新する。
+- `applyEasing(current, target)` — イージング関数を適用して現在値から目標値への補間を計算する。
+- `calcEasing(t)` — イージングタイプに応じた補間値を計算する。
+- `easeIn(t, exponent)` — Ease In（ゆっくり開始）の補間値を計算する。
+- `easeOut(t, exponent)` — Ease Out（ゆっくり終了）の補間値を計算する。
+- `easeInOut(t, exponent)` — Ease In Out（ゆっくり開始＆終了）の補間値を計算する。
 
 ### Game_Item
 
@@ -1378,18 +1380,18 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 
 #### インスタンスメソッド
 
-- `initialize(item)` — 初期化する。
-- `isSkill()` — Skillかどうかを確認する。
-- `isItem()` — Itemかどうかを確認する。
-- `isUsableItem()` — Usable Itemかどうかを確認する。
-- `isWeapon()` — Weaponかどうかを確認する。
-- `isArmor()` — Armorかどうかを確認する。
-- `isEquipItem()` — Equip Itemかどうかを確認する。
-- `isNull()` — Nullかどうかを確認する。
-- `itemId()` — itemのIDを返す。
-- `object()`
-- `setObject(item)` — Objectを設定する。
-- `setEquip(isWeapon, itemId)` — Equipを設定する。
+- `initialize(item)` — 初期化する。itemが指定されていればそのアイテムをセットする。
+- `isSkill()` — スキルかどうかを確認する。
+- `isItem()` — 通常アイテムかどうかを確認する。
+- `isUsableItem()` — 使用可能なアイテム（スキルまたは通常アイテム）かを確認する。
+- `isWeapon()` — 武器かどうかを確認する。
+- `isArmor()` — 防具かどうかを確認する。
+- `isEquipItem()` — 装備品（武器または防具）かを確認する。
+- `isNull()` — 未設定（空）かどうかを確認する。
+- `itemId()` — アイテムIDを返す。
+- `object()` — 対応するデータベースオブジェクト（$dataSkills等）を返す。未設定ならnull。
+- `setObject(item)` — データベースオブジェクトからデータクラスとIDをセットする。
+- `setEquip(isWeapon, itemId)` — 装備品として設定する（武器/防具とIDを直接指定）。
 
 ### Game_Action ⭐
 
@@ -1420,112 +1422,112 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 
 #### インスタンスメソッド
 
-- `initialize(subject, forcing)` — 初期化する。
-- `clear()` — クリアする。
-- `setSubject(subject)` — Subjectを設定する。
-- `subject()`
-- `friendsUnit()`
-- `opponentsUnit()`
-- `setEnemyAction(action)` — Enemy Actionを設定する。
-- `setAttack()` — Attackを設定する。
-- `setGuard()` — Guardを設定する。
-- `setSkill(skillId)` — Skillを設定する。
-- `setItem(itemId)` — Itemを設定する。
-- `setItemObject(object)` — Item Objectを設定する。
-- `setTarget(targetIndex)` — Targetを設定する。
-- `item()` — 現在選択中の項目を返す。
-- `isSkill()` — Skillかどうかを確認する。
-- `isItem()` — Itemかどうかを確認する。
-- `numRepeats()`
-- `checkItemScope(list)` — Item Scopeをチェックする。
-- `isForOpponent()` — For Opponentかどうかを確認する。
-- `isForFriend()` — For Friendかどうかを確認する。
-- `isForEveryone()` — For Everyoneかどうかを確認する。
-- `isForAliveFriend()` — For Alive Friendかどうかを確認する。
-- `isForDeadFriend()` — For Dead Friendかどうかを確認する。
-- `isForUser()` — For Userかどうかを確認する。
-- `isForOne()` — For Oneかどうかを確認する。
-- `isForRandom()` — For Randomかどうかを確認する。
-- `isForAll()` — For Allかどうかを確認する。
-- `needsSelection()` — Selectionが必要かを確認する。
-- `numTargets()`
-- `checkDamageType(list)` — Damage Typeをチェックする。
-- `isHpEffect()` — Hp Effectかどうかを確認する。
-- `isMpEffect()` — Mp Effectかどうかを確認する。
-- `isDamage()` — Damageかどうかを確認する。
-- `isRecover()` — Recoverかどうかを確認する。
-- `isDrain()` — Drainかどうかを確認する。
-- `isHpRecover()` — Hp Recoverかどうかを確認する。
-- `isMpRecover()` — Mp Recoverかどうかを確認する。
-- `isCertainHit()` — Certain Hitかどうかを確認する。
-- `isPhysical()` — Physicalかどうかを確認する。
-- `isMagical()` — Magicalかどうかを確認する。
-- `isAttack()` — Attackかどうかを確認する。
-- `isGuard()` — Guardかどうかを確認する。
-- `isMagicSkill()` — Magic Skillかどうかを確認する。
-- `decideRandomTarget()`
-- `setConfusion()` — Confusionを設定する。
-- `prepare()`
-- `isValid()` — Validかどうかを確認する。
-- `speed()`
-- `makeTargets()` — Targetsを作成する。
-- `repeatTargets(targets)`
-- `confusionTarget()`
-- `targetsForEveryone()`
-- `targetsForOpponents()`
-- `targetsForFriends()`
-- `randomTargets(unit)`
-- `targetsForDead(unit)`
-- `targetsForAlive(unit)`
-- `targetsForDeadAndAlive(unit)`
-- `evaluate()`
-- `itemTargetCandidates()`
-- `evaluateWithTarget(target)`
-- `testApply(target)`
-- `testLifeAndDeath(target)`
-- `hasItemAnyValidEffects(target)` — Item Any Valid Effectsを持っているかを確認する。
-- `testItemEffect(target, effect)`
-- `itemCnt(target)`
-- `itemMrf(target)`
-- `itemHit(/*target*/)`
-- `itemEva(target)`
-- `itemCri(target)`
-- `apply(target)`
-- `makeDamageValue(target, critical)` — Damage Valueを作成する。
-- `evalDamageFormula(target)` — Damage Formulaを評価する。
-- `calcElementRate(target)` — Element Rateを計算する。
-- `elementsMaxRate(target, elements)` — elements Maxの倍率を返す。
-- `applyCritical(damage)` — Criticalを適用する。
-- `applyVariance(damage, variance)` — Varianceを適用する。
-- `applyGuard(damage, target)` — Guardを適用する。
-- `executeDamage(target, value)` — Damageを実行する。
-- `executeHpDamage(target, value)` — Hp Damageを実行する。
-- `executeMpDamage(target, value)` — Mp Damageを実行する。
-- `gainDrainedHp(value)` — Drained Hpを獲得する。
-- `gainDrainedMp(value)` — Drained Mpを獲得する。
-- `applyItemEffect(target, effect)` — Item Effectを適用する。
-- `itemEffectRecoverHp(target, effect)`
-- `itemEffectRecoverMp(target, effect)`
-- `itemEffectGainTp(target, effect)`
-- `itemEffectAddState(target, effect)`
-- `itemEffectAddAttackState(target, effect)`
-- `itemEffectAddNormalState(target, effect)`
-- `itemEffectRemoveState(target, effect)`
-- `itemEffectAddBuff(target, effect)`
-- `itemEffectAddDebuff(target, effect)`
-- `itemEffectRemoveBuff(target, effect)`
-- `itemEffectRemoveDebuff(target, effect)`
-- `itemEffectSpecial(target, effect)`
-- `itemEffectGrow(target, effect)`
-- `itemEffectLearnSkill(target, effect)`
-- `itemEffectCommonEvent(/*target, effect*/)`
-- `makeSuccess(target)` — Successを作成する。
-- `applyItemUserEffect(/*target*/)` — Item User Effectを適用する。
-- `lukEffectRate(target)` — luk Effectの倍率を返す。
-- `applyGlobal()` — Globalを適用する。
-- `updateLastUsed()` — Last Usedを更新する。
-- `updateLastSubject()` — Last Subjectを更新する。
-- `updateLastTarget(target)` — Last Targetを更新する。
+- `initialize(subject, forcing)` — 初期化する。subjectは行動主体のバトラー、forcingは強制アクションか。
+- `clear()` — アクション内容をクリアする。
+- `setSubject(subject)` — 行動主体のバトラーを設定する。
+- `subject()` — 行動主体のバトラーを返す。
+- `friendsUnit()` — 行動主体の味方ユニットを返す。
+- `opponentsUnit()` — 行動主体の敵側ユニットを返す。
+- `setEnemyAction(action)` — 敵の行動パターンからアクションを設定する。
+- `setAttack()` — 通常攻撃をアクションとして設定する。
+- `setGuard()` — 防御をアクションとして設定する。
+- `setSkill(skillId)` — 指定スキルIDをアクションとして設定する。
+- `setItem(itemId)` — 指定アイテムIDをアクションとして設定する。
+- `setItemObject(object)` — データベースオブジェクトからアクションを設定する。
+- `setTarget(targetIndex)` — 対象インデックスを設定する。
+- `item()` — アクションに対応するスキルまたはアイテムのデータベースオブジェクトを返す。
+- `isSkill()` — スキルアクションかを確認する。
+- `isItem()` — アイテムアクションかを確認する。
+- `numRepeats()` — アクションの繰り返し回数を返す。
+- `checkItemScope(list)` — アイテムの範囲が指定リストに含まれるかを確認する。
+- `isForOpponent()` — 敵側対象のアクションかを確認する。
+- `isForFriend()` — 味方対象のアクションかを確認する。
+- `isForEveryone()` — 敵味方全体対象かを確認する。
+- `isForAliveFriend()` — 生存味方対象かを確認する。
+- `isForDeadFriend()` — 戦闘不能味方対象かを確認する。
+- `isForUser()` — 使用者自身対象かを確認する。
+- `isForOne()` — 単体対象かを確認する。
+- `isForRandom()` — ランダム対象かを確認する。
+- `isForAll()` — 全体対象かを確認する。
+- `needsSelection()` — 対象選択が必要かを確認する。
+- `numTargets()` — ランダム対象の人数を返す。
+- `checkDamageType(list)` — ダメージタイプが指定リストに含まれるかを確認する。
+- `isHpEffect()` — HPに影響するアクションかを確認する。
+- `isMpEffect()` — MPに影響するアクションかを確認する。
+- `isDamage()` — ダメージアクションかを確認する。
+- `isRecover()` — 回復アクションかを確認する。
+- `isDrain()` — 吸収アクションかを確認する。
+- `isHpRecover()` — HP回復アクションかを確認する。
+- `isMpRecover()` — MP回復アクションかを確認する。
+- `isCertainHit()` — 必中アクションかを確認する。
+- `isPhysical()` — 物理アクションかを確認する。
+- `isMagical()` — 魔法アクションかを確認する。
+- `isAttack()` — 通常攻撃かを確認する。
+- `isGuard()` — 防御かを確認する。
+- `isMagicSkill()` — 魔法スキルかを確認する。
+- `decideRandomTarget()` — ランダムに対象を決定する。
+- `setConfusion()` — 混乱時のアクションを設定する。
+- `prepare()` — アクション実行前の準備を行う（混乱時の対象変更等）。
+- `isValid()` — アクションが有効かを確認する。
+- `speed()` — アクションの速度を返す（行動順序に使用）。
+- `makeTargets()` — アクションの対象リストを作成する。
+- `repeatTargets(targets)` — 繰り返し回数分ターゲットを複製する。
+- `confusionTarget()` — 混乱状態での対象を返す。
+- `targetsForEveryone()` — 全体対象（敵+味方）の配列を返す。
+- `targetsForOpponents()` — 敵側対象の配列を返す。
+- `targetsForFriends()` — 味方対象の配列を返す。
+- `randomTargets(unit)` — ユニットからランダムに対象を選ぶ。
+- `targetsForDead(unit)` — ユニットの戦闘不能メンバーを対象として返す。
+- `targetsForAlive(unit)` — ユニットの生存メンバーを対象として返す。
+- `targetsForDeadAndAlive(unit)` — ユニットの全メンバー（生死問わず）を返す。
+- `evaluate()` — アクションの有効度を評価する（AI用）。
+- `itemTargetCandidates()` — アイテムの対象候補一覧を返す。
+- `evaluateWithTarget(target)` — 特定の対象に対するアクションの有効度を評価する。
+- `testApply(target)` — 対象にアクションが適用可能かをテストする。
+- `testLifeAndDeath(target)` — 対象の生死状態がアクションの範囲と合致するかを確認する。
+- `hasItemAnyValidEffects(target)` — 対象に有効な効果が1つでもあるかを確認する。
+- `testItemEffect(target, effect)` — 個別の効果が対象に有効かをテストする。
+- `itemCnt(target)` — 対象の反撃率を返す。
+- `itemMrf(target)` — 対象の魔法反射率を返す。
+- `itemHit(/*target*/)` — アクションの命中率を返す。
+- `itemEva(target)` — 対象の回避率を返す。
+- `itemCri(target)` — クリティカル率を返す。
+- `apply(target)` — 対象にアクションを適用する（命中判定・ダメージ計算・効果適用）。
+- `makeDamageValue(target, critical)` — ダメージ値を計算する（属性・分散・防御・クリティカル反映）。
+- `evalDamageFormula(target)` — ダメージ計算式を評価する（データベースの式をevalで実行）。
+- `calcElementRate(target)` — 属性有効度を計算する。
+- `elementsMaxRate(target, elements)` — 複数属性の最大有効度を返す。
+- `applyCritical(damage)` — クリティカル倍率（×3）を適用する。
+- `applyVariance(damage, variance)` — ダメージに分散（ランダム変動）を適用する。
+- `applyGuard(damage, target)` — 防御によるダメージ軽減を適用する。
+- `executeDamage(target, value)` — ダメージを実行する（HPまたはMPに応じて振り分け）。
+- `executeHpDamage(target, value)` — HPダメージを実行する。
+- `executeMpDamage(target, value)` — MPダメージを実行する。
+- `gainDrainedHp(value)` — 吸収したHPを行動主体が獲得する。
+- `gainDrainedMp(value)` — 吸収したMPを行動主体が獲得する。
+- `applyItemEffect(target, effect)` — アイテムの個別効果を対象に適用する。
+- `itemEffectRecoverHp(target, effect)` — HP回復効果を適用する。
+- `itemEffectRecoverMp(target, effect)` — MP回復効果を適用する。
+- `itemEffectGainTp(target, effect)` — TP獲得効果を適用する。
+- `itemEffectAddState(target, effect)` — ステート付与効果を適用する。
+- `itemEffectAddAttackState(target, effect)` — 通常攻撃時のステート付与効果を適用する。
+- `itemEffectAddNormalState(target, effect)` — 指定ステートの付与効果を適用する。
+- `itemEffectRemoveState(target, effect)` — ステート解除効果を適用する。
+- `itemEffectAddBuff(target, effect)` — バフ付与効果を適用する。
+- `itemEffectAddDebuff(target, effect)` — デバフ付与効果を適用する。
+- `itemEffectRemoveBuff(target, effect)` — バフ解除効果を適用する。
+- `itemEffectRemoveDebuff(target, effect)` — デバフ解除効果を適用する。
+- `itemEffectSpecial(target, effect)` — 特殊効果（逃走等）を適用する。
+- `itemEffectGrow(target, effect)` — 成長効果（永続パラメータ上昇）を適用する。
+- `itemEffectLearnSkill(target, effect)` — スキル習得効果を適用する。
+- `itemEffectCommonEvent(/*target, effect*/)` — コモンイベント呼び出し効果を適用する。
+- `makeSuccess(target)` — 対象のアクション結果を成功に設定する。
+- `applyItemUserEffect(/*target*/)` — アイテム使用者へのTP獲得効果を適用する。
+- `lukEffectRate(target)` — 運による効果補正率を返す。
+- `applyGlobal()` — グローバル効果（コモンイベント予約等）を適用する。
+- `updateLastUsed()` — 最後に使用したスキル/アイテムのIDを記録する。
+- `updateLastSubject()` — 最後の行動主体情報を記録する。
+- `updateLastTarget(target)` — 最後の対象情報を記録する。
 
 ### Game_ActionResult
 
@@ -1537,21 +1539,21 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 #### インスタンスメソッド
 
 - `initialize()` — 初期化する。
-- `clear()` — クリアする。
-- `addedStateObjects()`
-- `removedStateObjects()`
-- `isStatusAffected()` — Status Affectedかどうかを確認する。
-- `isHit()` — Hitかどうかを確認する。
-- `isStateAdded(stateId)` — State Addedかどうかを確認する。
-- `pushAddedState(stateId)`
-- `isStateRemoved(stateId)` — State Removedかどうかを確認する。
-- `pushRemovedState(stateId)`
-- `isBuffAdded(paramId)` — Buff Addedかどうかを確認する。
-- `pushAddedBuff(paramId)`
-- `isDebuffAdded(paramId)` — Debuff Addedかどうかを確認する。
-- `pushAddedDebuff(paramId)`
-- `isBuffRemoved(paramId)` — Buff Removedかどうかを確認する。
-- `pushRemovedBuff(paramId)`
+- `clear()` — アクション結果をクリアする。
+- `addedStateObjects()` — 付与されたステートのデータベースオブジェクトの配列を返す。
+- `removedStateObjects()` — 解除されたステートのデータベースオブジェクトの配列を返す。
+- `isStatusAffected()` — ステート・バフ・デバフに変化があったかを確認する。
+- `isHit()` — アクションが命中したかを確認する。
+- `isStateAdded(stateId)` — 指定ステートが付与されたかを確認する。
+- `pushAddedState(stateId)` — 付与ステートリストに追加する。
+- `isStateRemoved(stateId)` — 指定ステートが解除されたかを確認する。
+- `pushRemovedState(stateId)` — 解除ステートリストに追加する。
+- `isBuffAdded(paramId)` — 指定パラメータのバフが付与されたかを確認する。
+- `pushAddedBuff(paramId)` — 付与バフリストに追加する。
+- `isDebuffAdded(paramId)` — 指定パラメータのデバフが付与されたかを確認する。
+- `pushAddedDebuff(paramId)` — 付与デバフリストに追加する。
+- `isBuffRemoved(paramId)` — 指定パラメータのバフが解除されたかを確認する。
+- `pushRemovedBuff(paramId)` — 解除バフリストに追加する。`
 
 ### Game_BattlerBase ⭐
 
@@ -1597,131 +1599,131 @@ Game_Battlerのスーパークラス。主にパラメータ計算を行う。
 #### インスタンスメソッド
 
 - `initialize()` — 初期化する。
-- `initMembers()` — Membersを初期化する。
-- `clearParamPlus()` — Param Plusをクリアする。
-- `clearStates()` — Statesをクリアする。
-- `eraseState(stateId)` — Stateを消去する。
-- `isStateAffected(stateId)` — State Affectedかどうかを確認する。
-- `isDeathStateAffected()` — Death State Affectedかどうかを確認する。
-- `deathStateId()` — death StateのIDを返す。
-- `resetStateCounts(stateId)` — State Countsをリセットする。
-- `isStateExpired(stateId)` — State Expiredかどうかを確認する。
-- `updateStateTurns()` — State Turnsを更新する。
-- `clearBuffs()` — Buffsをクリアする。
-- `eraseBuff(paramId)` — Buffを消去する。
-- `buffLength()`
-- `buff(paramId)`
-- `isBuffAffected(paramId)` — Buff Affectedかどうかを確認する。
-- `isDebuffAffected(paramId)` — Debuff Affectedかどうかを確認する。
-- `isBuffOrDebuffAffected(paramId)` — Buff Or Debuff Affectedかどうかを確認する。
-- `isMaxBuffAffected(paramId)` — Max Buff Affectedかどうかを確認する。
-- `isMaxDebuffAffected(paramId)` — Max Debuff Affectedかどうかを確認する。
-- `increaseBuff(paramId)`
-- `decreaseBuff(paramId)`
-- `overwriteBuffTurns(paramId, turns)`
-- `isBuffExpired(paramId)` — Buff Expiredかどうかを確認する。
-- `updateBuffTurns()` — Buff Turnsを更新する。
-- `die()`
-- `revive()`
-- `states()`
-- `stateIcons()`
-- `buffIcons()`
-- `buffIconIndex(buffLevel, paramId)`
-- `allIcons()`
-- `traitObjects()`
-- `allTraits()`
-- `traits(code)`
-- `traitsWithId(code, id)` — traits WithのIDを返す。
-- `traitsPi(code, id)`
-- `traitsSum(code, id)`
-- `traitsSumAll(code)`
-- `traitsSet(code)`
-- `paramBase(/*paramId*/)`
-- `paramPlus(paramId)`
-- `paramBasePlus(paramId)`
-- `paramMin(paramId)`
-- `paramMax(/*paramId*/)`
-- `paramRate(paramId)` — paramの倍率を返す。
-- `paramBuffRate(paramId)` — param Buffの倍率を返す。
-- `param(paramId)` — 指定されたパラメータIDの値を返す。
-- `xparam(xparamId)` — 追加パラメータの値を返す。
-- `sparam(sparamId)` — 特殊パラメータの値を返す。
-- `elementRate(elementId)` — elementの倍率を返す。
-- `debuffRate(paramId)` — debuffの倍率を返す。
-- `stateRate(stateId)` — stateの倍率を返す。
-- `stateResistSet()`
-- `isStateResist(stateId)` — State Resistかどうかを確認する。
-- `attackElements()`
-- `attackStates()`
-- `attackStatesRate(stateId)` — attack Statesの倍率を返す。
-- `attackSpeed()`
-- `attackTimesAdd()`
-- `attackSkillId()` — attack SkillのIDを返す。
-- `addedSkillTypes()`
-- `isSkillTypeSealed(stypeId)` — Skill Type Sealedかどうかを確認する。
-- `addedSkills()`
-- `isSkillSealed(skillId)` — Skill Sealedかどうかを確認する。
-- `isEquipWtypeOk(wtypeId)` — Equip Wtype Okかどうかを確認する。
-- `isEquipAtypeOk(atypeId)` — Equip Atype Okかどうかを確認する。
-- `isEquipTypeLocked(etypeId)` — Equip Type Lockedかどうかを確認する。
-- `isEquipTypeSealed(etypeId)` — Equip Type Sealedかどうかを確認する。
-- `slotType()`
-- `isDualWield()` — Dual Wieldかどうかを確認する。
-- `actionPlusSet()`
-- `specialFlag(flagId)`
-- `collapseType()`
-- `partyAbility(abilityId)`
-- `isAutoBattle()` — Auto Battleかどうかを確認する。
-- `isGuard()` — Guardかどうかを確認する。
-- `isSubstitute()` — Substituteかどうかを確認する。
-- `isPreserveTp()` — Preserve Tpかどうかを確認する。
-- `addParam(paramId, value)` — Paramを追加する。
-- `setHp(hp)` — Hpを設定する。
-- `setMp(mp)` — Mpを設定する。
-- `setTp(tp)` — Tpを設定する。
-- `maxTp()`
-- `refresh()` — 再描画・更新する。
-- `recoverAll()`
-- `hpRate()` — hpの倍率を返す。
-- `mpRate()` — mpの倍率を返す。
-- `tpRate()` — tpの倍率を返す。
-- `hide()` — 非表示にする。
-- `appear()`
-- `isHidden()` — Hiddenかどうかを確認する。
-- `isAppeared()` — Appearedかどうかを確認する。
+- `initMembers()` — メンバー変数を初期化する。
+- `clearParamPlus()` — パラメータ加算値をクリアする。
+- `clearStates()` — 全ステートをクリアする。
+- `eraseState(stateId)` — 指定ステートを解除する。
+- `isStateAffected(stateId)` — 指定ステートが付与されているかを確認する。
+- `isDeathStateAffected()` — 戦闘不能ステートが付与されているかを確認する。
+- `deathStateId()` — 戦闘不能ステートのIDを返す（デフォルト: 1）。
+- `resetStateCounts(stateId)` — ステートの残りターン数をリセットする。
+- `isStateExpired(stateId)` — ステートの有効期限が切れたかを確認する。
+- `updateStateTurns()` — 全ステートの残りターン数を1減少させる。
+- `clearBuffs()` — 全バフ・デバフをクリアする。
+- `eraseBuff(paramId)` — 指定パラメータのバフ・デバフを消去する。
+- `buffLength()` — バフ配列の長さ（パラメータ数: 8）を返す。
+- `buff(paramId)` — 指定パラメータのバフレベルを返す（正=バフ、負=デバフ）。
+- `isBuffAffected(paramId)` — 指定パラメータにバフが付与されているかを確認する。
+- `isDebuffAffected(paramId)` — 指定パラメータにデバフが付与されているかを確認する。
+- `isBuffOrDebuffAffected(paramId)` — 指定パラメータにバフまたはデバフが付与されているかを確認する。
+- `isMaxBuffAffected(paramId)` — バフが最大段階（2段階）かを確認する。
+- `isMaxDebuffAffected(paramId)` — デバフが最大段階（-2段階）かを確認する。
+- `increaseBuff(paramId)` — 指定パラメータのバフレベルを1段階上げる。
+- `decreaseBuff(paramId)` — 指定パラメータのバフレベルを1段階下げる。
+- `overwriteBuffTurns(paramId, turns)` — バフの残りターン数を上書きする（現在値より大きい場合のみ）。
+- `isBuffExpired(paramId)` — バフの有効期限が切れたかを確認する。
+- `updateBuffTurns()` — 全バフの残りターン数を1減少させる。
+- `die()` — 戦闘不能にする（HP=0、ステート・バフクリア）。
+- `revive()` — 戦闘不能から復活する（HP=1以上に）。
+- `states()` — 付与されているステートのデータベースオブジェクトの配列を返す。
+- `stateIcons()` — 付与されているステートのアイコンID配列を返す。
+- `buffIcons()` — バフ・デバフのアイコンID配列を返す。
+- `buffIconIndex(buffLevel, paramId)` — バフレベルとパラメータIDからアイコンインデックスを返す。
+- `allIcons()` — ステート+バフの全アイコンID配列を返す。
+- `traitObjects()` — 特徴を持つオブジェクト（ステート等）の配列を返す。サブクラスでオーバーライド。
+- `allTraits()` — 全特徴の配列を返す。
+- `traits(code)` — 指定コードの特徴の配列を返す。
+- `traitsWithId(code, id)` — 指定コード・IDの特徴の配列を返す。
+- `traitsPi(code, id)` — 指定特徴の値を乗算で合成して返す。
+- `traitsSum(code, id)` — 指定特徴の値を加算で合成して返す。
+- `traitsSumAll(code)` — 指定コードの全特徴の値を合計して返す。
+- `traitsSet(code)` — 指定コードの特徴のdataIdのセットを返す。
+- `paramBase(/*paramId*/)` — パラメータの基本値を返す。サブクラスでオーバーライド。
+- `paramPlus(paramId)` — パラメータの加算値（装備・成長等）を返す。
+- `paramBasePlus(paramId)` — パラメータの基本値+加算値を返す（最小値制限付き）。
+- `paramMin(paramId)` — パラメータの最小値を返す。
+- `paramMax(/*paramId*/)` — パラメータの最大値を返す。
+- `paramRate(paramId)` — パラメータの特徴による倍率を返す。
+- `paramBuffRate(paramId)` — バフによるパラメータ倍率を返す（1段階あたり25%）。
+- `param(paramId)` — 最終的なパラメータ値を返す（基本+加算×倍率×バフ倍率）。
+- `xparam(xparamId)` — 追加パラメータ（命中率・回避率等）の値を返す。
+- `sparam(sparamId)` — 特殊パラメータ（狙われ率・防御効果率等）の値を返す。
+- `elementRate(elementId)` — 属性有効度を返す。
+- `debuffRate(paramId)` — デバフ有効度を返す。
+- `stateRate(stateId)` — ステート有効度を返す。
+- `stateResistSet()` — ステート無効化のセットを返す。
+- `isStateResist(stateId)` — 指定ステートを無効化するかを確認する。
+- `attackElements()` — 通常攻撃の属性ID配列を返す。
+- `attackStates()` — 通常攻撃時に付与するステートID配列を返す。
+- `attackStatesRate(stateId)` — 通常攻撃時のステート付与率を返す。
+- `attackSpeed()` — 通常攻撃の速度補正を返す。
+- `attackTimesAdd()` — 通常攻撃の追加回数を返す。
+- `attackSkillId()` — 通常攻撃に使用するスキルIDを返す。
+- `addedSkillTypes()` — 追加されたスキルタイプID配列を返す。
+- `isSkillTypeSealed(stypeId)` — 指定スキルタイプが封印されているかを確認する。
+- `addedSkills()` — 特徴で追加されたスキルID配列を返す。
+- `isSkillSealed(skillId)` — 指定スキルが封印されているかを確認する。
+- `isEquipWtypeOk(wtypeId)` — 指定武器タイプを装備可能かを確認する。
+- `isEquipAtypeOk(atypeId)` — 指定防具タイプを装備可能かを確認する。
+- `isEquipTypeLocked(etypeId)` — 指定装備タイプがロックされているかを確認する。
+- `isEquipTypeSealed(etypeId)` — 指定装備タイプが封印されているかを確認する。
+- `slotType()` — スロットタイプ（0:通常, 1:二刀流）を返す。
+- `isDualWield()` — 二刀流かを確認する。
+- `actionPlusSet()` — 行動回数追加の確率配列を返す。
+- `specialFlag(flagId)` — 指定特殊フラグが有効かを返す。
+- `collapseType()` — 消滅エフェクトのタイプを返す。
+- `partyAbility(abilityId)` — パーティアビリティが有効かを返す。
+- `isAutoBattle()` — 自動戦闘かを確認する。
+- `isGuard()` — 防御状態かを確認する。
+- `isSubstitute()` — 身代わり状態かを確認する。
+- `isPreserveTp()` — TP持ち越しが有効かを確認する。
+- `addParam(paramId, value)` — パラメータ加算値に値を追加する。
+- `setHp(hp)` — HPを設定する（0〜最大HPにクランプ）。
+- `setMp(mp)` — MPを設定する（0〜最大MPにクランプ）。
+- `setTp(tp)` — TPを設定する（0〜最大TPにクランプ）。
+- `maxTp()` — 最大TPを返す（デフォルト: 100）。
+- `refresh()` — ステート・HP・MPの状態を再計算する。
+- `recoverAll()` — HP・MPを全回復し、全ステートを解除する。
+- `hpRate()` — HP割合（現在HP/最大HP）を返す。
+- `mpRate()` — MP割合（現在MP/最大MP）を返す。
+- `tpRate()` — TP割合（現在TP/最大TP）を返す。
+- `hide()` — バトラーを非表示にする。
+- `appear()` — バトラーを表示する。
+- `isHidden()` — 非表示状態かを確認する。
+- `isAppeared()` — 表示状態かを確認する。
 - `isDead()` — 戦闘不能かを確認する。
 - `isAlive()` — 生存しているかを確認する。
-- `isDying()` — 瀕死かを確認する。
-- `isRestricted()` — Restrictedかどうかを確認する。
-- `canInput()` — 入力可能かを確認する。
-- `canMove()` — 行動可能かを確認する。
-- `isConfused()` — Confusedかどうかを確認する。
-- `confusionLevel()`
+- `isDying()` — 瀕死（HP25%以下）かを確認する。
+- `isRestricted()` — 行動制約（混乱等）があるかを確認する。
+- `canInput()` — コマンド入力可能かを確認する。
+- `canMove()` — 行動可能（移動・攻撃等）かを確認する。
+- `isConfused()` — 混乱状態かを確認する。
+- `confusionLevel()` — 混乱レベルを返す（行動制約の種類に応じて1〜3）。
 - `isActor()` — アクターかを確認する。
 - `isEnemy()` — 敵かを確認する。
-- `sortStates()`
-- `restriction()`
-- `addNewState(stateId)` — New Stateを追加する。
-- `onRestrict()` — Restrict時のコールバック。
-- `mostImportantStateText()` — most Important Stateテキストを返す。
-- `stateMotionIndex()`
-- `stateOverlayIndex()`
-- `isSkillWtypeOk(/*skill*/)` — Skill Wtype Okかどうかを確認する。
-- `skillMpCost(skill)`
-- `skillTpCost(skill)`
-- `canPaySkillCost(skill)` — Pay Skill Costが可能かを確認する。
-- `paySkillCost(skill)`
-- `isOccasionOk(item)` — Occasion Okかどうかを確認する。
-- `meetsUsableItemConditions(item)`
-- `meetsSkillConditions(skill)`
-- `meetsItemConditions(item)`
-- `canUse(item)` — Useが可能かを確認する。
-- `canEquip(item)` — Equipが可能かを確認する。
-- `canEquipWeapon(item)` — Equip Weaponが可能かを確認する。
-- `canEquipArmor(item)` — Equip Armorが可能かを確認する。
-- `guardSkillId()` — guard SkillのIDを返す。
-- `canAttack()` — Attackが可能かを確認する。
-- `canGuard()` — Guardが可能かを確認する。
+- `sortStates()` — ステートを優先度順にソートする。
+- `restriction()` — 最も優先度の高い行動制約値を返す。
+- `addNewState(stateId)` — 新しいステートを付与する。戦闘不能ステートなら死亡処理。
+- `onRestrict()` — 行動制約が発生した時のコールバック。
+- `mostImportantStateText()` — 最も優先度の高いステートのメッセージを返す。
+- `stateMotionIndex()` — ステートに対応するモーションインデックスを返す。
+- `stateOverlayIndex()` — ステートに対応するオーバーレイインデックスを返す。
+- `isSkillWtypeOk(/*skill*/)` — スキルに必要な武器タイプを装備しているかを確認する。
+- `skillMpCost(skill)` — スキルのMP消費量を計算する。
+- `skillTpCost(skill)` — スキルのTP消費量を計算する。
+- `canPaySkillCost(skill)` — スキルのコストを支払えるかを確認する。
+- `paySkillCost(skill)` — スキルのMP・TPコストを支払う。
+- `isOccasionOk(item)` — アイテムが現在の状況で使用可能かを確認する。
+- `meetsUsableItemConditions(item)` — アイテム使用条件を満たすかを確認する。
+- `meetsSkillConditions(skill)` — スキル使用条件を満たすかを確認する。
+- `meetsItemConditions(item)` — アイテム使用条件を満たすかを確認する。
+- `canUse(item)` — アイテムまたはスキルを使用可能かを確認する。
+- `canEquip(item)` — 装備可能かを確認する。
+- `canEquipWeapon(item)` — 武器を装備可能かを確認する。
+- `canEquipArmor(item)` — 防具を装備可能かを確認する。
+- `guardSkillId()` — 防御に使用するスキルIDを返す（デフォルト: 2）。
+- `canAttack()` — 通常攻撃可能かを確認する。
+- `canGuard()` — 防御可能かを確認する。
 
 ### Game_Battler ⭐
 
