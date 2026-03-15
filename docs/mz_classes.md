@@ -2235,115 +2235,115 @@ Game_PartyとGame_Troopのスーパークラス。
 #### インスタンスメソッド
 
 - `initialize()` — 初期化する。
-- `setup(mapId)` — セットアップする。
-- `isEventRunning()` — Event Runningかどうかを確認する。
-- `tileWidth()` — tileの幅を返す。
-- `tileHeight()` — tileの高さを返す。
-- `bushDepth()`
-- `mapId()` — mapのIDを返す。
-- `tilesetId()` — tilesetのIDを返す。
-- `displayX()` — Xを表示する。
-- `displayY()` — Yを表示する。
-- `parallaxName()` — parallaxの名前を返す。
-- `battleback1Name()` — battleback1の名前を返す。
-- `battleback2Name()` — battleback2の名前を返す。
-- `requestRefresh()` — Refreshを要求する。
-- `isNameDisplayEnabled()` — Name Display Enabledかどうかを確認する。
-- `disableNameDisplay()` — Name Displayを無効にする。
-- `enableNameDisplay()` — Name Displayを有効にする。
-- `createVehicles()` — Vehiclesを作成する。
-- `refereshVehicles()`
-- `vehicles()`
-- `vehicle(type)`
-- `boat()`
-- `ship()`
-- `airship()`
-- `setupEvents()` — Eventsをセットアップする。
-- `events()`
-- `event(eventId)`
-- `eraseEvent(eventId)` — Eventを消去する。
-- `autorunCommonEvents()`
-- `parallelCommonEvents()`
-- `setupScroll()` — Scrollをセットアップする。
-- `setupParallax()` — Parallaxをセットアップする。
-- `setupBattleback()` — Battlebackをセットアップする。
-- `setDisplayPos(x, y)` — Display Posを設定する。
-- `parallaxOx()`
-- `parallaxOy()`
-- `tileset()`
-- `tilesetFlags()`
-- `displayName()` — Nameを表示する。
-- `width()`
-- `height()`
-- `data()`
-- `isLoopHorizontal()` — Loop Horizontalかどうかを確認する。
-- `isLoopVertical()` — Loop Verticalかどうかを確認する。
-- `isDashDisabled()` — Dash Disabledかどうかを確認する。
-- `encounterList()`
-- `encounterStep()`
-- `isOverworld()` — Overworldかどうかを確認する。
-- `screenTileX()`
-- `screenTileY()`
-- `adjustX(x)`
-- `adjustY(y)`
-- `roundX(x)`
-- `roundY(y)`
-- `xWithDirection(x, d)`
-- `yWithDirection(y, d)`
-- `roundXWithDirection(x, d)`
-- `roundYWithDirection(y, d)`
-- `deltaX(x1, x2)`
-- `deltaY(y1, y2)`
-- `distance(x1, y1, x2, y2)`
-- `canvasToMapX(x)`
-- `canvasToMapY(y)`
-- `autoplay()`
-- `refreshIfNeeded()` — If Neededを再描画する。
-- `refresh()` — 再描画・更新する。
-- `refreshTileEvents()` — Tile Eventsを再描画する。
-- `eventsXy(x, y)`
-- `eventsXyNt(x, y)`
-- `tileEventsXy(x, y)`
-- `eventIdXy(x, y)`
+- `setup(mapId)` — マップIDでセットアップする。
+- `isEventRunning()` — イベントが実行中かを確認する。
+- `tileWidth()` — タイルの幅（ピクセル）を返す。
+- `tileHeight()` — タイルの高さ（ピクセル）を返す。
+- `bushDepth()` — 茂みの深さ（ピクセル）を返す。
+- `mapId()` — マップIDを返す。
+- `tilesetId()` — タイルセットIDを返す。
+- `displayX()` — 画面表示のX座標（タイル単位）を返す。
+- `displayY()` — 画面表示のY座標（タイル単位）を返す。
+- `parallaxName()` — 遠景画像のファイル名を返す。
+- `battleback1Name()` — 戦闘背景1のファイル名を返す。
+- `battleback2Name()` — 戦闘背景2のファイル名を返す。
+- `requestRefresh()` — マップのリフレッシュを要求する。
+- `isNameDisplayEnabled()` — マップ名表示が有効かを確認する。
+- `disableNameDisplay()` — マップ名表示を無効にする。
+- `enableNameDisplay()` — マップ名表示を有効にする。
+- `createVehicles()` — 乗り物オブジェクトを作成する。
+- `refereshVehicles()` — 乗り物をリフレッシュする。
+- `vehicles()` — 乗り物の配列を返す。
+- `vehicle(type)` — 指定タイプの乗り物を返す。
+- `boat()` — 小型船を返す。
+- `ship()` — 大型船を返す。
+- `airship()` — 飛行船を返す。
+- `setupEvents()` — マップイベントをセットアップする。
+- `events()` — 全イベントの配列を返す。
+- `event(eventId)` — 指定IDのイベントを返す。
+- `eraseEvent(eventId)` — 指定IDのイベントを一時消去する。
+- `autorunCommonEvents()` — 自動実行コモンイベントの配列を返す。
+- `parallelCommonEvents()` — 並列処理コモンイベントの配列を返す。
+- `setupScroll()` — スクロール状態を初期化する。
+- `setupParallax()` — 遠景をセットアップする。
+- `setupBattleback()` — 戦闘背景をセットアップする。
+- `setDisplayPos(x, y)` — 画面表示位置を設定する。
+- `parallaxOx()` — 遠景のX方向オフセットを返す。
+- `parallaxOy()` — 遠景のY方向オフセットを返す。
+- `tileset()` — タイルセットデータを返す。
+- `tilesetFlags()` — タイルセットのフラグ配列を返す。
+- `displayName()` — マップの表示名を返す。
+- `width()` — マップの幅（タイル数）を返す。
+- `height()` — マップの高さ（タイル数）を返す。
+- `data()` — マップのタイルデータ配列を返す。
+- `isLoopHorizontal()` — 横方向ループマップかを確認する。
+- `isLoopVertical()` — 縦方向ループマップかを確認する。
+- `isDashDisabled()` — ダッシュが無効かを確認する。
+- `encounterList()` — エンカウントリストを返す。
+- `encounterStep()` — エンカウント歩数を返す。
+- `isOverworld()` — フィールドマップかを確認する。
+- `screenTileX()` — 画面に表示されるタイル数（横）を返す。
+- `screenTileY()` — 画面に表示されるタイル数（縦）を返す。
+- `adjustX(x)` — ループ考慮でX座標を調整する。
+- `adjustY(y)` — ループ考慮でY座標を調整する。
+- `roundX(x)` — ループ考慮でX座標を丸める。
+- `roundY(y)` — ループ考慮でY座標を丸める。
+- `xWithDirection(x, d)` — 指定方向に1タイル移動したX座標を返す。
+- `yWithDirection(y, d)` — 指定方向に1タイル移動したY座標を返す。
+- `roundXWithDirection(x, d)` — ループ考慮で方向移動後のX座標を返す。
+- `roundYWithDirection(y, d)` — ループ考慮で方向移動後のY座標を返す。
+- `deltaX(x1, x2)` — ループ考慮で2地点間のX差分を返す。
+- `deltaY(y1, y2)` — ループ考慮で2地点間のY差分を返す。
+- `distance(x1, y1, x2, y2)` — 2地点間の距離を返す。
+- `canvasToMapX(x)` — 画面座標をマップX座標に変換する。
+- `canvasToMapY(y)` — 画面座標をマップY座標に変換する。
+- `autoplay()` — マップのBGM・BGSを自動再生する。
+- `refreshIfNeeded()` — リフレッシュが必要なら実行する。
+- `refresh()` — マップの全イベント・乗り物をリフレッシュする。
+- `refreshTileEvents()` — タイルイベントをリフレッシュする。
+- `eventsXy(x, y)` — 指定座標のイベント配列を返す。
+- `eventsXyNt(x, y)` — 指定座標のすり抜けでないイベント配列を返す。
+- `tileEventsXy(x, y)` — 指定座標のタイルイベント配列を返す。
+- `eventIdXy(x, y)` — 指定座標のイベントIDを返す。
 - `scrollDown(distance)` — 下にスクロールする。
-- `scrollLeft(distance)`
-- `scrollRight(distance)`
+- `scrollLeft(distance)` — 左にスクロールする。
+- `scrollRight(distance)` — 右にスクロールする。
 - `scrollUp(distance)` — 上にスクロールする。
-- `isValid(x, y)` — Validかどうかを確認する。
-- `checkPassage(x, y, bit)` — Passageをチェックする。
-- `tileId(x, y, z)` — tileのIDを返す。
-- `layeredTiles(x, y)`
-- `allTiles(x, y)`
-- `autotileType(x, y, z)`
-- `isPassable(x, y, d)` — Passableかどうかを確認する。
-- `isBoatPassable(x, y)` — Boat Passableかどうかを確認する。
-- `isShipPassable(x, y)` — Ship Passableかどうかを確認する。
-- `isAirshipLandOk(x, y)` — Airship Land Okかどうかを確認する。
-- `checkLayeredTilesFlags(x, y, bit)` — Layered Tiles Flagsをチェックする。
-- `isLadder(x, y)` — Ladderかどうかを確認する。
-- `isBush(x, y)` — Bushかどうかを確認する。
-- `isCounter(x, y)` — Counterかどうかを確認する。
-- `isDamageFloor(x, y)` — Damage Floorかどうかを確認する。
-- `terrainTag(x, y)`
-- `regionId(x, y)` — regionのIDを返す。
-- `startScroll(direction, distance, speed)` — Scrollを開始する。
-- `isScrolling()` — Scrollingかどうかを確認する。
+- `isValid(x, y)` — 座標がマップ範囲内かを確認する。
+- `checkPassage(x, y, bit)` — タイルの通行フラグをチェックする。
+- `tileId(x, y, z)` — 指定座標・レイヤーのタイルIDを返す。
+- `layeredTiles(x, y)` — 指定座標の全レイヤータイルID配列を返す。
+- `allTiles(x, y)` — 指定座標の全タイルID（オートタイル含む）配列を返す。
+- `autotileType(x, y, z)` — オートタイルのタイプを返す。
+- `isPassable(x, y, d)` — 指定座標・方向が通行可能かを確認する。
+- `isBoatPassable(x, y)` — 小型船が通行可能かを確認する。
+- `isShipPassable(x, y)` — 大型船が通行可能かを確認する。
+- `isAirshipLandOk(x, y)` — 飛行船が着陸可能かを確認する。
+- `checkLayeredTilesFlags(x, y, bit)` — 全レイヤータイルのフラグをチェックする。
+- `isLadder(x, y)` — はしごタイルかを確認する。
+- `isBush(x, y)` — 茂みタイルかを確認する。
+- `isCounter(x, y)` — カウンタータイルかを確認する。
+- `isDamageFloor(x, y)` — ダメージ床かを確認する。
+- `terrainTag(x, y)` — 地形タグを返す。
+- `regionId(x, y)` — リージョンIDを返す。
+- `startScroll(direction, distance, speed)` — スクロールを開始する。
+- `isScrolling()` — スクロール中かを確認する。
 - `update(sceneActive)` — 毎フレーム更新する。
-- `updateScroll()` — Scrollを更新する。
-- `scrollDistance()`
-- `doScroll(direction, distance)`
-- `updateEvents()` — Eventsを更新する。
-- `updateVehicles()` — Vehiclesを更新する。
-- `updateParallax()` — Parallaxを更新する。
-- `changeTileset(tilesetId)` — Tilesetを変更する。
-- `changeParallax(name, loopX, loopY, sx, sy)` — Parallaxを変更する。
-- `updateInterpreter()` — Interpreterを更新する。
-- `unlockEvent(eventId)`
-- `setupStartingEvent()` — Starting Eventをセットアップする。
-- `setupTestEvent()` — Test Eventをセットアップする。
-- `setupStartingMapEvent()` — Starting Map Eventをセットアップする。
-- `setupAutorunCommonEvent()` — Autorun Common Eventをセットアップする。
-- `isAnyEventStarting()` — Any Event Startingかどうかを確認する。
+- `updateScroll()` — スクロールの進行を更新する。
+- `scrollDistance()` — スクロール距離を返す。
+- `doScroll(direction, distance)` — 指定方向にスクロールを実行する。
+- `updateEvents()` — 全イベントを更新する。
+- `updateVehicles()` — 全乗り物を更新する。
+- `updateParallax()` — 遠景を更新する。
+- `changeTileset(tilesetId)` — タイルセットを変更する。
+- `changeParallax(name, loopX, loopY, sx, sy)` — 遠景を変更する。
+- `updateInterpreter()` — マップイベントのインタプリタを更新する。
+- `unlockEvent(eventId)` — 指定イベントのロックを解除する。
+- `setupStartingEvent()` — 開始イベントをセットアップする。
+- `setupTestEvent()` — テストイベントをセットアップする。
+- `setupStartingMapEvent()` — 開始マップイベントをセットアップする。
+- `setupAutorunCommonEvent()` — 自動実行コモンイベントをセットアップする。
+- `isAnyEventStarting()` — いずれかのイベントが開始中かを確認する。
 
 ### Game_CommonEvent
 
@@ -2355,10 +2355,10 @@ Game_PartyとGame_Troopのスーパークラス。
 #### インスタンスメソッド
 
 - `initialize(commonEventId)` — 初期化する。
-- `event()`
-- `list()`
-- `refresh()` — 再描画・更新する。
-- `isActive()` — アクティブかどうかを確認する。
+- `event()` — データベースのコモンイベントデータを返す。
+- `list()` — イベントコマンドリストを返す。
+- `refresh()` — インタプリタをリフレッシュする。
+- `isActive()` — アクティブ（実行条件を満たす）かを確認する。
 - `update()` — 毎フレーム更新する。
 
 ### Game_CharacterBase ⭐
@@ -2371,98 +2371,98 @@ Game_Characterのスーパークラス。座標や画像などの基本情報を
 #### インスタンスメソッド
 
 - `initialize()` — 初期化する。
-- `initMembers()` — Membersを初期化する。
-- `pos(x, y)`
-- `posNt(x, y)`
-- `moveSpeed()` — Speedに移動する。
-- `setMoveSpeed(moveSpeed)` — Move Speedを設定する。
-- `moveFrequency()` — Frequencyに移動する。
-- `setMoveFrequency(moveFrequency)` — Move Frequencyを設定する。
-- `opacity()`
-- `setOpacity(opacity)` — Opacityを設定する。
-- `blendMode()`
-- `setBlendMode(blendMode)` — Blend Modeを設定する。
-- `isNormalPriority()` — Normal Priorityかどうかを確認する。
-- `setPriorityType(priorityType)` — Priority Typeを設定する。
-- `isMoving()` — Movingかどうかを確認する。
-- `isJumping()` — Jumpingかどうかを確認する。
-- `jumpHeight()` — jumpの高さを返す。
-- `isStopping()` — Stoppingかどうかを確認する。
-- `checkStop(threshold)` — Stopをチェックする。
-- `resetStopCount()` — Stop Countをリセットする。
-- `realMoveSpeed()`
-- `distancePerFrame()`
-- `isDashing()` — Dashingかどうかを確認する。
-- `isDebugThrough()` — Debug Throughかどうかを確認する。
-- `straighten()`
-- `reverseDir(d)`
-- `canPass(x, y, d)` — Passが可能かを確認する。
-- `canPassDiagonally(x, y, horz, vert)` — Pass Diagonallyが可能かを確認する。
-- `isMapPassable(x, y, d)` — Map Passableかどうかを確認する。
-- `isCollidedWithCharacters(x, y)` — Collided With Charactersかどうかを確認する。
-- `isCollidedWithEvents(x, y)` — Collided With Eventsかどうかを確認する。
-- `isCollidedWithVehicles(x, y)` — Collided With Vehiclesかどうかを確認する。
-- `setPosition(x, y)` — Positionを設定する。
-- `copyPosition(character)`
-- `locate(x, y)`
-- `direction()`
-- `setDirection(d)` — Directionを設定する。
-- `isTile()` — Tileかどうかを確認する。
-- `isObjectCharacter()` — Object Characterかどうかを確認する。
-- `shiftY()`
-- `scrolledX()`
-- `scrolledY()`
-- `screenX()`
-- `screenY()`
-- `screenZ()`
-- `isNearTheScreen()` — Near The Screenかどうかを確認する。
+- `initMembers()` — メンバー変数を初期化する。
+- `pos(x, y)` — 指定座標にいるかを確認する。
+- `posNt(x, y)` — 指定座標にいるかを確認する（すり抜けでない場合）。
+- `moveSpeed()` — 移動速度を返す。
+- `setMoveSpeed(moveSpeed)` — 移動速度を設定する。
+- `moveFrequency()` — 移動頻度を返す。
+- `setMoveFrequency(moveFrequency)` — 移動頻度を設定する。
+- `opacity()` — 不透明度を返す。
+- `setOpacity(opacity)` — 不透明度を設定する。
+- `blendMode()` — ブレンドモードを返す。
+- `setBlendMode(blendMode)` — ブレンドモードを設定する。
+- `isNormalPriority()` — 通常プライオリティ（キャラと同じ）かを確認する。
+- `setPriorityType(priorityType)` — プライオリティタイプを設定する。
+- `isMoving()` — 移動中かを確認する。
+- `isJumping()` — ジャンプ中かを確認する。
+- `jumpHeight()` — ジャンプの高さ（ピクセル）を返す。
+- `isStopping()` — 停止中かを確認する。
+- `checkStop(threshold)` — 停止カウントが閾値以上かを確認する。
+- `resetStopCount()` — 停止カウントをリセットする。
+- `realMoveSpeed()` — 実際の移動速度（ダッシュ補正含む）を返す。
+- `distancePerFrame()` — 1フレームあたりの移動距離を返す。
+- `isDashing()` — ダッシュ中かを確認する。
+- `isDebugThrough()` — デバッグすり抜けが有効かを確認する。
+- `straighten()` — キャラクターのパターンを正面に戻す。
+- `reverseDir(d)` — 指定方向の逆方向を返す。
+- `canPass(x, y, d)` — 指定座標・方向に通行可能かを確認する。
+- `canPassDiagonally(x, y, horz, vert)` — 斜め方向に通行可能かを確認する。
+- `isMapPassable(x, y, d)` — マップの通行判定（イベントを除く）を確認する。
+- `isCollidedWithCharacters(x, y)` — 他キャラクターとの衍突を確認する。
+- `isCollidedWithEvents(x, y)` — イベントとの衍突を確認する。
+- `isCollidedWithVehicles(x, y)` — 乗り物との衍突を確認する。
+- `setPosition(x, y)` — 座標を設定する。
+- `copyPosition(character)` — 他キャラクターの座標をコピーする。
+- `locate(x, y)` — 指定座標に配置する（移動カウントリセット）。
+- `direction()` — 向き（2/4/6/8）を返す。
+- `setDirection(d)` — 向きを設定する。
+- `isTile()` — タイルキャラクターかを確認する。
+- `isObjectCharacter()` — オブジェクトキャラ（!付き）かを確認する。
+- `shiftY()` — Y方向の表示オフセットを返す。
+- `scrolledX()` — スクロール調整後のX座標を返す。
+- `scrolledY()` — スクロール調整後のY座標を返す。
+- `screenX()` — 画面上のX座標（ピクセル）を返す。
+- `screenY()` — 画面上のY座標（ピクセル）を返す。
+- `screenZ()` — 画面上のZソート順を返す。
+- `isNearTheScreen()` — 画面近くにいるかを確認する。
 - `update()` — 毎フレーム更新する。
-- `updateStop()` — Stopを更新する。
-- `updateJump()` — Jumpを更新する。
-- `updateMove()` — Moveを更新する。
-- `updateAnimation()` — Animationを更新する。
-- `animationWait()`
-- `updateAnimationCount()` — Animation Countを更新する。
-- `updatePattern()` — Patternを更新する。
-- `maxPattern()`
-- `pattern()`
-- `setPattern(pattern)` — Patternを設定する。
-- `isOriginalPattern()` — Original Patternかどうかを確認する。
-- `resetPattern()` — Patternをリセットする。
-- `refreshBushDepth()` — Bush Depthを再描画する。
-- `isOnLadder()` — On Ladderかどうかを確認する。
-- `isOnBush()` — On Bushかどうかを確認する。
-- `terrainTag()`
-- `regionId()` — regionのIDを返す。
-- `increaseSteps()`
-- `tileId()` — tileのIDを返す。
-- `characterName()` — characterの名前を返す。
-- `characterIndex()`
-- `setTileImage(tileId)` — Tile Imageを設定する。
-- `checkEventTriggerTouchFront(d)` — Event Trigger Touch Frontをチェックする。
-- `checkEventTriggerTouch(/*x, y*/)` — Event Trigger Touchをチェックする。
-- `isMovementSucceeded(/*x, y*/)` — Movement Succeededかどうかを確認する。
-- `setMovementSuccess(success)` — Movement Successを設定する。
-- `moveStraight(d)` — Straightに移動する。
-- `moveDiagonally(horz, vert)` — Diagonallyに移動する。
-- `jump(xPlus, yPlus)`
-- `hasWalkAnime()` — Walk Animeを持っているかを確認する。
-- `setWalkAnime(walkAnime)` — Walk Animeを設定する。
-- `hasStepAnime()` — Step Animeを持っているかを確認する。
-- `setStepAnime(stepAnime)` — Step Animeを設定する。
-- `isDirectionFixed()` — Direction Fixedかどうかを確認する。
-- `setDirectionFix(directionFix)` — Direction Fixを設定する。
-- `isThrough()` — Throughかどうかを確認する。
-- `setThrough(through)` — Throughを設定する。
-- `isTransparent()` — Transparentかどうかを確認する。
-- `bushDepth()`
-- `setTransparent(transparent)` — Transparentを設定する。
-- `startAnimation()` — Animationを開始する。
-- `startBalloon()` — Balloonを開始する。
-- `isAnimationPlaying()` — Animation Playingかどうかを確認する。
-- `isBalloonPlaying()` — Balloon Playingかどうかを確認する。
-- `endAnimation()` — Animationを終了する。
-- `endBalloon()` — Balloonを終了する。
+- `updateStop()` — 停止中の更新を行う。
+- `updateJump()` — ジャンプの進行を更新する。
+- `updateMove()` — 移動の進行を更新する。
+- `updateAnimation()` — 歩行アニメーションを更新する。
+- `animationWait()` — アニメーションの待ちフレーム数を返す。
+- `updateAnimationCount()` — アニメーションカウントを更新する。
+- `updatePattern()` — アニメーションパターンを更新する。
+- `maxPattern()` — 最大パターン数を返す。
+- `pattern()` — 現在のパターン番号を返す。
+- `setPattern(pattern)` — パターンを設定する。
+- `isOriginalPattern()` — 初期パターンかを確認する。
+- `resetPattern()` — パターンを初期値にリセットする。
+- `refreshBushDepth()` — 茂みの深さを再計算する。
+- `isOnLadder()` — はしご上にいるかを確認する。
+- `isOnBush()` — 茂みの上にいるかを確認する。
+- `terrainTag()` — 現在位置の地形タグを返す。
+- `regionId()` — 現在位置のリージョンIDを返す。
+- `increaseSteps()` — 歩数を1増やす。
+- `tileId()` — タイルキャラのタイルIDを返す。
+- `characterName()` — キャラクター画像のファイル名を返す。
+- `characterIndex()` — キャラクター画像のインデックスを返す。
+- `setTileImage(tileId)` — タイル画像を設定する。
+- `checkEventTriggerTouchFront(d)` — 前方の接触イベントトリガーをチェックする。
+- `checkEventTriggerTouch(/*x, y*/)` — 接触イベントトリガーをチェックする。
+- `isMovementSucceeded(/*x, y*/)` — 移動が成功したかを確認する。
+- `setMovementSuccess(success)` — 移動成功フラグを設定する。
+- `moveStraight(d)` — 指定方向に直線移動する。
+- `moveDiagonally(horz, vert)` — 斜め方向に移動する。
+- `jump(xPlus, yPlus)` — 指定オフセットにジャンプする。
+- `hasWalkAnime()` — 歩行アニメが有効かを確認する。
+- `setWalkAnime(walkAnime)` — 歩行アニメの有効/無効を設定する。
+- `hasStepAnime()` — 足踏みアニメが有効かを確認する。
+- `setStepAnime(stepAnime)` — 足踏みアニメの有効/無効を設定する。
+- `isDirectionFixed()` — 向き固定かを確認する。
+- `setDirectionFix(directionFix)` — 向き固定の有効/無効を設定する。
+- `isThrough()` — すり抜けが有効かを確認する。
+- `setThrough(through)` — すり抜けの有効/無効を設定する。
+- `isTransparent()` — 透明かを確認する。
+- `bushDepth()` — 茂みの深さを返す。
+- `setTransparent(transparent)` — 透明の有効/無効を設定する。
+- `startAnimation()` — アニメーションを開始する。
+- `startBalloon()` — フキダシアイコンを開始する。
+- `isAnimationPlaying()` — アニメーション再生中かを確認する。
+- `isBalloonPlaying()` — フキダシアイコン再生中かを確認する。
+- `endAnimation()` — アニメーションを終了する。
+- `endBalloon()` — フキダシアイコンを終了する。
 
 ### Game_Character ⭐
 
