@@ -1736,125 +1736,125 @@ Game_ActorとGame_Enemyのスーパークラス。スプライトやアクショ
 #### インスタンスメソッド
 
 - `initialize()` — 初期化する。
-- `initMembers()` — Membersを初期化する。
-- `clearDamagePopup()` — Damage Popupをクリアする。
-- `clearWeaponAnimation()` — Weapon Animationをクリアする。
-- `clearEffect()` — Effectをクリアする。
-- `clearMotion()` — Motionをクリアする。
-- `requestEffect(effectType)` — Effectを要求する。
-- `requestMotion(motionType)` — Motionを要求する。
-- `requestMotionRefresh()` — Motion Refreshを要求する。
-- `cancelMotionRefresh()`
-- `select()` — 選択する。
-- `deselect()` — 選択を解除する。
-- `isDamagePopupRequested()` — Damage Popup Requestedかどうかを確認する。
-- `isEffectRequested()` — Effect Requestedかどうかを確認する。
-- `isMotionRequested()` — Motion Requestedかどうかを確認する。
-- `isWeaponAnimationRequested()` — Weapon Animation Requestedかどうかを確認する。
-- `isMotionRefreshRequested()` — Motion Refresh Requestedかどうかを確認する。
-- `isSelected()` — Selectedかどうかを確認する。
-- `effectType()`
-- `motionType()`
-- `weaponImageId()` — weapon ImageのIDを返す。
-- `startDamagePopup()` — Damage Popupを開始する。
-- `shouldPopupDamage()` — Popup Damageすべきかを確認する。
-- `startWeaponAnimation(weaponImageId)` — Weapon Animationを開始する。
-- `action(index)`
-- `setAction(index, action)` — Actionを設定する。
-- `numActions()`
-- `clearActions()` — Actionsをクリアする。
-- `result()`
-- `clearResult()` — Resultをクリアする。
-- `clearTpbChargeTime()` — Tpb Charge Timeをクリアする。
-- `applyTpbPenalty()` — Tpb Penaltyを適用する。
-- `initTpbChargeTime(advantageous)` — Tpb Charge Timeを初期化する。
-- `tpbChargeTime()`
-- `startTpbCasting()` — Tpb Castingを開始する。
-- `startTpbAction()` — Tpb Actionを開始する。
-- `isTpbCharged()` — Tpb Chargedかどうかを確認する。
-- `isTpbReady()` — Tpb Readyかどうかを確認する。
-- `isTpbTimeout()` — Tpb Timeoutかどうかを確認する。
-- `updateTpb()` — Tpbを更新する。
-- `updateTpbChargeTime()` — Tpb Charge Timeを更新する。
-- `updateTpbCastTime()` — Tpb Cast Timeを更新する。
-- `updateTpbAutoBattle()` — Tpb Auto Battleを更新する。
-- `updateTpbIdleTime()` — Tpb Idle Timeを更新する。
-- `tpbAcceleration()`
-- `tpbRelativeSpeed()`
-- `tpbSpeed()`
-- `tpbBaseSpeed()`
-- `tpbRequiredCastTime()`
-- `onTpbCharged()` — Tpb Charged時のコールバック。
-- `shouldDelayTpbCharge()` — Delay Tpb Chargeすべきかを確認する。
-- `finishTpbCharge()`
-- `isTpbTurnEnd()` — Tpb Turn Endかどうかを確認する。
-- `initTpbTurn()` — Tpb Turnを初期化する。
-- `startTpbTurn()` — Tpb Turnを開始する。
-- `makeTpbActions()` — Tpb Actionsを作成する。
-- `onTpbTimeout()` — Tpb Timeout時のコールバック。
-- `turnCount()`
-- `canInput()` — 入力可能かを確認する。
-- `refresh()` — 再描画・更新する。
-- `addState(stateId)` — Stateを追加する。
-- `isStateAddable(stateId)` — State Addableかどうかを確認する。
-- `isStateRestrict(stateId)` — State Restrictかどうかを確認する。
-- `onRestrict()` — Restrict時のコールバック。
-- `removeState(stateId)` — Stateを削除する。
-- `escape()`
-- `addBuff(paramId, turns)` — Buffを追加する。
-- `addDebuff(paramId, turns)` — Debuffを追加する。
-- `removeBuff(paramId)` — Buffを削除する。
-- `removeBattleStates()` — Battle Statesを削除する。
-- `removeAllBuffs()` — All Buffsを削除する。
-- `removeStatesAuto(timing)` — States Autoを削除する。
-- `removeBuffsAuto()` — Buffs Autoを削除する。
-- `removeStatesByDamage()` — States By Damageを削除する。
-- `makeActionTimes()` — Action Timesを作成する。
-- `makeActions()` — Actionsを作成する。
-- `speed()`
-- `makeSpeed()` — Speedを作成する。
-- `currentAction()`
-- `removeCurrentAction()` — Current Actionを削除する。
-- `setLastTarget(target)` — Last Targetを設定する。
-- `forceAction(skillId, targetIndex)`
-- `useItem(item)`
-- `consumeItem(item)`
-- `gainHp(value)` — Hpを獲得する。
-- `gainMp(value)` — Mpを獲得する。
-- `gainTp(value)` — Tpを獲得する。
-- `gainSilentTp(value)` — Silent Tpを獲得する。
-- `initTp()` — Tpを初期化する。
-- `clearTp()` — Tpをクリアする。
-- `chargeTpByDamage(damageRate)`
-- `regenerateHp()`
-- `maxSlipDamage()`
-- `regenerateMp()`
-- `regenerateTp()`
-- `regenerateAll()`
-- `onBattleStart(advantageous)` — Battle Start時のコールバック。
-- `onAllActionsEnd()` — All Actions End時のコールバック。
-- `onTurnEnd()` — Turn End時のコールバック。
-- `onBattleEnd()` — Battle End時のコールバック。
-- `onDamage(value)` — Damage時のコールバック。
-- `setActionState(actionState)` — Action Stateを設定する。
-- `isUndecided()` — Undecidedかどうかを確認する。
-- `isInputting()` — Inputtingかどうかを確認する。
-- `isWaiting()` — Waitingかどうかを確認する。
-- `isActing()` — Actingかどうかを確認する。
-- `isChanting()` — Chantingかどうかを確認する。
-- `isGuardWaiting()` — Guard Waitingかどうかを確認する。
-- `performActionStart(action)` — Action Startの演出を実行する。
-- `performAction(/*action*/)` — Actionの演出を実行する。
-- `performActionEnd()` — Action Endの演出を実行する。
-- `performDamage()` — Damageの演出を実行する。
-- `performMiss()` — Missの演出を実行する。
-- `performRecovery()` — Recoveryの演出を実行する。
-- `performEvasion()` — Evasionの演出を実行する。
-- `performMagicEvasion()` — Magic Evasionの演出を実行する。
-- `performCounter()` — Counterの演出を実行する。
-- `performReflection()` — Reflectionの演出を実行する。
-- `performSubstitute(/*target*/)` — Substituteの演出を実行する。
-- `performCollapse()` — Collapseの演出を実行する。
+- `initMembers()` — メンバー変数を初期化する。
+- `clearDamagePopup()` — ダメージポップアップ要求をクリアする。
+- `clearWeaponAnimation()` — 武器アニメーション要求をクリアする。
+- `clearEffect()` — エフェクト要求をクリアする。
+- `clearMotion()` — モーション要求をクリアする。
+- `requestEffect(effectType)` — スプライトエフェクトを要求する。
+- `requestMotion(motionType)` — スプライトモーションを要求する。
+- `requestMotionRefresh()` — モーションのリフレッシュを要求する。
+- `cancelMotionRefresh()` — モーションリフレッシュ要求をキャンセルする。
+- `select()` — バトラーを選択状態にする。
+- `deselect()` — バトラーの選択状態を解除する。
+- `isDamagePopupRequested()` — ダメージポップアップが要求されているかを確認する。
+- `isEffectRequested()` — エフェクトが要求されているかを確認する。
+- `isMotionRequested()` — モーションが要求されているかを確認する。
+- `isWeaponAnimationRequested()` — 武器アニメーションが要求されているかを確認する。
+- `isMotionRefreshRequested()` — モーションリフレッシュが要求されているかを確認する。
+- `isSelected()` — 選択状態かを確認する。
+- `effectType()` — 要求されたエフェクトタイプを返す。
+- `motionType()` — 要求されたモーションタイプを返す。
+- `weaponImageId()` — 武器アニメーションの画像IDを返す。
+- `startDamagePopup()` — ダメージポップアップ表示を要求する。
+- `shouldPopupDamage()` — ダメージポップアップを表示すべきかを確認する。
+- `startWeaponAnimation(weaponImageId)` — 武器アニメーションを開始する。
+- `action(index)` — 指定インデックスのGame_Actionを返す。
+- `setAction(index, action)` — 指定インデックスにアクションを設定する。
+- `numActions()` — アクションの数を返す。
+- `clearActions()` — 全アクションをクリアする。
+- `result()` — アクション結果（Game_ActionResult）を返す。
+- `clearResult()` — アクション結果をクリアする。
+- `clearTpbChargeTime()` — TPBチャージタイムをクリアする。
+- `applyTpbPenalty()` — TPBペナルティ（キャンセル時のチャージ減少）を適用する。
+- `initTpbChargeTime(advantageous)` — TPBチャージタイムを初期化する（先制時は満タン）。
+- `tpbChargeTime()` — TPBチャージタイムの値を返す。
+- `startTpbCasting()` — TPBキャスト（スキル詠唱）を開始する。
+- `startTpbAction()` — TPBアクション実行を開始する。
+- `isTpbCharged()` — TPBチャージが完了したかを確認する。
+- `isTpbReady()` — TPBアクション準備完了かを確認する。
+- `isTpbTimeout()` — TPBタイムアウトかを確認する。
+- `updateTpb()` — TPB状態を更新する。
+- `updateTpbChargeTime()` — TPBチャージタイムを進行させる。
+- `updateTpbCastTime()` — TPBキャストタイムを進行させる。
+- `updateTpbAutoBattle()` — TPB自動戦闘時のアクション決定を更新する。
+- `updateTpbIdleTime()` — TPBアイドルタイムを更新する。
+- `tpbAcceleration()` — TPBの加速度を返す。
+- `tpbRelativeSpeed()` — TPBの相対速度を返す。
+- `tpbSpeed()` — TPBの速度を返す。
+- `tpbBaseSpeed()` — TPBの基本速度を返す。
+- `tpbRequiredCastTime()` — TPBキャストに必要な時間を返す。
+- `onTpbCharged()` — TPBチャージ完了時のコールバック。
+- `shouldDelayTpbCharge()` — TPBチャージを遅延すべきかを確認する。
+- `finishTpbCharge()` — TPBチャージを完了する。
+- `isTpbTurnEnd()` — TPBターンが終了したかを確認する。
+- `initTpbTurn()` — TPBターンカウントを初期化する。
+- `startTpbTurn()` — TPBターンを開始する。
+- `makeTpbActions()` — TPB用アクションを作成する。
+- `onTpbTimeout()` — TPBタイムアウト時のコールバック。
+- `turnCount()` — ターンカウントを返す。
+- `canInput()` — コマンド入力可能かを確認する（TPBチャージ完了かつ制約なし）。
+- `refresh()` — ステート・バフを再計算する。
+- `addState(stateId)` — ステートを付与する（有効度・無効化判定含む）。
+- `isStateAddable(stateId)` — ステートを付与可能かを確認する。
+- `isStateRestrict(stateId)` — ステートが行動制約により付与不可かを確認する。
+- `onRestrict()` — 行動制約発生時のコールバック（アクションクリア等）。
+- `removeState(stateId)` — ステートを解除する。
+- `escape()` — 逃走する（戦闘不能ステートを解除して非表示に）。
+- `addBuff(paramId, turns)` — バフを付与する（指定ターン数）。
+- `addDebuff(paramId, turns)` — デバフを付与する（指定ターン数）。
+- `removeBuff(paramId)` — バフ・デバフを解除する。
+- `removeBattleStates()` — 戦闘終了時に解除されるステートを削除する。
+- `removeAllBuffs()` — 全バフ・デバフを解除する。
+- `removeStatesAuto(timing)` — 自動解除タイミングのステートを解除する。
+- `removeBuffsAuto()` — 有効期限切れのバフを自動解除する。
+- `removeStatesByDamage()` — ダメージによるステート解除を処理する。
+- `makeActionTimes()` — 行動回数を計算する。
+- `makeActions()` — アクションを作成する。
+- `speed()` — 行動速度を返す。
+- `makeSpeed()` — 行動速度を計算する。
+- `currentAction()` — 現在のアクションを返す。
+- `removeCurrentAction()` — 現在のアクションを削除する。
+- `setLastTarget(target)` — 最後の対象を設定する。
+- `forceAction(skillId, targetIndex)` — 強制アクションを設定する。
+- `useItem(item)` — アイテム・スキルを使用する（コスト支払い・消費）。
+- `consumeItem(item)` — アイテムを消費する（パーティの所持数を1減らす）。
+- `gainHp(value)` — HPを増減する（正=回復、負=ダメージ）。
+- `gainMp(value)` — MPを増減する。
+- `gainTp(value)` — TPを増減する。
+- `gainSilentTp(value)` — TPを増減する（ポップアップなし）。
+- `initTp()` — TPをランダムに初期化する（0〜25）。
+- `clearTp()` — TPを0にする。
+- `chargeTpByDamage(damageRate)` — ダメージ割合に応じてTPをチャージする。
+- `regenerateHp()` — HPの自動回復（スリップダメージ含む）を処理する。
+- `maxSlipDamage()` — スリップダメージの最大値を返す。
+- `regenerateMp()` — MPの自動回復を処理する。
+- `regenerateTp()` — TPの自動回復を処理する。
+- `regenerateAll()` — HP・MP・TPの全自動回復を処理する。
+- `onBattleStart(advantageous)` — 戦闘開始時のコールバック（TP初期化等）。
+- `onAllActionsEnd()` — 全アクション終了時のコールバック（ステート自動解除等）。
+- `onTurnEnd()` — ターン終了時のコールバック（自動回復・ステート解除・バフ解除等）。
+- `onBattleEnd()` — 戦闘終了時のコールバック（アクション・ステートクリア等）。
+- `onDamage(value)` — ダメージを受けた時のコールバック（TPチャージ・ステート解除等）。
+- `setActionState(actionState)` — 行動状態を設定する（undecided/inputting/waiting/acting）。
+- `isUndecided()` — 行動未決定かを確認する。
+- `isInputting()` — コマンド入力中かを確認する。
+- `isWaiting()` — 待機中かを確認する。
+- `isActing()` — 行動実行中かを確認する。
+- `isChanting()` — 詠唱中（魔法キャスト中）かを確認する。
+- `isGuardWaiting()` — 防御待機中かを確認する。
+- `performActionStart(action)` — アクション開始時の演出を実行する。
+- `performAction(/*action*/)` — アクション実行時の演出を実行する。
+- `performActionEnd()` — アクション終了時の演出を実行する。
+- `performDamage()` — ダメージ時の演出を実行する。
+- `performMiss()` — ミス時の演出を実行する。
+- `performRecovery()` — 回復時の演出を実行する。
+- `performEvasion()` — 回避時の演出を実行する。
+- `performMagicEvasion()` — 魔法回避時の演出を実行する。
+- `performCounter()` — 反撃時の演出を実行する。
+- `performReflection()` — 魔法反射時の演出を実行する。
+- `performSubstitute(/*target*/)` — 身代わり時の演出を実行する。
+- `performCollapse()` — 戦闘不能時の消滅演出を実行する。
 
 ### Game_Actor ⭐
 
@@ -1871,135 +1871,135 @@ Game_ActorとGame_Enemyのスーパークラス。スプライトやアクショ
 #### インスタンスメソッド
 
 - `initialize(actorId)` — 初期化する。
-- `initMembers()` — Membersを初期化する。
-- `setup(actorId)` — セットアップする。
-- `actorId()` — actorのIDを返す。
-- `actor()` — アクターオブジェクトを返す。
+- `initMembers()` — メンバー変数を初期化する。
+- `setup(actorId)` — アクターIDでセットアップする。
+- `actorId()` — アクターIDを返す。
+- `actor()` — データベースのアクターオブジェクトを返す。
 - `name()` — 名前を返す。
-- `setName(name)` — Nameを設定する。
-- `nickname()`
-- `setNickname(nickname)` — Nicknameを設定する。
-- `profile()`
-- `setProfile(profile)` — Profileを設定する。
-- `characterName()` — characterの名前を返す。
-- `characterIndex()`
-- `faceName()` — faceの名前を返す。
-- `faceIndex()`
-- `battlerName()` — battlerの名前を返す。
-- `clearStates()` — Statesをクリアする。
-- `eraseState(stateId)` — Stateを消去する。
-- `resetStateCounts(stateId)` — State Countsをリセットする。
-- `initImages()` — Imagesを初期化する。
-- `expForLevel(level)`
-- `initExp()` — Expを初期化する。
-- `currentExp()`
-- `currentLevelExp()`
-- `nextLevelExp()`
-- `nextRequiredExp()`
-- `maxLevel()`
-- `isMaxLevel()` — Max Levelかどうかを確認する。
-- `initSkills()` — Skillsを初期化する。
-- `initEquips(equips)` — Equipsを初期化する。
-- `equipSlots()`
+- `setName(name)` — 名前を設定する。
+- `nickname()` — 二つ名を返す。
+- `setNickname(nickname)` — 二つ名を設定する。
+- `profile()` — プロフィールを返す。
+- `setProfile(profile)` — プロフィールを設定する。
+- `characterName()` — キャラクター画像のファイル名を返す。
+- `characterIndex()` — キャラクター画像のインデックスを返す。
+- `faceName()` — 顔画像のファイル名を返す。
+- `faceIndex()` — 顔画像のインデックスを返す。
+- `battlerName()` — 戦闘キャラ画像のファイル名を返す。
+- `clearStates()` — 全ステートをクリアする。
+- `eraseState(stateId)` — 指定ステートを解除する。
+- `resetStateCounts(stateId)` — ステートの残りターン数をリセットする。
+- `initImages()` — キャラクター・顔・戦闘画像を初期化する。
+- `expForLevel(level)` — 指定レベルに必要な累計経験値を返す。
+- `initExp()` — 経験値を初期化する。
+- `currentExp()` — 現在の累計経験値を返す。
+- `currentLevelExp()` — 現在レベルの必要経験値を返す。
+- `nextLevelExp()` — 次のレベルの必要経験値を返す。
+- `nextRequiredExp()` — 次のレベルまでの残り経験値を返す。
+- `maxLevel()` — 最大レベルを返す。
+- `isMaxLevel()` — 最大レベルかを確認する。
+- `initSkills()` — 初期スキルを習得する。
+- `initEquips(equips)` — 初期装備をセットする。
+- `equipSlots()` — 装備スロットの配列を返す。
 - `equips()` — 装備品の配列を返す。
 - `weapons()` — 装備中の武器の配列を返す。
 - `armors()` — 装備中の防具の配列を返す。
-- `hasWeapon(weapon)` — Weaponを持っているかを確認する。
-- `hasArmor(armor)` — Armorを持っているかを確認する。
-- `isEquipChangeOk(slotId)` — Equip Change Okかどうかを確認する。
-- `changeEquip(slotId, item)` — Equipを変更する。
-- `forceChangeEquip(slotId, item)`
-- `tradeItemWithParty(newItem, oldItem)`
-- `changeEquipById(etypeId, itemId)` — Equip By Idを変更する。
-- `isEquipped(item)` — Equippedかどうかを確認する。
-- `discardEquip(item)`
-- `releaseUnequippableItems(forcing)`
-- `clearEquipments()` — Equipmentsをクリアする。
-- `optimizeEquipments()`
-- `bestEquipItem(slotId)`
-- `calcEquipItemPerformance(item)` — Equip Item Performanceを計算する。
-- `isSkillWtypeOk(skill)` — Skill Wtype Okかどうかを確認する。
-- `isWtypeEquipped(wtypeId)` — Wtype Equippedかどうかを確認する。
-- `refresh()` — 再描画・更新する。
+- `hasWeapon(weapon)` — 指定武器を装備しているかを確認する。
+- `hasArmor(armor)` — 指定防具を装備しているかを確認する。
+- `isEquipChangeOk(slotId)` — 指定スロットの装備変更が可能かを確認する。
+- `changeEquip(slotId, item)` — 指定スロットの装備を変更する。
+- `forceChangeEquip(slotId, item)` — 装備を強制変更する（パーティ所持数考慮なし）。
+- `tradeItemWithParty(newItem, oldItem)` — パーティとアイテムを交換する（旧装備を返却、新装備を取得）。
+- `changeEquipById(etypeId, itemId)` — 装備タイプとアイテムIDで装備を変更する。
+- `isEquipped(item)` — 指定アイテムを装備中かを確認する。
+- `discardEquip(item)` — 装備を破棄する（パーティに返却しない）。
+- `releaseUnequippableItems(forcing)` — 装備不可になったアイテムを外す。
+- `clearEquipments()` — 全装備を外す。
+- `optimizeEquipments()` — 装備を最適化する（最強装備）。
+- `bestEquipItem(slotId)` — 指定スロットの最適装備を返す。
+- `calcEquipItemPerformance(item)` — 装備品の性能値を計算する。
+- `isSkillWtypeOk(skill)` — スキルに必要な武器タイプを装備しているかを確認する。
+- `isWtypeEquipped(wtypeId)` — 指定武器タイプを装備中かを確認する。
+- `refresh()` — ステート・装備を再計算する。
 - `hide()` — 非表示にする。
-- `isActor()` — アクターかを確認する。
-- `friendsUnit()`
-- `opponentsUnit()`
-- `index()` — 現在のインデックスを返す。
-- `isBattleMember()` — Battle Memberかどうかを確認する。
-- `isFormationChangeOk()` — Formation Change Okかどうかを確認する。
-- `currentClass()`
-- `isClass(gameClass)` — Classかどうかを確認する。
-- `skillTypes()`
-- `skills()` — 使用可能なスキルの配列を返す。
-- `usableSkills()`
-- `traitObjects()`
-- `attackElements()`
-- `hasNoWeapons()` — No Weaponsを持っているかを確認する。
-- `bareHandsElementId()` — bare Hands ElementのIDを返す。
-- `paramBase(paramId)`
-- `paramPlus(paramId)`
-- `attackAnimationId1()`
-- `attackAnimationId2()`
-- `bareHandsAnimationId()` — bare Hands AnimationのIDを返す。
-- `changeExp(exp, show)` — Expを変更する。
-- `levelUp()`
-- `levelDown()`
-- `findNewSkills(lastSkills)` — New Skillsを検索する。
-- `displayLevelUp(newSkills)` — Level Upを表示する。
-- `gainExp(exp)` — Expを獲得する。
-- `finalExpRate()` — final Expの倍率を返す。
-- `benchMembersExpRate()` — bench Members Expの倍率を返す。
-- `shouldDisplayLevelUp()` — Display Level Upすべきかを確認する。
-- `changeLevel(level, show)` — Levelを変更する。
-- `learnSkill(skillId)`
-- `forgetSkill(skillId)`
-- `isLearnedSkill(skillId)` — Learned Skillかどうかを確認する。
-- `hasSkill(skillId)` — Skillを持っているかを確認する。
-- `changeClass(classId, keepExp)` — Classを変更する。
-- `setFaceImage(faceName, faceIndex)` — Face Imageを設定する。
-- `setBattlerImage(battlerName)` — Battler Imageを設定する。
-- `isSpriteVisible()` — Sprite Visibleかどうかを確認する。
-- `performActionStart(action)` — Action Startの演出を実行する。
-- `performAction(action)` — Actionの演出を実行する。
-- `performActionEnd()` — Action Endの演出を実行する。
-- `performAttack()` — Attackの演出を実行する。
-- `performDamage()` — Damageの演出を実行する。
-- `performEvasion()` — Evasionの演出を実行する。
-- `performMagicEvasion()` — Magic Evasionの演出を実行する。
-- `performCounter()` — Counterの演出を実行する。
-- `performCollapse()` — Collapseの演出を実行する。
-- `performVictory()` — Victoryの演出を実行する。
-- `performEscape()` — Escapeの演出を実行する。
-- `makeActionList()` — Action Listを作成する。
-- `makeAutoBattleActions()` — Auto Battle Actionsを作成する。
-- `makeConfusionActions()` — Confusion Actionsを作成する。
-- `makeActions()` — Actionsを作成する。
-- `onPlayerWalk()` — Player Walk時のコールバック。
-- `updateStateSteps(state)` — State Stepsを更新する。
-- `showAddedStates()` — Added Statesを表示する。
-- `showRemovedStates()` — Removed Statesを表示する。
-- `stepsForTurn()`
-- `turnEndOnMap()`
-- `checkFloorEffect()` — Floor Effectをチェックする。
-- `executeFloorDamage()` — Floor Damageを実行する。
-- `basicFloorDamage()`
-- `maxFloorDamage()`
-- `performMapDamage()` — Map Damageの演出を実行する。
-- `clearActions()` — Actionsをクリアする。
-- `inputtingAction()`
-- `selectNextCommand()` — Next Commandを選択する。
-- `selectPreviousCommand()` — Previous Commandを選択する。
-- `lastSkill()`
-- `lastMenuSkill()`
-- `setLastMenuSkill(skill)` — Last Menu Skillを設定する。
-- `lastBattleSkill()`
-- `setLastBattleSkill(skill)` — Last Battle Skillを設定する。
-- `lastCommandSymbol()`
-- `setLastCommandSymbol(symbol)` — Last Command Symbolを設定する。
-- `testEscape(item)`
-- `meetsUsableItemConditions(item)`
-- `onEscapeFailure()` — Escape Failure時のコールバック。
+- `isActor()` — アクターかを確認する（常にtrue）。
+- `friendsUnit()` — 味方ユニット（$gameParty）を返す。
+- `opponentsUnit()` — 敵ユニット（$gameTroop）を返す。
+- `index()` — パーティ内のインデックスを返す。
+- `isBattleMember()` — 戦闘メンバーかを確認する。
+- `isFormationChangeOk()` — 隊列変更可能かを確認する。
+- `currentClass()` — 現在の職業データを返す。
+- `isClass(gameClass)` — 指定職業かを確認する。
+- `skillTypes()` — 使用可能なスキルタイプID配列を返す。
+- `skills()` — 習得済みスキルの配列を返す。
+- `usableSkills()` — 現在使用可能なスキルの配列を返す。
+- `traitObjects()` — 特徴を持つオブジェクト（アクター・職業・装備・ステート）の配列を返す。
+- `attackElements()` — 通常攻撃の属性ID配列を返す。
+- `hasNoWeapons()` — 武器を装備していないかを確認する。
+- `bareHandsElementId()` — 素手攻撃の属性IDを返す。
+- `paramBase(paramId)` — レベルに応じたパラメータ基本値を返す。
+- `paramPlus(paramId)` — パラメータ加算値（装備含む）を返す。
+- `attackAnimationId1()` — 通常攻撃アニメーションID（武器1）を返す。
+- `attackAnimationId2()` — 通常攻撃アニメーションID（武器2/二刀流）を返す。
+- `bareHandsAnimationId()` — 素手攻撃のアニメーションIDを返す。
+- `changeExp(exp, show)` — 経験値を変更する（レベルアップ表示制御付き）。
+- `levelUp()` — レベルアップ処理を行う。
+- `levelDown()` — レベルダウン処理を行う。
+- `findNewSkills(lastSkills)` — レベルアップで新たに習得したスキルを検索する。
+- `displayLevelUp(newSkills)` — レベルアップメッセージを表示する。
+- `gainExp(exp)` — 経験値を獲得する。
+- `finalExpRate()` — 最終的な経験値倍率を返す。
+- `benchMembersExpRate()` — 控えメンバーの経験値倍率を返す。
+- `shouldDisplayLevelUp()` — レベルアップ表示をすべきかを確認する。
+- `changeLevel(level, show)` — レベルを変更する。
+- `learnSkill(skillId)` — スキルを習得する。
+- `forgetSkill(skillId)` — スキルを忘れる。
+- `isLearnedSkill(skillId)` — スキルを習得済みかを確認する。
+- `hasSkill(skillId)` — スキルを所持しているか（習得+特徴追加）を確認する。
+- `changeClass(classId, keepExp)` — 職業を変更する。
+- `setFaceImage(faceName, faceIndex)` — 顔画像を設定する。
+- `setBattlerImage(battlerName)` — 戦闘キャラ画像を設定する。
+- `isSpriteVisible()` — SV戦闘でスプライトが表示されるかを確認する。
+- `performActionStart(action)` — アクション開始演出を実行する。
+- `performAction(action)` — アクション演出を実行する。
+- `performActionEnd()` — アクション終了演出を実行する。
+- `performAttack()` — 通常攻撃演出を実行する。
+- `performDamage()` — ダメージ演出を実行する。
+- `performEvasion()` — 回避演出を実行する。
+- `performMagicEvasion()` — 魔法回避演出を実行する。
+- `performCounter()` — 反撃演出を実行する。
+- `performCollapse()` — 戦闘不能演出を実行する。
+- `performVictory()` — 勝利演出を実行する。
+- `performEscape()` — 逃走演出を実行する。
+- `makeActionList()` — 自動戦闘用アクション候補リストを作成する。
+- `makeAutoBattleActions()` — 自動戦闘用アクションを作成する。
+- `makeConfusionActions()` — 混乱時のアクションを作成する。
+- `makeActions()` — アクションを作成する。
+- `onPlayerWalk()` — プレイヤー移動時のコールバック（歩数経過ステート等）。
+- `updateStateSteps(state)` — 歩数経過ステートの歩数を更新する。
+- `showAddedStates()` — 付与されたステートのメッセージを表示する。
+- `showRemovedStates()` — 解除されたステートのメッセージを表示する。
+- `stepsForTurn()` — 1ターンあたりの歩数を返す。
+- `turnEndOnMap()` — マップ上でのターン終了処理を行う。
+- `checkFloorEffect()` — 床ダメージのチェックを行う。
+- `executeFloorDamage()` — 床ダメージを実行する。
+- `basicFloorDamage()` — 床ダメージの基本値を返す。
+- `maxFloorDamage()` — 床ダメージの最大値を返す。
+- `performMapDamage()` — マップ上ダメージの演出を実行する。
+- `clearActions()` — 全アクションをクリアする。
+- `inputtingAction()` — 現在入力中のアクションを返す。
+- `selectNextCommand()` — 次のコマンド入力へ進む。
+- `selectPreviousCommand()` — 前のコマンド入力に戻る。
+- `lastSkill()` — 最後に使用したスキルを返す。
+- `lastMenuSkill()` — メニューで最後に使用したスキルを返す。
+- `setLastMenuSkill(skill)` — メニューで最後に使用したスキルを設定する。
+- `lastBattleSkill()` — 戦闘で最後に使用したスキルを返す。
+- `setLastBattleSkill(skill)` — 戦闘で最後に使用したスキルを設定する。
+- `lastCommandSymbol()` — 最後のコマンドシンボルを返す。
+- `setLastCommandSymbol(symbol)` — 最後のコマンドシンボルを設定する。
+- `testEscape(item)` — アイテムが逃走効果を持つかをテストする。
+- `meetsUsableItemConditions(item)` — アイテム使用条件を満たすかを確認する。
+- `onEscapeFailure()` — 逃走失敗時のコールバック（TPBペナルティ適用）。
 
 ### Game_Enemy ⭐
 
@@ -2012,49 +2012,49 @@ Game_ActorとGame_Enemyのスーパークラス。スプライトやアクショ
 #### インスタンスメソッド
 
 - `initialize(enemyId, x, y)` — 初期化する。
-- `initMembers()` — Membersを初期化する。
-- `setup(enemyId, x, y)` — セットアップする。
-- `isEnemy()` — 敵かを確認する。
-- `friendsUnit()`
-- `opponentsUnit()`
-- `index()` — 現在のインデックスを返す。
-- `isBattleMember()` — Battle Memberかどうかを確認する。
-- `enemyId()` — enemyのIDを返す。
-- `enemy()` — 敵オブジェクトを返す。
-- `traitObjects()`
-- `paramBase(paramId)`
-- `exp()`
-- `gold()`
-- `makeDropItems()` — Drop Itemsを作成する。
-- `dropItemRate()` — drop Itemの倍率を返す。
-- `itemObject(kind, dataId)`
-- `isSpriteVisible()` — Sprite Visibleかどうかを確認する。
-- `screenX()`
-- `screenY()`
-- `battlerName()` — battlerの名前を返す。
-- `battlerHue()`
-- `originalName()` — originalの名前を返す。
-- `name()` — 名前を返す。
-- `isLetterEmpty()` — Letter Emptyかどうかを確認する。
-- `setLetter(letter)` — Letterを設定する。
-- `setPlural(plural)` — Pluralを設定する。
-- `performActionStart(action)` — Action Startの演出を実行する。
-- `performAction(action)` — Actionの演出を実行する。
-- `performActionEnd()` — Action Endの演出を実行する。
-- `performDamage()` — Damageの演出を実行する。
-- `performCollapse()` — Collapseの演出を実行する。
-- `transform(enemyId)`
-- `meetsCondition(action)`
-- `meetsTurnCondition(param1, param2)`
-- `meetsHpCondition(param1, param2)`
-- `meetsMpCondition(param1, param2)`
-- `meetsStateCondition(param)`
-- `meetsPartyLevelCondition(param)`
-- `meetsSwitchCondition(param)`
-- `isActionValid(action)` — Action Validかどうかを確認する。
-- `selectAction(actionList, ratingZero)` — Actionを選択する。
-- `selectAllActions(actionList)` — All Actionsを選択する。
-- `makeActions()` — Actionsを作成する。
+- `initMembers()` — メンバー変数を初期化する。
+- `setup(enemyId, x, y)` — 敵IDと座標でセットアップする。
+- `isEnemy()` — 敵かを確認する（常にtrue）。
+- `friendsUnit()` — 味方ユニット（$gameTroop）を返す。
+- `opponentsUnit()` — 敵ユニット（$gameParty）を返す。
+- `index()` — 敵グループ内のインデックスを返す。
+- `isBattleMember()` — 戦闘メンバーかを確認する（常にtrue）。
+- `enemyId()` — 敵キャラクIDを返す。
+- `enemy()` — データベースの敵オブジェクトを返す。
+- `traitObjects()` — 特徴を持つオブジェクト（敵・ステート）の配列を返す。
+- `paramBase(paramId)` — パラメータ基本値を返す。
+- `exp()` — 獲得経験値を返す。
+- `gold()` — 獲得ゴールドを返す。
+- `makeDropItems()` — ドロップアイテムの配列を作成する。
+- `dropItemRate()` — ドロップアイテム倍率を返す。
+- `itemObject(kind, dataId)` — 種類とIDからデータベースオブジェクトを返す。
+- `isSpriteVisible()` — スプライトが表示されるかを確認する（常にtrue）。
+- `screenX()` — 画面上のX座標を返す。
+- `screenY()` — 画面上のY座標を返す。
+- `battlerName()` — バトラー画像のファイル名を返す。
+- `battlerHue()` — バトラー画像の色相を返す。
+- `originalName()` — 元の名前（変身前）を返す。
+- `name()` — 名前（複数がいる場合は英字付き）を返す。
+- `isLetterEmpty()` — 識別英字が未設定かを確認する。
+- `setLetter(letter)` — 識別英字を設定する（A, B等）。
+- `setPlural(plural)` — 同名の敵が複数いるかを設定する。
+- `performActionStart(action)` — アクション開始演出を実行する。
+- `performAction(action)` — アクション演出を実行する。
+- `performActionEnd()` — アクション終了演出を実行する。
+- `performDamage()` — ダメージ演出を実行する。
+- `performCollapse()` — 戦闘不能演出を実行する。
+- `transform(enemyId)` — 別の敵に変身する。
+- `meetsCondition(action)` — 行動パターンの条件を満たすかを確認する。
+- `meetsTurnCondition(param1, param2)` — ターン条件を満たすかを確認する。
+- `meetsHpCondition(param1, param2)` — HP条件を満たすかを確認する。
+- `meetsMpCondition(param1, param2)` — MP条件を満たすかを確認する。
+- `meetsStateCondition(param)` — ステート条件を満たすかを確認する。
+- `meetsPartyLevelCondition(param)` — パーティレベル条件を満たすかを確認する。
+- `meetsSwitchCondition(param)` — スイッチ条件を満たすかを確認する。
+- `isActionValid(action)` — 行動パターンが有効かを確認する。
+- `selectAction(actionList, ratingZero)` — レーティングに基づいて行動を選択する。
+- `selectAllActions(actionList)` — 全アクションスロットの行動を選択する。
+- `makeActions()` — アクションを作成する。
 
 ### Game_Actors
 
@@ -2078,28 +2078,28 @@ Game_PartyとGame_Troopのスーパークラス。
 #### インスタンスメソッド
 
 - `initialize()` — 初期化する。
-- `inBattle()`
+- `inBattle()` — 戦闘中かを確認する。
 - `members()` — メンバーの配列を返す。
-- `aliveMembers()`
-- `deadMembers()`
-- `movableMembers()`
-- `clearActions()` — Actionsをクリアする。
-- `agility()`
-- `tgrSum()`
-- `randomTarget()`
-- `randomDeadTarget()`
-- `smoothTarget(index)` — Targetをスムーズに変更する。
-- `smoothDeadTarget(index)` — Dead Targetをスムーズに変更する。
-- `clearResults()` — Resultsをクリアする。
-- `onBattleStart(advantageous)` — Battle Start時のコールバック。
-- `onBattleEnd()` — Battle End時のコールバック。
-- `makeActions()` — Actionsを作成する。
-- `select(activeMember)` — 選択する。
-- `isAllDead()` — All Deadかどうかを確認する。
-- `substituteBattler(target)`
-- `tpbBaseSpeed()`
-- `tpbReferenceTime()`
-- `updateTpb()` — Tpbを更新する。
+- `aliveMembers()` — 生存メンバーの配列を返す。
+- `deadMembers()` — 戦闘不能メンバーの配列を返す。
+- `movableMembers()` — 行動可能なメンバーの配列を返す。
+- `clearActions()` — 全メンバーのアクションをクリアする。
+- `agility()` — ユニットの平均敏捷性を返す。
+- `tgrSum()` — ユニットの狙われ率合計を返す。
+- `randomTarget()` — 狙われ率に基づいてランダムに対象を選ぶ。
+- `randomDeadTarget()` — 戦闘不能メンバーからランダムに対象を選ぶ。
+- `smoothTarget(index)` — 指定インデックスの生存メンバーを返す（戦闘不能なら別の生存者）。
+- `smoothDeadTarget(index)` — 指定インデックスの戦闘不能メンバーを返す。
+- `clearResults()` — 全メンバーのアクション結果をクリアする。
+- `onBattleStart(advantageous)` — 戦闘開始時のコールバック。
+- `onBattleEnd()` — 戦闘終了時のコールバック。
+- `makeActions()` — 全メンバーのアクションを作成する。
+- `select(activeMember)` — 指定メンバーを選択状態にする。
+- `isAllDead()` — 全メンバーが戦闘不能かを確認する。
+- `substituteBattler(target)` — 身代わり可能なバトラーを返す。
+- `tpbBaseSpeed()` — TPBの基本速度を返す。
+- `tpbReferenceTime()` — TPBの参照時間を返す。
+- `updateTpb()` — 全メンバーのTPBを更新する。
 
 ### Game_Party ⭐
 
