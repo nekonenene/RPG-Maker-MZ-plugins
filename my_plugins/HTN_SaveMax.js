@@ -4,7 +4,7 @@
 //
 // Copyright (c) 2016-2026 hatonekoe
 // This software is released under the MIT License.
-// http://opensource.org/licenses/mit-license.php
+// https://opensource.org/license/mit
 //
 // 2026/03/18 ver2.0.0 ツクールMZに対応
 // 2016/09/12 ver1.0.0 first release
@@ -15,7 +15,7 @@
 /*:
  * @target MV MZ
  * @plugindesc Change the maximum number of save slots
- * @author nekonenene - https://hato-neko.x0.com
+ * @author hatonekoe - https://hato-neko.x0.com
  *
  * @help
  * Change the maximum number of save slots. (Default: 20)
