@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------
 //
-// HTN_SmartConfusion.js
+// HTN_SmartCharm.js
 //
 // Copyright (c) 2026 hatonekoe
 // This software is released under the MIT License.
@@ -13,8 +13,8 @@
  * @target MZ
  * @author ハトネコエ - https://hato-neko.x0.com
  *
- * @param TargetConfusionLevel
- * @text 対象の行動制約(混乱レベル)
+ * @param TargetCharmLevel
+ * @text 対象の行動制約(混乱・魅了レベル)
  * @desc どの行動制約のときにスマートな行動をとらせるか。1:敵を攻撃 2:誰かを攻撃 3:味方を攻撃(魅了)。0なら全ての混乱で有効。
  * @default 3
  * @type select
@@ -35,7 +35,7 @@
  * @min 1
  * @max 99
  *
- * @help HTN_SmartConfusion.js
+ * @help HTN_SmartCharm.js
  *
  * 対象の混乱状態異常（デフォルトでは行動制約「味方を攻撃」である「魅了」などを想定）になったとき、
  * 以下のような頭の良い行動（スマートアクション）をとらせることができます。
@@ -51,9 +51,9 @@
 (() => {
   'use strict';
 
-  const pluginName = "HTN_SmartConfusion";
+  const pluginName = "HTN_SmartCharm";
   const parameters = PluginManager.parameters(pluginName);
-  const paramTargetConfusionLevel = Number(parameters['TargetConfusionLevel'] || 3);
+  const paramTargetCharmLevel = Number(parameters['TargetCharmLevel'] || 3);
   const paramHealThreshold = Number(parameters['HealThreshold'] || 50) / 100;
 
   const _Game_Action_setConfusion = Game_Action.prototype.setConfusion;
@@ -64,14 +64,14 @@
     const subject = this.subject();
     let isTarget = false;
 
-    if (paramTargetConfusionLevel === 0) {
+    if (paramTargetCharmLevel === 0) {
       if (subject.isConfused()) isTarget = true;
     } else {
-      if (subject.confusionLevel() === paramTargetConfusionLevel) isTarget = true;
+      if (subject.confusionLevel() === paramTargetCharmLevel) isTarget = true;
     }
 
     if (!isTarget) {
-      this._smartConfusionTarget = null;
+      this._smartCharmTarget = null;
       return;
     }
 
@@ -172,13 +172,13 @@
     // 決定したスキルとターゲットをセット (見つからなければ通常攻撃のまま)
     if (decidedSkill) {
       this.setSkill(decidedSkill.id);
-      this._smartConfusionTarget = decidedTarget;
+      this._smartCharmTarget = decidedTarget;
     } else {
       this.setAttack();
       if (targetUnitForAttack.length > 0) {
-        this._smartConfusionTarget = targetUnitForAttack[Math.randomInt(targetUnitForAttack.length)];
+        this._smartCharmTarget = targetUnitForAttack[Math.randomInt(targetUnitForAttack.length)];
       } else {
-        this._smartConfusionTarget = null;
+        this._smartCharmTarget = null;
       }
     }
   };
@@ -188,8 +188,8 @@
    */
   const _Game_Action_confusionTarget = Game_Action.prototype.confusionTarget;
   Game_Action.prototype.confusionTarget = function() {
-    if (this._smartConfusionTarget) {
-      return this._smartConfusionTarget;
+    if (this._smartCharmTarget) {
+      return this._smartCharmTarget;
     }
     return _Game_Action_confusionTarget.apply(this, arguments);
   };
@@ -199,11 +199,11 @@
    */
   const _Game_Action_makeTargets = Game_Action.prototype.makeTargets;
   Game_Action.prototype.makeTargets = function() {
-    if (!this._forcing && this.subject().isConfused() && this._smartConfusionTarget) {
+    if (!this._forcing && this.subject().isConfused() && this._smartCharmTarget) {
       let targets = [];
       // スキルが全体対象の場合、ターゲットが属しているユニットの生存者全体を対象にする
       if (this.isForAll()) {
-        const unit = this._smartConfusionTarget.friendsUnit();
+        const unit = this._smartCharmTarget.friendsUnit();
         targets = unit.aliveMembers();
       } else {
         targets.push(this.confusionTarget());
