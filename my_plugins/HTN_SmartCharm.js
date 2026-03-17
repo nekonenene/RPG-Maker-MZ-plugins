@@ -37,6 +37,11 @@
  *
  * @help HTN_SmartCharm.js
  *
+ * 【使い方】
+ * スマートアクションをとらせたいステート（「魅了」など）のメモ欄に
+ * <SmartCharm>
+ * と記述してください。
+ *
  * 対象の混乱状態異常（デフォルトでは行動制約「味方を攻撃」である「魅了」などを想定）になったとき、
  * 以下のような頭の良い行動（スマートアクション）をとらせることができます。
  *
@@ -63,6 +68,14 @@
 
     const subject = this.subject();
     let isTarget = false;
+
+    // ステートのメモ欄に <SmartCharm> の記述があるかチェック
+    const hasSmartCharmState = subject.states().some(state => state.meta.SmartCharm);
+
+    if (!hasSmartCharmState) {
+      this._smartCharmTarget = null;
+      return;
+    }
 
     if (paramTargetCharmLevel === 0) {
       if (subject.isConfused()) isTarget = true;
