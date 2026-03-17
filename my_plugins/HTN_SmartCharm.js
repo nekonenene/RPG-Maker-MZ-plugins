@@ -13,20 +13,6 @@
  * @target MZ
  * @author ハトネコエ - https://hato-neko.x0.com
  *
- * @param TargetCharmLevel
- * @text 対象の行動制約(混乱・魅了レベル)
- * @desc どの行動制約のときにスマートな行動をとらせるか。1:敵を攻撃 2:誰かを攻撃 3:味方を攻撃(魅了)。0なら全ての混乱で有効。
- * @default 3
- * @type select
- * @option 全ての混乱
- * @value 0
- * @option 敵を攻撃
- * @value 1
- * @option 誰かを攻撃
- * @value 2
- * @option 味方を攻撃(魅了)
- * @value 3
- *
  * @param HealThreshold
  * @text 回復閾値(%)
  * @desc 該当ターゲットのHPがこのパーセンテージ以下の場合、HP回復スキルを使用します。
@@ -58,7 +44,6 @@
 
   const pluginName = "HTN_SmartCharm";
   const parameters = PluginManager.parameters(pluginName);
-  const paramTargetCharmLevel = Number(parameters['TargetCharmLevel'] || 3);
   const paramHealThreshold = Number(parameters['HealThreshold'] || 50) / 100;
 
   const _Game_Action_setConfusion = Game_Action.prototype.setConfusion;
@@ -67,23 +52,11 @@
     _Game_Action_setConfusion.call(this);
 
     const subject = this.subject();
-    let isTarget = false;
 
     // ステートのメモ欄に <SmartCharm> の記述があるかチェック
     const hasSmartCharmState = subject.states().some(state => state.meta.SmartCharm);
 
     if (!hasSmartCharmState) {
-      this._smartCharmTarget = null;
-      return;
-    }
-
-    if (paramTargetCharmLevel === 0) {
-      if (subject.isConfused()) isTarget = true;
-    } else {
-      if (subject.confusionLevel() === paramTargetCharmLevel) isTarget = true;
-    }
-
-    if (!isTarget) {
       this._smartCharmTarget = null;
       return;
     }
