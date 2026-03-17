@@ -63,24 +63,10 @@
 
     const friends = subject.friendsUnit().aliveMembers();
     const opponents = subject.opponentsUnit().aliveMembers();
-    const confusionLevel = subject.confusionLevel();
 
-    let targetUnitForHeal = [];
-    let targetUnitForAttack = [];
-
-    if (confusionLevel === 3) {
-      // 魅了: 回復は敵部隊へ、攻撃は味方部隊へ
-      targetUnitForHeal = opponents;
-      targetUnitForAttack = friends;
-    } else if (confusionLevel === 2) {
-      // 混乱: 全てが対象。誰か回復が必要なら回復。
-      targetUnitForHeal = friends.concat(opponents);
-      targetUnitForAttack = targetUnitForHeal;
-    } else {
-      // 1(敵を攻撃)など
-      targetUnitForHeal = friends;
-      targetUnitForAttack = opponents;
-    }
+    // 魅了: 回復は敵部隊へ、攻撃は味方部隊へ
+    let targetUnitForHeal = opponents;
+    let targetUnitForAttack = friends;
 
     // 使用可能なスキルを取得 (MP不足や封印状態などを考慮)
     const usableSkills = subject.skills().filter(skill => subject.canUse(skill));
