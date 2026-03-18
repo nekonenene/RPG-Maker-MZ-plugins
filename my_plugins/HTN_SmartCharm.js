@@ -58,7 +58,7 @@
  * @param StunMessage
  * @text 行動不能時のメッセージ
  * @desc 行動しなかった際に表示するメッセージです。空欄にするとメッセージをスキップします。%1は行動者の名前に置き換わります。
- * @default %1は魅了されて体に力が入らない。
+ * @default %1は幸せな顔で相手に見とれている。
  * @type string
  *
  * @help HTN_SmartCharm.js
