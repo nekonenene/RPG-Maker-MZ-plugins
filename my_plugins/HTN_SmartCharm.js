@@ -39,12 +39,8 @@
  * 【ステートごとの個別設定】
  * メモ欄に以下のように記述することで、プラグインパラメータの「回復閾値(%)」や
  * 「自傷確率(%)」をステートごとに上書き設定できます。
- * （設定は両方の書き方をサポートしています）
  *
- * 例1（JSON形式でまとめて書く場合 ※キーはダブルクォーテーションで囲む必要があります）：
- * <SmartCharm: {"HealThreshold": 80, "SelfAttackRate": 0}>
- *
- * 例2（個別のタグで書く場合）：
+ * 設定例：
  * <SmartCharm>
  * <SmartCharm_HealThreshold: 80>
  * <SmartCharm_SelfAttackRate: 0>
@@ -92,22 +88,7 @@
     // 優先度の最も高いステートから設定を読み込む
     const charmState = smartCharmStates[0];
 
-    // JSON形式でのパース (<SmartCharm: {"HealThreshold": 80}> のような形)
-    if (typeof charmState.meta.SmartCharm === 'string' && charmState.meta.SmartCharm.trim()) {
-      try {
-        const customParams = JSON.parse(charmState.meta.SmartCharm);
-        if (customParams.HealThreshold !== undefined) {
-          currentHealThreshold = Number(customParams.HealThreshold) / 100;
-        }
-        if (customParams.SelfAttackRate !== undefined) {
-          currentSelfAttackRate = Number(customParams.SelfAttackRate);
-        }
-      } catch (e) {
-        console.warn("HTN_SmartCharm: <SmartCharm>タグのJSONパースに失敗しました。キー名をダブルクォーテーションで囲む等、書式を確認してください。", e);
-      }
-    }
-
-    // 個別タグでの上書き (こちらが優先される)
+    // 個別タグでの上書き
     if (charmState.meta.SmartCharm_HealThreshold !== undefined) {
       currentHealThreshold = Number(charmState.meta.SmartCharm_HealThreshold) / 100;
     }
