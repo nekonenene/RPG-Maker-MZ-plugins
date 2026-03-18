@@ -73,7 +73,7 @@
 
     const subject = this.subject();
 
-    // ステートのメモ欄に <SmartCharm> の記述があるかチェック
+    // 現在かかっている状態異常のうち、ステートのメモ欄に <SmartCharm> の記述があるものを探す
     const smartCharmStates = subject.states().filter(state => state.meta.SmartCharm);
 
     if (smartCharmStates.length === 0) {
@@ -85,7 +85,7 @@
     let currentHealThreshold = paramHealThreshold;
     let currentSelfAttackRate = paramSelfAttackRate;
 
-    // 優先度の最も高いステートから設定を読み込む
+    // <SmartCharm> の付いた状態異常に複数かかっている場合、「優先度」がもっとも高いステートのタグを採用
     const charmState = smartCharmStates[0];
 
     // 個別タグでの上書き
