@@ -29,6 +29,24 @@
  * @min 0
  * @max 100
  *
+ * @param AllowHeal
+ * @text 回復スキルの許可
+ * @desc 回復スキル(HP回復)の使用を許可するかどうか。
+ * @default true
+ * @type boolean
+ *
+ * @param AllowMagic
+ * @text 魔法スキルの許可
+ * @desc 魔法スキル(スキルタイプ1、または命中タイプ:魔法)の使用を許可するかどうか。
+ * @default true
+ * @type boolean
+ *
+ * @param AllowSpecial
+ * @text 必殺技スキルの許可
+ * @desc 必殺技スキル(スキルタイプ2)の使用を許可するかどうか。
+ * @default true
+ * @type boolean
+ *
  * @help HTN_SmartCharm.js
  *
  * 【使い方】
@@ -44,6 +62,9 @@
  * <SmartCharm>
  * <SmartCharm_HealThreshold: 80>
  * <SmartCharm_SelfAttackRate: 0>
+ * <SmartCharm_Heal: false>
+ * <SmartCharm_Magic: false>
+ * <SmartCharm_Special: false>
  *
  * 対象の混乱状態異常（デフォルトでは行動制約「味方を攻撃」である「魅了」などを想定）になったとき、
  * 以下のような頭の良い行動（スマートアクション）をとらせることができます。
@@ -65,6 +86,9 @@
   const parameters = PluginManager.parameters(pluginName);
   const paramHealThreshold = Number(parameters['HealThreshold'] || 60) / 100;
   const paramSelfAttackRate = Number(parameters['SelfAttackRate'] || 10);
+  const paramAllowHeal = String(parameters['AllowHeal']) !== 'false';
+  const paramAllowMagic = String(parameters['AllowMagic']) !== 'false';
+  const paramAllowSpecial = String(parameters['AllowSpecial']) !== 'false';
 
   const _Game_Action_setConfusion = Game_Action.prototype.setConfusion;
   Game_Action.prototype.setConfusion = function() {
@@ -84,6 +108,9 @@
     // デフォルトパラメータから初期化
     let currentHealThreshold = paramHealThreshold;
     let currentSelfAttackRate = paramSelfAttackRate;
+    let currentAllowHeal = paramAllowHeal;
+    let currentAllowMagic = paramAllowMagic;
+    let currentAllowSpecial = paramAllowSpecial;
 
     // <SmartCharm> の付いた状態異常に複数かかっている場合、「優先度」がもっとも高いステートのタグを採用
     const charmState = smartCharmStates[0];
@@ -94,6 +121,15 @@
     }
     if (charmState.meta.SmartCharm_SelfAttackRate !== undefined) {
       currentSelfAttackRate = Number(charmState.meta.SmartCharm_SelfAttackRate);
+    }
+    if (charmState.meta.SmartCharm_Heal !== undefined) {
+      currentAllowHeal = String(charmState.meta.SmartCharm_Heal).trim().toLowerCase() !== 'false';
+    }
+    if (charmState.meta.SmartCharm_Magic !== undefined) {
+      currentAllowMagic = String(charmState.meta.SmartCharm_Magic).trim().toLowerCase() !== 'false';
+    }
+    if (charmState.meta.SmartCharm_Special !== undefined) {
+      currentAllowSpecial = String(charmState.meta.SmartCharm_Special).trim().toLowerCase() !== 'false';
     }
 
     const friends = subject.friendsUnit().aliveMembers();
@@ -114,7 +150,19 @@
         .filter(s => !!s);
     }
 
-    const usableSkills = allSkills.filter(skill => subject.canUse(skill));
+    const usableSkills = allSkills.filter(skill => {
+      if (!subject.canUse(skill)) return false;
+
+      // 魔法スキルの判定 (命中タイプが2=魔法、またはスキルタイプが1)
+      const isMagic = skill.hitType === 2 || skill.stypeId === 1;
+      // 必殺技スキルの判定 (スキルタイプが2)
+      const isSpecial = skill.stypeId === 2;
+
+      if (!currentAllowMagic && isMagic) return false;
+      if (!currentAllowSpecial && isSpecial) return false;
+
+      return true;
+    });
 
     // 通常攻撃も候補に入れる
     const attackSkill = $dataSkills[subject.attackSkillId()];
@@ -128,59 +176,61 @@
     // 1. HP回復スキルの判定
     let targetNeedHeal = null;
 
-    // 魅了を付与してきた相手（または同種のモンスター）がいれば、その回復を優先する
-    const inflicter = subject._smartCharmInflicter;
-    let priorityTargets = [];
+    if (currentAllowHeal) {
+      // 魅了を付与してきた相手（または同種のモンスター）がいれば、その回復を優先する
+      const inflicter = subject._smartCharmInflicter;
+      let priorityTargets = [];
 
-    if (inflicter) {
-      if (inflicter.isAlive() && targetUnitForHeal.includes(inflicter)) {
-        priorityTargets.push(inflicter);
-      } else if (inflicter.isEnemy()) { // 魅了付与者がモンスターの場合
-        // 本人がいない場合、同種のモンスターを探す
-        priorityTargets = targetUnitForHeal.filter(member =>
-          member.isEnemy() && member.enemyId() === inflicter.enemyId()
-        );
+      if (inflicter) {
+        if (inflicter.isAlive() && targetUnitForHeal.includes(inflicter)) {
+          priorityTargets.push(inflicter);
+        } else if (inflicter.isEnemy()) { // 魅了付与者がモンスターの場合
+          // 本人がいない場合、同種のモンスターを探す
+          priorityTargets = targetUnitForHeal.filter(member =>
+            member.isEnemy() && member.enemyId() === inflicter.enemyId()
+          );
+        }
       }
-    }
 
-    // まず優先ターゲットの中で回復が必要な者がいないかチェック
-    for (const priorityTarget of priorityTargets) {
-      if (priorityTarget.hp <= priorityTarget.mhp * currentHealThreshold) {
-        targetNeedHeal = priorityTarget;
-        break;
-      }
-    }
-
-    // 優先対象がいない、または回復不要な場合は他のメンバーをチェック
-    if (!targetNeedHeal) {
-      for (const member of targetUnitForHeal) {
-        if (member.hp <= member.mhp * currentHealThreshold) {
-          targetNeedHeal = member;
+      // まず優先ターゲットの中で回復が必要な者がいないかチェック
+      for (const priorityTarget of priorityTargets) {
+        if (priorityTarget.hp <= priorityTarget.mhp * currentHealThreshold) {
+          targetNeedHeal = priorityTarget;
           break;
         }
       }
-    }
 
-    if (targetNeedHeal) {
-      // HP回復スキル (damage.type === 3) を探す
-      const healSkills = usableSkills.filter(s => s.damage && s.damage.type === 3);
-      if (healSkills.length > 0) {
-        let bestHealScore = 0;
-        let bestSkill = null;
-
-        for (const skill of healSkills) {
-          this.setSkill(skill.id);
-          const rawVal = this.evalDamageFormula(targetNeedHeal); // 回復量に応じたマイナスの値
-
-          if (rawVal < bestHealScore) {
-            bestHealScore = rawVal;
-            bestSkill = skill;
+      // 優先対象がいない、または回復不要な場合は他のメンバーをチェック
+      if (!targetNeedHeal) {
+        for (const member of targetUnitForHeal) {
+          if (member.hp <= member.mhp * currentHealThreshold) {
+            targetNeedHeal = member;
+            break;
           }
         }
+      }
 
-        if (bestSkill) {
-          decidedSkill = bestSkill;
-          decidedTarget = targetNeedHeal;
+      if (targetNeedHeal) {
+        // HP回復スキル (damage.type === 3) を探す
+        const healSkills = usableSkills.filter(s => s.damage && s.damage.type === 3);
+        if (healSkills.length > 0) {
+          let bestHealScore = 0;
+          let bestSkill = null;
+
+          for (const skill of healSkills) {
+            this.setSkill(skill.id);
+            const rawVal = this.evalDamageFormula(targetNeedHeal); // 回復量に応じたマイナスの値
+
+            if (rawVal < bestHealScore) {
+              bestHealScore = rawVal;
+              bestSkill = skill;
+            }
+          }
+
+          if (bestSkill) {
+            decidedSkill = bestSkill;
+            decidedTarget = targetNeedHeal;
+          }
         }
       }
     }
