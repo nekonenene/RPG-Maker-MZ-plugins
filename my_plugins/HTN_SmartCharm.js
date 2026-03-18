@@ -178,17 +178,17 @@
     let targetNeedHeal = null;
 
     if (currentAllowHeal) {
-      // 1. 回復が必要なメンバーを抽出
+      // 回復が必要なメンバーを抽出
       const healThresholdRatio = currentHealThreshold / 100;
       let targetsNeedingHeal = targetUnitForHeal.filter(member =>
         member.hp <= member.mhp * healThresholdRatio
       );
 
       if (targetsNeedingHeal.length > 0) {
-        // 2. HPの残りパーセンテージが低い順に並び替え
+        // HPの残りパーセンテージが低い順に並び替え
         targetsNeedingHeal.sort((a, b) => (a.hp / a.mhp) - (b.hp / b.mhp));
 
-        // 3. 魅了を付与してきた相手（または同種のモンスター）の条件定義
+        // 魅了を付与してきた相手（または同種のモンスター）の条件定義
         const inflicter = subject._smartCharmInflicter;
         let isPriorityTarget = (member) => false;
 
@@ -201,7 +201,7 @@
           }
         }
 
-        // 4. 優先対象がいれば選ぶ、いなければ最もHP割合が低い者を選ぶ
+        // 優先対象がいれば選ぶ、いなければ最もHP割合が低い者を選ぶ
         targetNeedHeal = targetsNeedingHeal.find(isPriorityTarget) || targetsNeedingHeal[0];
       }
 
