@@ -165,7 +165,7 @@
     let decidedTargetForAttack = null;
     if (targetUnitForAttack.length > 0) {
       const otherTargets = targetUnitForAttack.filter(m => m !== subject);
-      
+
       if (otherTargets.length === 0) {
         // 自分しかいない場合
         decidedTargetForAttack = targetUnitForAttack[0];
@@ -181,8 +181,8 @@
 
     // 3. 攻撃・魔法攻撃・必殺技 スキルの判定
     if (!decidedSkill && decidedTargetForAttack) {
-      // HPダメージスキル (damage.type === 1: HPダメージ, 5: HP吸収) を探す
-      const atkSkills = usableSkills.filter(s => s.damage && (s.damage.type === 1 || s.damage.type === 5));
+      // HPダメージスキル (damage.type === 1: HPダメージ) を探す
+      const atkSkills = usableSkills.filter(s => s.damage && s.damage.type === 1);
 
       let bestAtkScore = -1;
       let bestSkill = null;
