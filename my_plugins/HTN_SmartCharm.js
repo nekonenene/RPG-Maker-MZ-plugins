@@ -48,7 +48,7 @@
  * @type boolean
  *
  * @param StunRate
- * @text 行動不可確率(%)
+ * @text 行動不能確率(%)
  * @desc 魅了時に何も行動しなくなる確率です。
  * @default 0
  * @type number
@@ -56,7 +56,7 @@
  * @max 100
  *
  * @param StunMessage
- * @text 行動不可時のメッセージ
+ * @text 行動不能時のメッセージ
  * @desc 行動しなかった際に表示するメッセージです。空欄にするとメッセージをスキップします。%1は行動者の名前に置き換わります。
  * @default %1は幸せな顔で相手に見とれている。
  * @type string
@@ -76,8 +76,8 @@
  * <SmartCharm> （※この記述は必須です）
  * <SmartCharm_HealThreshold: 80> （※回復閾値を80%に設定したい場合）
  * <SmartCharm_SelfAttackRate: 10> （※自傷確率を10%に設定したい場合）
- * <SmartCharm_StunRate: 20> （※行動不可になる確率を20%に設定したい場合）
- * <SmartCharm_StunMessage: %1はぼーっとしている。> （※メッセージを変える場合）
+ * <SmartCharm_StunRate: 20> （※行動不能になる確率を20%に設定したい場合）
+ * <SmartCharm_StunMessage: %1はぼーっとしている。> （※行動不能時のメッセージを変える場合）
  * <SmartCharm_AllowHeal: false> （※敵陣への回復スキルを許可しない場合）
  * <SmartCharm_AllowMagic: false> （※魔法スキルを許可しない場合）
  * <SmartCharm_AllowSpecial: false> （※必殺技を許可しない場合）
@@ -92,12 +92,12 @@
  * <SmartCharm> が記されたステート（状態異常）になったとき、
  * 以下のような行動をとります。
  *
- * 1. 通常攻撃・魔法攻撃・必殺技を含む、一番威力の高い攻撃手段を選択して使用します。
- * 2. 敵側に、設定した閾値（デフォルト60%）以下のHPを持つ対象がいれば、優先してHP回復スキルを使います。
+ * 1. 指定した「行動不能確率(%)」を満たした場合、行動をキャンセルして専用メッセージを表示します。
+ * 2. 通常攻撃・魔法攻撃・必殺技を含む、一番威力の高い攻撃手段を選択して使用します。
+ * 3. 敵側に、設定した閾値（デフォルト60%）以下のHPを持つ対象がいれば、優先してHP回復スキルを使います。
  *    このとき、魅了を付与してきた相手の回復を最優先します。もしその相手が戦闘不能などで不在の場合は、
  *    同じ種類のモンスター（同IDの敵キャラ）を優先して回復しようとします。
- * 3. 該当のスキルがない、またはMP不足などで使えない場合は通常攻撃をおこないます。
- * 4. 指定した「行動不可確率(%)」を満たした場合、行動をキャンセルして専用メッセージを表示します。
+ * 4. 該当のスキルがない、またはMP不足などで使えない場合は通常攻撃をおこないます。
  * 5. 自傷（自分を攻撃）する場合の回避確率は0%になっています。
  *
  * 注意：
@@ -115,7 +115,7 @@
   const paramAllowMagic = String(parameters['AllowMagic']) !== 'false';
   const paramAllowSpecial = String(parameters['AllowSpecial']) !== 'false';
   const paramStunRate = Number(parameters['StunRate'] || 0);
-  const paramStunMessage = String(parameters['StunMessage'] || '%1は幸せな顔で相手に見とれている。');
+  const paramStunMessage = String(parameters['StunMessage']);
 
   const _Game_Action_setConfusion = Game_Action.prototype.setConfusion;
   Game_Action.prototype.setConfusion = function() {
@@ -167,7 +167,7 @@
       currentAllowSpecial = String(charmState.meta.SmartCharm_AllowSpecial).trim().toLowerCase() !== 'false';
     }
 
-    // 行動不可(スタン)判定
+    // 行動不能(スタン)判定
     if (Math.random() * 100 < currentStunRate) {
       this.setAttack(); // ダミーのアクションをセット
       this._isSmartCharmStunned = true;
@@ -414,7 +414,7 @@
   };
 
   /**
-   * 行動不可判定が出ている場合、アクションをスキップしメッセージを表示する
+   * 行動不能判定が出ている場合、アクションをスキップしメッセージを表示する
    */
   const _BattleManager_startAction = BattleManager.startAction;
   BattleManager.startAction = function() {
@@ -422,14 +422,14 @@
     const action = subject.currentAction();
 
     if (action && action._isSmartCharmStunned) {
-      const msg = action._smartCharmStunMessage;
-      if (msg) {
-        this._logWindow.push("addText", msg.format(subject.name()));
+      const stunMessage = action._smartCharmStunMessage;
+      if (stunMessage) {
+        this._logWindow.push("addText", stunMessage.format(subject.name()));
         this._logWindow.push("wait"); // メッセージを読ませるためのウェイト
         this._logWindow.push("clear");
       }
 
-      // Actionフェーズへの移行処理だけ行い、ターゲットを空にしてスキップする
+      // Actionフェーズへの移行処理だけおこない、ターゲットを空にしてスキップする
       this._phase = "action";
       this._action = action;
       this._targets = [];
