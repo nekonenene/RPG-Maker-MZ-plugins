@@ -37,13 +37,13 @@
  *
  * @param AllowMagic
  * @text 魔法スキルの許可
- * @desc 魔法スキル(スキルタイプ1、または命中タイプ:魔法)の使用を許可するかどうか。
+ * @desc 魔法スキル（スキルタイプ：魔法）の使用を許可するかどうか。
  * @default true
  * @type boolean
  *
  * @param AllowSpecial
  * @text 必殺技スキルの許可
- * @desc 必殺技スキル(スキルタイプ2)の使用を許可するかどうか。
+ * @desc 必殺技スキル（スキルタイプ：必殺技）の使用を許可するかどうか。
  * @default true
  * @type boolean
  *
@@ -153,9 +153,9 @@
     const usableSkills = allSkills.filter(skill => {
       if (!subject.canUse(skill)) return false;
 
-      // 魔法スキルの判定 (命中タイプが2=魔法、またはスキルタイプが1)
-      const isMagic = skill.hitType === 2 || skill.stypeId === 1;
-      // 必殺技スキルの判定 (スキルタイプが2)
+      // 魔法スキルの判定（スキルタイプが1）
+      const isMagic = skill.stypeId === 1;
+      // 必殺技スキルの判定（スキルタイプが2）
       const isSpecial = skill.stypeId === 2;
 
       if (!currentAllowMagic && isMagic) return false;
