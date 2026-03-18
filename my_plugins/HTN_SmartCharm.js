@@ -33,6 +33,7 @@
  *
  * 1. 攻撃または魔法攻撃の中で、一番威力の高いものを選択して使用します。
  * 2. ターゲットのHPが設定した閾値（デフォルト50%）以下の対象がいれば、優先してHP回復スキルを使います。
+ *    このとき、魅了を付与してきた相手が明確である場合、その相手の回復を最優先します。
  * 3. 該当のスキルがない、またはMP不足などで使えない場合は通常攻撃をおこないます。
  *
  * 注意：
@@ -47,7 +48,6 @@
   const paramHealThreshold = Number(parameters['HealThreshold'] || 50) / 100;
 
   const _Game_Action_setConfusion = Game_Action.prototype.setConfusion;
-
   Game_Action.prototype.setConfusion = function() {
     // デフォルトでは通常攻撃がセットされる
     _Game_Action_setConfusion.call(this);
@@ -83,11 +83,22 @@
 
     // 1. HP回復スキルの判定
     let targetNeedHeal = null;
-    // HP割合が低い順などで選んでもよいが、ここでは最初の閾値以下のメンバーを選ぶ
-    for (const member of targetUnitForHeal) {
-      if (member.hp <= member.mhp * paramHealThreshold) {
-        targetNeedHeal = member;
-        break;
+
+    // 魅了を付与してきた相手がいれば、その相手の回復を優先する
+    const inflicter = subject._smartCharmInflicter;
+    if (inflicter && inflicter.isAlive() && targetUnitForHeal.includes(inflicter)) {
+      if (inflicter.hp <= inflicter.mhp * paramHealThreshold) {
+        targetNeedHeal = inflicter;
+      }
+    }
+
+    // 優先対象がいない、または回復不要な場合は他のメンバーをチェック
+    if (!targetNeedHeal) {
+      for (const member of targetUnitForHeal) {
+        if (member.hp <= member.mhp * paramHealThreshold) {
+          targetNeedHeal = member;
+          break;
+        }
       }
     }
 
@@ -184,6 +195,32 @@
       return this.repeatTargets(targets);
     }
     return _Game_Action_makeTargets.apply(this, arguments);
+  };
+
+  /**
+   * 魅了を付与した相手を記憶する
+   */
+  const _Game_Action_apply = Game_Action.prototype.apply;
+  Game_Action.prototype.apply = function(target) {
+    const wasCharmed = target.states().some(s => s.meta.SmartCharm);
+    
+    _Game_Action_apply.call(this, target);
+    
+    const isCharmedNow = target.states().some(s => s.meta.SmartCharm);
+    if (!wasCharmed && isCharmedNow) {
+      target._smartCharmInflicter = this.subject();
+    }
+  };
+
+  /**
+   * 魅了が解除されたら記憶を消去する
+   */
+  const _Game_Battler_removeState = Game_Battler.prototype.removeState;
+  Game_Battler.prototype.removeState = function(stateId) {
+    _Game_Battler_removeState.call(this, stateId);
+    if (!this.states().some(s => s.meta.SmartCharm)) {
+      this._smartCharmInflicter = null;
+    }
   };
 
 })();
