@@ -333,7 +333,15 @@
 
     const isCharmedNow = target.states().some(s => s.meta.SmartCharm);
     if (!wasCharmed && isCharmedNow) {
-      target._smartCharmInflicter = this.subject();
+      const subject = this.subject();
+      let inflicter = subject;
+      
+      // 魅了を付与した相手がすでに魅了されている場合、その「元凶」を引き継ぐ
+      if (subject.states().some(s => s.meta.SmartCharm) && subject._smartCharmInflicter) {
+        inflicter = subject._smartCharmInflicter;
+      }
+      
+      target._smartCharmInflicter = inflicter;
     }
   };
 
