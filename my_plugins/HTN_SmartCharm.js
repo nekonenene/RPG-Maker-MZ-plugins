@@ -84,7 +84,7 @@
 
   const pluginName = "HTN_SmartCharm";
   const parameters = PluginManager.parameters(pluginName);
-  const paramHealThreshold = Number(parameters['HealThreshold'] || 60) / 100;
+  const paramHealThreshold = Number(parameters['HealThreshold'] || 60);
   const paramSelfAttackRate = Number(parameters['SelfAttackRate'] || 10);
   const paramAllowHeal = String(parameters['AllowHeal']) !== 'false';
   const paramAllowMagic = String(parameters['AllowMagic']) !== 'false';
@@ -117,7 +117,7 @@
 
     // 個別タグでの上書き
     if (charmState.meta.SmartCharm_HealThreshold !== undefined) {
-      currentHealThreshold = Number(charmState.meta.SmartCharm_HealThreshold) / 100;
+      currentHealThreshold = Number(charmState.meta.SmartCharm_HealThreshold);
     }
     if (charmState.meta.SmartCharm_SelfAttackRate !== undefined) {
       currentSelfAttackRate = Number(charmState.meta.SmartCharm_SelfAttackRate);
@@ -194,7 +194,7 @@
 
       // まず優先ターゲットの中で回復が必要な者がいないかチェック
       for (const priorityTarget of priorityTargets) {
-        if (priorityTarget.hp <= priorityTarget.mhp * currentHealThreshold) {
+        if (priorityTarget.hp <= priorityTarget.mhp * (currentHealThreshold / 100)) {
           targetNeedHeal = priorityTarget;
           break;
         }
@@ -203,7 +203,7 @@
       // 優先対象がいない、または回復不要な場合は他のメンバーをチェック
       if (!targetNeedHeal) {
         for (const member of targetUnitForHeal) {
-          if (member.hp <= member.mhp * currentHealThreshold) {
+          if (member.hp <= member.mhp * (currentHealThreshold / 100)) {
             targetNeedHeal = member;
             break;
           }
