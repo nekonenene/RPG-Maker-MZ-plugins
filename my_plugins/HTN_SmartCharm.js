@@ -62,9 +62,9 @@
  * <SmartCharm>
  * <SmartCharm_HealThreshold: 80>
  * <SmartCharm_SelfAttackRate: 10>
- * <SmartCharm_Heal: false>
- * <SmartCharm_Magic: true>
- * <SmartCharm_Special: true>
+ * <SmartCharm_AllowHeal: false>
+ * <SmartCharm_AllowMagic: true>
+ * <SmartCharm_AllowSpecial: true>
  *
  * <SmartCharm> が記されたステート（状態異常）になったとき、
  * 以下のような行動をとります。
@@ -122,14 +122,14 @@
     if (charmState.meta.SmartCharm_SelfAttackRate !== undefined) {
       currentSelfAttackRate = Number(charmState.meta.SmartCharm_SelfAttackRate);
     }
-    if (charmState.meta.SmartCharm_Heal !== undefined) {
-      currentAllowHeal = String(charmState.meta.SmartCharm_Heal).trim().toLowerCase() !== 'false';
+    if (charmState.meta.SmartCharm_AllowHeal !== undefined) {
+      currentAllowHeal = String(charmState.meta.SmartCharm_AllowHeal).trim().toLowerCase() !== 'false';
     }
-    if (charmState.meta.SmartCharm_Magic !== undefined) {
-      currentAllowMagic = String(charmState.meta.SmartCharm_Magic).trim().toLowerCase() !== 'false';
+    if (charmState.meta.SmartCharm_AllowMagic !== undefined) {
+      currentAllowMagic = String(charmState.meta.SmartCharm_AllowMagic).trim().toLowerCase() !== 'false';
     }
-    if (charmState.meta.SmartCharm_Special !== undefined) {
-      currentAllowSpecial = String(charmState.meta.SmartCharm_Special).trim().toLowerCase() !== 'false';
+    if (charmState.meta.SmartCharm_AllowSpecial !== undefined) {
+      currentAllowSpecial = String(charmState.meta.SmartCharm_AllowSpecial).trim().toLowerCase() !== 'false';
     }
 
     const friends = subject.friendsUnit().aliveMembers();
