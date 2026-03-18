@@ -332,7 +332,7 @@
   };
 
   /**
-   * _smartCharmTarget の指定があれば、それを利用するよう上書き
+   * 攻撃対象について _smartCharmTarget で指定があれば、それを利用するよう早期return
    */
   const _Game_Action_confusionTarget = Game_Action.prototype.confusionTarget;
   Game_Action.prototype.confusionTarget = function() {
