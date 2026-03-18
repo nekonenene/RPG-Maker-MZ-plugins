@@ -9,7 +9,7 @@
 // --------------------------------------------------------------------------
 
 /*:
- * @plugindesc 状態異常時により頭の良い行動をとるようにします。
+ * @plugindesc 魅了の状態異常時に、より適切な（？）行動をとるようにします。
  * @target MZ
  * @author ハトネコエ - https://hato-neko.x0.com
  *
@@ -24,33 +24,33 @@
  * @param SelfAttackRate
  * @text 自傷確率(%)
  * @desc 攻撃対象として自分自身を選ぶ確率です。0%の場合、自分以外がいればそちらを攻撃します。
- * @default 10
+ * @default 0
  * @type number
  * @min 0
  * @max 100
  *
  * @param AllowHeal
  * @text 回復スキルの許可
- * @desc 回復スキル(HP回復)の使用を許可するかどうか。
+ * @desc 回復スキル（HP回復）を敵に使用するか（trueなら使用する）
  * @default true
  * @type boolean
  *
  * @param AllowMagic
  * @text 魔法スキルの許可
- * @desc 魔法スキル（スキルタイプ：魔法）の使用を許可するかどうか。
+ * @desc 魔法スキル（スキルタイプ：魔法）を味方に使用するか（trueなら使用する）
  * @default true
  * @type boolean
  *
  * @param AllowSpecial
  * @text 必殺技スキルの許可
- * @desc 必殺技スキル（スキルタイプ：必殺技）の使用を許可するかどうか。
+ * @desc 必殺技スキル（スキルタイプ：必殺技）を味方に使用するか（trueなら使用する）
  * @default true
  * @type boolean
  *
  * @help HTN_SmartCharm.js
  *
  * 【使い方】
- * スマートアクションをとらせたいステート（「魅了」など）のメモ欄に
+ * このプラグインの挙動をさせたいステート（「魅了」などの状態異常）のメモ欄に
  * <SmartCharm>
  * と記述してください。
  *
@@ -61,22 +61,22 @@
  * 設定例：
  * <SmartCharm>
  * <SmartCharm_HealThreshold: 80>
- * <SmartCharm_SelfAttackRate: 0>
+ * <SmartCharm_SelfAttackRate: 10>
  * <SmartCharm_Heal: false>
- * <SmartCharm_Magic: false>
- * <SmartCharm_Special: false>
+ * <SmartCharm_Magic: true>
+ * <SmartCharm_Special: true>
  *
- * 対象の混乱状態異常（デフォルトでは行動制約「味方を攻撃」である「魅了」などを想定）になったとき、
- * 以下のような頭の良い行動（スマートアクション）をとらせることができます。
+ * <SmartCharm> が記されたステート（状態異常）になったとき、
+ * 以下のような行動をとります。
  *
  * 1. 通常攻撃・魔法攻撃・必殺技を含む、一番威力の高い攻撃手段を選択して使用します。
- * 2. ターゲットのHPが設定した閾値（デフォルト60%）以下の対象がいれば、優先してHP回復スキルを使います。
+ * 2. 敵側に、設定した閾値（デフォルト60%）以下のHPを持つ対象がいれば、優先してHP回復スキルを使います。
  *    このとき、魅了を付与してきた相手の回復を最優先します。もしその相手が戦闘不能などで不在の場合は、
- *    同じ種類のモンスター（同IDの敵キャラなど）を優先して回復しようとします。
+ *    同じ種類のモンスター（同IDの敵キャラ）を優先して回復しようとします。
  * 3. 該当のスキルがない、またはMP不足などで使えない場合は通常攻撃をおこないます。
  *
  * 注意：
- * もともとのスキルが「全体」対象の範囲を持つ場合、スマートアクションで選ばれた場合も全体化されます。
+ * もともとのスキルが「全体」対象の場合、自傷確率に関わらず全体攻撃になります。
  */
 
 (() => {
@@ -85,7 +85,7 @@
   const pluginName = "HTN_SmartCharm";
   const parameters = PluginManager.parameters(pluginName);
   const paramHealThreshold = Number(parameters['HealThreshold'] || 60);
-  const paramSelfAttackRate = Number(parameters['SelfAttackRate'] || 10);
+  const paramSelfAttackRate = Number(parameters['SelfAttackRate'] || 0);
   const paramAllowHeal = String(parameters['AllowHeal']) !== 'false';
   const paramAllowMagic = String(parameters['AllowMagic']) !== 'false';
   const paramAllowSpecial = String(parameters['AllowSpecial']) !== 'false';
