@@ -21,6 +21,14 @@
  * @min 1
  * @max 99
  *
+ * @param SelfAttackRate
+ * @text 自傷確率(%)
+ * @desc 攻撃対象として自分自身を選ぶ確率です。0%の場合、自分以外がいればそちらを攻撃します。
+ * @default 10
+ * @type number
+ * @min 0
+ * @max 100
+ *
  * @help HTN_SmartCharm.js
  *
  * 【使い方】
@@ -47,6 +55,7 @@
   const pluginName = "HTN_SmartCharm";
   const parameters = PluginManager.parameters(pluginName);
   const paramHealThreshold = Number(parameters['HealThreshold'] || 60) / 100;
+  const paramSelfAttackRate = Number(parameters['SelfAttackRate'] || 10);
 
   const _Game_Action_setConfusion = Game_Action.prototype.setConfusion;
   Game_Action.prototype.setConfusion = function() {
@@ -142,13 +151,29 @@
       }
     }
 
-    // 2. 攻撃または魔法攻撃スキルの判定
-    if (!decidedSkill && targetUnitForAttack.length > 0) {
+    // 2. 攻撃対象の決定処理 (自傷確率の考慮)
+    let decidedTargetForAttack = null;
+    if (targetUnitForAttack.length > 0) {
+      const otherTargets = targetUnitForAttack.filter(m => m !== subject);
+      
+      if (otherTargets.length === 0) {
+        // 自分しかいない場合
+        decidedTargetForAttack = targetUnitForAttack[0];
+      } else {
+        const canAttackSelf = targetUnitForAttack.includes(subject);
+        if (canAttackSelf && (Math.random() * 100) < paramSelfAttackRate) {
+          decidedTargetForAttack = subject;
+        } else {
+          decidedTargetForAttack = otherTargets[Math.randomInt(otherTargets.length)];
+        }
+      }
+    }
+
+    // 3. 攻撃または魔法攻撃スキルの判定
+    if (!decidedSkill && decidedTargetForAttack) {
       // HPダメージスキル (damage.type === 1) を探す
       const atkSkills = usableSkills.filter(s => s.damage && s.damage.type === 1);
 
-      // ターゲットをランダムに一つ選んで、そのターゲットに対する最大ダメージのスキルを選ぶ
-      const targetForAtk = targetUnitForAttack[Math.randomInt(targetUnitForAttack.length)];
       let bestAtkScore = -1;
       let bestSkill = null;
 
@@ -156,7 +181,7 @@
         this.setSkill(skill.id);
         // hitType: 0(必中), 1(物理), 2(魔法)
         // ダメージ計算をおこない、最も威力が大きなものを選ぶ
-        const rawVal = this.evalDamageFormula(targetForAtk);
+        const rawVal = this.evalDamageFormula(decidedTargetForAttack);
         if (rawVal > bestAtkScore) {
           bestAtkScore = rawVal;
           bestSkill = skill;
@@ -165,7 +190,7 @@
 
       if (bestSkill) {
         decidedSkill = bestSkill;
-        decidedTarget = targetForAtk;
+        decidedTarget = decidedTargetForAttack;
       }
     }
 
@@ -176,8 +201,8 @@
     } else {
       this.setAttack();
 
-      if (targetUnitForAttack.length > 0) {
-        this._smartCharmTarget = targetUnitForAttack[Math.randomInt(targetUnitForAttack.length)];
+      if (decidedTargetForAttack) {
+        this._smartCharmTarget = decidedTargetForAttack;
       } else {
         this._smartCharmTarget = null;
       }
