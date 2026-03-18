@@ -32,8 +32,9 @@
  * 以下のような頭の良い行動（スマートアクション）をとらせることができます。
  *
  * 1. 攻撃または魔法攻撃の中で、一番威力の高いものを選択して使用します。
- * 2. ターゲットのHPが設定した閾値（デフォルト50%）以下の対象がいれば、優先してHP回復スキルを使います。
- *    このとき、魅了を付与してきた相手が明確である場合、その相手の回復を最優先します。
+ * 2. ターゲットのHPが設定した閾値（デフォルト60%）以下の対象がいれば、優先してHP回復スキルを使います。
+ *    このとき、魅了を付与してきた相手の回復を最優先します。もしその相手が戦闘不能などで不在の場合は、
+ *    同じ種類のモンスター（同IDの敵キャラなど）を優先して回復しようとします。
  * 3. 該当のスキルがない、またはMP不足などで使えない場合は通常攻撃をおこないます。
  *
  * 注意：
@@ -84,11 +85,31 @@
     // 1. HP回復スキルの判定
     let targetNeedHeal = null;
 
-    // 魅了を付与してきた相手がいれば、その相手の回復を優先する
+    // 魅了を付与してきた相手（または同種のモンスター）がいれば、その回復を優先する
     const inflicter = subject._smartCharmInflicter;
-    if (inflicter && inflicter.isAlive() && targetUnitForHeal.includes(inflicter)) {
-      if (inflicter.hp <= inflicter.mhp * paramHealThreshold) {
-        targetNeedHeal = inflicter;
+    let priorityTargets = [];
+
+    if (inflicter) {
+      if (inflicter.isAlive() && targetUnitForHeal.includes(inflicter)) {
+        priorityTargets.push(inflicter);
+      } else if (inflicter.isEnemy()) {
+        // 本人がいない場合、同種のモンスターを探す
+        priorityTargets = targetUnitForHeal.filter(member =>
+          member.isEnemy() && member.enemyId() === inflicter.enemyId()
+        );
+      } else if (inflicter.isActor()) {
+        // (念のため)アクターの場合
+        priorityTargets = targetUnitForHeal.filter(member =>
+          member.isActor() && member.actorId() === inflicter.actorId()
+        );
+      }
+    }
+
+    // まず優先ターゲットの中で回復が必要な者がいないかチェック
+    for (const priorityTarget of priorityTargets) {
+      if (priorityTarget.hp <= priorityTarget.mhp * paramHealThreshold) {
+        targetNeedHeal = priorityTarget;
+        break;
       }
     }
 
