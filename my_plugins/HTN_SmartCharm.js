@@ -178,37 +178,31 @@
     let targetNeedHeal = null;
 
     if (currentAllowHeal) {
-      // 魅了を付与してきた相手（または同種のモンスター）がいれば、その回復を優先する
-      const inflicter = subject._smartCharmInflicter;
-      let priorityTargets = [];
+      // 1. 回復が必要なメンバーを抽出
+      const healThresholdRatio = currentHealThreshold / 100;
+      let targetsNeedingHeal = targetUnitForHeal.filter(member =>
+        member.hp <= member.mhp * healThresholdRatio
+      );
 
-      if (inflicter) {
-        if (inflicter.isAlive() && targetUnitForHeal.includes(inflicter)) {
-          priorityTargets.push(inflicter);
-        } else if (inflicter.isEnemy()) { // 魅了付与者がモンスターの場合
-          // 本人がいない場合、同種のモンスターを探す
-          priorityTargets = targetUnitForHeal.filter(member =>
-            member.isEnemy() && member.enemyId() === inflicter.enemyId()
-          );
-        }
-      }
+      if (targetsNeedingHeal.length > 0) {
+        // 2. HPの残りパーセンテージが低い順に並び替え
+        targetsNeedingHeal.sort((a, b) => (a.hp / a.mhp) - (b.hp / b.mhp));
 
-      // まず優先ターゲットの中で回復が必要な者がいないかチェック
-      for (const priorityTarget of priorityTargets) {
-        if (priorityTarget.hp <= priorityTarget.mhp * (currentHealThreshold / 100)) {
-          targetNeedHeal = priorityTarget;
-          break;
-        }
-      }
+        // 3. 魅了を付与してきた相手（または同種のモンスター）の条件定義
+        const inflicter = subject._smartCharmInflicter;
+        let isPriorityTarget = (member) => false;
 
-      // 優先対象がいない、または回復不要な場合は他のメンバーをチェック
-      if (!targetNeedHeal) {
-        for (const member of targetUnitForHeal) {
-          if (member.hp <= member.mhp * (currentHealThreshold / 100)) {
-            targetNeedHeal = member;
-            break;
+        if (inflicter) {
+          if (inflicter.isAlive() && targetUnitForHeal.includes(inflicter)) {
+            isPriorityTarget = (member) => member === inflicter;
+          } else if (inflicter.isEnemy()) { // 魅了付与者がモンスターの場合
+            // 本人がいない場合、同種のモンスターを探す条件
+            isPriorityTarget = (member) => member.isEnemy() && member.enemyId() === inflicter.enemyId();
           }
         }
+
+        // 4. 優先対象がいれば選ぶ、いなければ最もHP割合が低い者を選ぶ
+        targetNeedHeal = targetsNeedingHeal.find(isPriorityTarget) || targetsNeedingHeal[0];
       }
 
       if (targetNeedHeal) {
