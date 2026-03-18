@@ -47,6 +47,20 @@
  * @default true
  * @type boolean
  *
+ * @param StunRate
+ * @text 行動不可確率(%)
+ * @desc 魅了時に何も行動しなくなる確率です。
+ * @default 0
+ * @type number
+ * @min 0
+ * @max 100
+ *
+ * @param StunMessage
+ * @text 行動不可時のメッセージ
+ * @desc 行動しなかった際に表示するメッセージです。空欄にするとメッセージをスキップします。%1は行動者の名前に置き換わります。
+ * @default %1は幸せな顔で相手に見とれている。
+ * @type string
+ *
  * @help HTN_SmartCharm.js
  *
  * 【使い方】
@@ -62,6 +76,8 @@
  * <SmartCharm> （※この記述は必須です）
  * <SmartCharm_HealThreshold: 80> （※回復閾値を80%に設定したい場合）
  * <SmartCharm_SelfAttackRate: 10> （※自傷確率を10%に設定したい場合）
+ * <SmartCharm_StunRate: 20> （※行動不可になる確率を20%に設定したい場合）
+ * <SmartCharm_StunMessage: %1はぼーっとしている。> （※メッセージを変える場合）
  * <SmartCharm_AllowHeal: false> （※敵陣への回復スキルを許可しない場合）
  * <SmartCharm_AllowMagic: false> （※魔法スキルを許可しない場合）
  * <SmartCharm_AllowSpecial: false> （※必殺技を許可しない場合）
@@ -81,7 +97,8 @@
  *    このとき、魅了を付与してきた相手の回復を最優先します。もしその相手が戦闘不能などで不在の場合は、
  *    同じ種類のモンスター（同IDの敵キャラ）を優先して回復しようとします。
  * 3. 該当のスキルがない、またはMP不足などで使えない場合は通常攻撃をおこないます。
- * 4. 自傷（自分を攻撃）する場合の回避確率は0%になっています。
+ * 4. 指定した「行動不可確率(%)」を満たした場合、行動をキャンセルして専用メッセージを表示します。
+ * 5. 自傷（自分を攻撃）する場合の回避確率は0%になっています。
  *
  * 注意：
  * もともとのスキルが「全体」対象の場合、自傷確率に関わらず全体攻撃になります。
@@ -97,6 +114,8 @@
   const paramAllowHeal = String(parameters['AllowHeal']) !== 'false';
   const paramAllowMagic = String(parameters['AllowMagic']) !== 'false';
   const paramAllowSpecial = String(parameters['AllowSpecial']) !== 'false';
+  const paramStunRate = Number(parameters['StunRate'] || 0);
+  const paramStunMessage = String(parameters['StunMessage'] || '%1は幸せな顔で相手に見とれている。');
 
   const _Game_Action_setConfusion = Game_Action.prototype.setConfusion;
   Game_Action.prototype.setConfusion = function() {
@@ -119,6 +138,8 @@
     let currentAllowHeal = paramAllowHeal;
     let currentAllowMagic = paramAllowMagic;
     let currentAllowSpecial = paramAllowSpecial;
+    let currentStunRate = paramStunRate;
+    let currentStunMessage = paramStunMessage;
 
     // <SmartCharm> の付いた状態異常に複数かかっている場合、「優先度」がもっとも高いステートのタグを採用
     const charmState = smartCharmStates[0];
@@ -130,6 +151,12 @@
     if (charmState.meta.SmartCharm_SelfAttackRate !== undefined) {
       currentSelfAttackRate = Number(charmState.meta.SmartCharm_SelfAttackRate);
     }
+    if (charmState.meta.SmartCharm_StunRate !== undefined) {
+      currentStunRate = Number(charmState.meta.SmartCharm_StunRate);
+    }
+    if (charmState.meta.SmartCharm_StunMessage !== undefined) {
+      currentStunMessage = String(charmState.meta.SmartCharm_StunMessage);
+    }
     if (charmState.meta.SmartCharm_AllowHeal !== undefined) {
       currentAllowHeal = String(charmState.meta.SmartCharm_AllowHeal).trim().toLowerCase() !== 'false';
     }
@@ -138,6 +165,14 @@
     }
     if (charmState.meta.SmartCharm_AllowSpecial !== undefined) {
       currentAllowSpecial = String(charmState.meta.SmartCharm_AllowSpecial).trim().toLowerCase() !== 'false';
+    }
+
+    // 行動不可(スタン)判定
+    if (Math.random() * 100 < currentStunRate) {
+      this.setAttack(); // ダミーのアクションをセット
+      this._isSmartCharmStunned = true;
+      this._smartCharmStunMessage = currentStunMessage;
+      return;
     }
 
     const friends = subject.friendsUnit().aliveMembers();
@@ -378,4 +413,31 @@
     }
   };
 
+  /**
+   * 行動不可判定が出ている場合、アクションをスキップしメッセージを表示する
+   */
+  const _BattleManager_startAction = BattleManager.startAction;
+  BattleManager.startAction = function() {
+    const subject = this._subject;
+    const action = subject.currentAction();
+
+    if (action && action._isSmartCharmStunned) {
+      const msg = action._smartCharmStunMessage;
+      if (msg) {
+        this._logWindow.push("addText", msg.format(subject.name()));
+        this._logWindow.push("wait"); // メッセージを読ませるためのウェイト
+        this._logWindow.push("clear");
+      }
+
+      // Actionフェーズへの移行処理だけ行い、ターゲットを空にしてスキップする
+      this._phase = "action";
+      this._action = action;
+      this._targets = [];
+      subject.cancelMotionRefresh();
+
+      return;
+    }
+
+    _BattleManager_startAction.call(this);
+  };
 })();
