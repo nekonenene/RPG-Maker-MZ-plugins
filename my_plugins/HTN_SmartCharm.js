@@ -15,7 +15,7 @@
  *
  * @param HealThreshold
  * @text 回復閾値(%)
- * @desc 該当ターゲットのHPがこのパーセンテージ以下の場合、HP回復スキルを使用します。
+ * @desc 敵陣に、このパーセンテージ以下のHPの相手がいる場合にHP回復スキルを使用します。
  * @default 60
  * @type number
  * @min 1
@@ -50,22 +50,29 @@
  * @help HTN_SmartCharm.js
  *
  * 【使い方】
- * このプラグインの挙動をさせたいステート（「魅了」などの状態異常）のメモ欄に
+ * このプラグインの挙動をさせたいステート（「魅了」などの状態異常）の「メモ」の欄に
  * <SmartCharm>
  * と記述してください。
  *
  * 【ステートごとの個別設定】
- * メモ欄に以下のように記述することで、プラグインパラメータの「回復閾値(%)」や
- * 「自傷確率(%)」をステートごとに上書き設定できます。
+ * ステートの「メモ」に以下のように記述することで、プラグインパラメータの
+ * 「回復閾値(%)」や「自傷確率(%)」などを、ステートごとに上書き設定できます。
+ *
+ * 設定項目一覧：
+ * <SmartCharm> （※この記述は必須です）
+ * <SmartCharm_HealThreshold: 80> （※回復閾値を80%に設定したい場合）
+ * <SmartCharm_SelfAttackRate: 10> （※自傷確率を10%に設定したい場合）
+ * <SmartCharm_AllowHeal: false> （※敵陣への回復スキルを許可しない場合）
+ * <SmartCharm_AllowMagic: false> （※魔法スキルを許可しない場合）
+ * <SmartCharm_AllowSpecial: false> （※必殺技を許可しない場合）
  *
  * 設定例：
+ * 例えば、敵陣への回復スキルだけ禁止して、あとはデフォルト通りでいい場合は、
+ * 以下の２つをステートの「メモ」に書きます。
  * <SmartCharm>
- * <SmartCharm_HealThreshold: 80>
- * <SmartCharm_SelfAttackRate: 10>
  * <SmartCharm_AllowHeal: false>
- * <SmartCharm_AllowMagic: true>
- * <SmartCharm_AllowSpecial: true>
  *
+ * 【行動パターンの解説】
  * <SmartCharm> が記されたステート（状態異常）になったとき、
  * 以下のような行動をとります。
  *
