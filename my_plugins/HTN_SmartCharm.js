@@ -422,11 +422,9 @@
     const action = subject.currentAction();
 
     if (action && action._isSmartCharmStunned) {
-      const stunMessage = action._smartCharmStunMessage;
-      if (stunMessage) {
-        this._logWindow.push("addText", stunMessage.format(subject.name()));
-        this._logWindow.push("wait"); // メッセージを読ませるためのウェイト
-        this._logWindow.push("clear");
+      if (action._smartCharmStunMessage) {
+        // ここですぐに表示せず、後で状態異常継続メッセージの直後に出すために保持しておく
+        subject._smartCharmPendingStunMessage = action._smartCharmStunMessage;
       }
 
       // Actionフェーズへの移行処理だけおこない、ターゲットを空にしてスキップする
@@ -439,5 +437,20 @@
     }
 
     _BattleManager_startAction.call(this);
+  };
+
+  /**
+   * 状態異常の継続メッセージの直後に、行動不能メッセージを表示する
+   */
+  const _Window_BattleLog_displayCurrentState = Window_BattleLog.prototype.displayCurrentState;
+  Window_BattleLog.prototype.displayCurrentState = function(subject) {
+    _Window_BattleLog_displayCurrentState.call(this, subject);
+
+    if (subject._smartCharmPendingStunMessage) {
+      this.push("addText", subject._smartCharmPendingStunMessage.format(subject.name()));
+      this.push("wait");
+      this.push("clear");
+      subject._smartCharmPendingStunMessage = null; // 表示したら削除
+    }
   };
 })();
