@@ -74,6 +74,7 @@
  *    このとき、魅了を付与してきた相手の回復を最優先します。もしその相手が戦闘不能などで不在の場合は、
  *    同じ種類のモンスター（同IDの敵キャラ）を優先して回復しようとします。
  * 3. 該当のスキルがない、またはMP不足などで使えない場合は通常攻撃をおこないます。
+ * 4. 自傷（自分を攻撃）する場合の回避確率は0%になっています。
  *
  * 注意：
  * もともとのスキルが「全体」対象の場合、自傷確率に関わらず全体攻撃になります。
@@ -332,7 +333,7 @@
     _Game_Action_apply.call(this, target);
 
     const isCharmedNow = target.states().some(s => s.meta.SmartCharm);
-    if (!wasCharmed && isCharmedNow) {
+    if (!wasCharmed && isCharmedNow) { // すでに魅了されてはおらず、新たに魅了された場合
       const subject = this.subject();
       let inflicter = subject;
 
@@ -359,7 +360,7 @@
   };
 
   /**
-   * 魅了が解除されたら記憶を消去する
+   * 魅了が解除されたときに、誰から魅了されたかの情報を消去
    */
   const _Game_Battler_removeState = Game_Battler.prototype.removeState;
   Game_Battler.prototype.removeState = function(stateId) {
