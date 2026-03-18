@@ -36,6 +36,19 @@
  * <SmartCharm>
  * と記述してください。
  *
+ * 【ステートごとの個別設定】
+ * メモ欄に以下のように記述することで、プラグインパラメータの「回復閾値(%)」や
+ * 「自傷確率(%)」をステートごとに上書き設定できます。
+ * （設定は両方の書き方をサポートしています）
+ *
+ * 例1（JSON形式でまとめて書く場合 ※キーはダブルクォーテーションで囲む必要があります）：
+ * <SmartCharm: {"HealThreshold": 80, "SelfAttackRate": 0}>
+ *
+ * 例2（個別のタグで書く場合）：
+ * <SmartCharm>
+ * <SmartCharm_HealThreshold: 80>
+ * <SmartCharm_SelfAttackRate: 0>
+ *
  * 対象の混乱状態異常（デフォルトでは行動制約「味方を攻撃」である「魅了」などを想定）になったとき、
  * 以下のような頭の良い行動（スマートアクション）をとらせることができます。
  *
@@ -65,11 +78,41 @@
     const subject = this.subject();
 
     // ステートのメモ欄に <SmartCharm> の記述があるかチェック
-    const hasSmartCharmState = subject.states().some(state => state.meta.SmartCharm);
+    const smartCharmStates = subject.states().filter(state => state.meta.SmartCharm);
 
-    if (!hasSmartCharmState) {
+    if (smartCharmStates.length === 0) {
       this._smartCharmTarget = null;
       return;
+    }
+
+    // デフォルトパラメータから初期化
+    let currentHealThreshold = paramHealThreshold;
+    let currentSelfAttackRate = paramSelfAttackRate;
+
+    // 優先度の最も高いステートから設定を読み込む
+    const charmState = smartCharmStates[0];
+
+    // JSON形式でのパース (<SmartCharm: {"HealThreshold": 80}> のような形)
+    if (typeof charmState.meta.SmartCharm === 'string' && charmState.meta.SmartCharm.trim()) {
+      try {
+        const customParams = JSON.parse(charmState.meta.SmartCharm);
+        if (customParams.HealThreshold !== undefined) {
+          currentHealThreshold = Number(customParams.HealThreshold) / 100;
+        }
+        if (customParams.SelfAttackRate !== undefined) {
+          currentSelfAttackRate = Number(customParams.SelfAttackRate);
+        }
+      } catch (e) {
+        console.warn("HTN_SmartCharm: <SmartCharm>タグのJSONパースに失敗しました。キー名をダブルクォーテーションで囲む等、書式を確認してください。", e);
+      }
+    }
+
+    // 個別タグでの上書き (こちらが優先される)
+    if (charmState.meta.SmartCharm_HealThreshold !== undefined) {
+      currentHealThreshold = Number(charmState.meta.SmartCharm_HealThreshold) / 100;
+    }
+    if (charmState.meta.SmartCharm_SelfAttackRate !== undefined) {
+      currentSelfAttackRate = Number(charmState.meta.SmartCharm_SelfAttackRate);
     }
 
     const friends = subject.friendsUnit().aliveMembers();
@@ -121,7 +164,7 @@
 
     // まず優先ターゲットの中で回復が必要な者がいないかチェック
     for (const priorityTarget of priorityTargets) {
-      if (priorityTarget.hp <= priorityTarget.mhp * paramHealThreshold) {
+      if (priorityTarget.hp <= priorityTarget.mhp * currentHealThreshold) {
         targetNeedHeal = priorityTarget;
         break;
       }
@@ -130,7 +173,7 @@
     // 優先対象がいない、または回復不要な場合は他のメンバーをチェック
     if (!targetNeedHeal) {
       for (const member of targetUnitForHeal) {
-        if (member.hp <= member.mhp * paramHealThreshold) {
+        if (member.hp <= member.mhp * currentHealThreshold) {
           targetNeedHeal = member;
           break;
         }
@@ -171,7 +214,7 @@
         decidedTargetForAttack = targetUnitForAttack[0];
       } else {
         const canAttackSelf = targetUnitForAttack.includes(subject);
-        if (canAttackSelf && (Math.random() * 100) < paramSelfAttackRate) {
+        if (canAttackSelf && (Math.random() * 100) < currentSelfAttackRate) {
           decidedTargetForAttack = subject;
         } else {
           decidedTargetForAttack = otherTargets[Math.randomInt(otherTargets.length)];
