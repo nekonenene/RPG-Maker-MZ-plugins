@@ -39,7 +39,7 @@
  * 対象の混乱状態異常（デフォルトでは行動制約「味方を攻撃」である「魅了」などを想定）になったとき、
  * 以下のような頭の良い行動（スマートアクション）をとらせることができます。
  *
- * 1. 攻撃または魔法攻撃の中で、一番威力の高いものを選択して使用します。
+ * 1. 通常攻撃・魔法攻撃・必殺技を含む、一番威力の高い攻撃手段を選択して使用します。
  * 2. ターゲットのHPが設定した閾値（デフォルト60%）以下の対象がいれば、優先してHP回復スキルを使います。
  *    このとき、魅了を付与してきた相手の回復を最優先します。もしその相手が戦闘不能などで不在の場合は、
  *    同じ種類のモンスター（同IDの敵キャラなど）を優先して回復しようとします。
@@ -79,8 +79,18 @@
     let targetUnitForHeal = opponents;
     let targetUnitForAttack = friends;
 
-    // 使用可能なスキルを取得 (MP不足や封印状態などを考慮)
-    const usableSkills = subject.skills().filter(skill => subject.canUse(skill));
+    // どのようなスキルを持っているかを取得 (MP不足や封印状態などを考慮)
+    let allSkills = [];
+    if (subject.isActor()) {
+      allSkills = subject.skills();
+    } else if (subject.isEnemy()) {
+      // 敵キャラの場合
+      allSkills = subject.enemy().actions
+        .map(a => $dataSkills[a.skillId])
+        .filter(s => !!s);
+    }
+
+    const usableSkills = allSkills.filter(skill => subject.canUse(skill));
 
     // 通常攻撃も候補に入れる
     const attackSkill = $dataSkills[subject.attackSkillId()];
@@ -169,17 +179,17 @@
       }
     }
 
-    // 3. 攻撃または魔法攻撃スキルの判定
+    // 3. 攻撃・魔法攻撃・必殺技 スキルの判定
     if (!decidedSkill && decidedTargetForAttack) {
-      // HPダメージスキル (damage.type === 1) を探す
-      const atkSkills = usableSkills.filter(s => s.damage && s.damage.type === 1);
+      // HPダメージスキル (damage.type === 1: HPダメージ, 5: HP吸収) を探す
+      const atkSkills = usableSkills.filter(s => s.damage && (s.damage.type === 1 || s.damage.type === 5));
 
       let bestAtkScore = -1;
       let bestSkill = null;
 
       for (const skill of atkSkills) {
         this.setSkill(skill.id);
-        // hitType: 0(必中), 1(物理), 2(魔法)
+        // hitType: 0(必中), 1(物理), 2(魔法) に関係なく、「必殺技」もここで拾われます。
         // ダメージ計算をおこない、最も威力が大きなものを選ぶ
         const rawVal = this.evalDamageFormula(decidedTargetForAttack);
         if (rawVal > bestAtkScore) {
