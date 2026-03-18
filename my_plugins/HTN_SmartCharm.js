@@ -150,6 +150,7 @@
         .filter(s => !!s);
     }
 
+    // 使用可能なスキル一覧を取得
     const usableSkills = allSkills.filter(skill => {
       if (!subject.canUse(skill)) return false;
 
