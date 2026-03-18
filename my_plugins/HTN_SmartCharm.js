@@ -16,7 +16,7 @@
  * @param HealThreshold
  * @text 回復閾値(%)
  * @desc 該当ターゲットのHPがこのパーセンテージ以下の場合、HP回復スキルを使用します。
- * @default 50
+ * @default 60
  * @type number
  * @min 1
  * @max 99
@@ -45,7 +45,7 @@
 
   const pluginName = "HTN_SmartCharm";
   const parameters = PluginManager.parameters(pluginName);
-  const paramHealThreshold = Number(parameters['HealThreshold'] || 50) / 100;
+  const paramHealThreshold = Number(parameters['HealThreshold'] || 60) / 100;
 
   const _Game_Action_setConfusion = Game_Action.prototype.setConfusion;
   Game_Action.prototype.setConfusion = function() {
@@ -159,6 +159,7 @@
       this._smartCharmTarget = decidedTarget;
     } else {
       this.setAttack();
+
       if (targetUnitForAttack.length > 0) {
         this._smartCharmTarget = targetUnitForAttack[Math.randomInt(targetUnitForAttack.length)];
       } else {
@@ -175,6 +176,7 @@
     if (this._smartCharmTarget) {
       return this._smartCharmTarget;
     }
+
     return _Game_Action_confusionTarget.apply(this, arguments);
   };
 
@@ -185,6 +187,7 @@
   Game_Action.prototype.makeTargets = function() {
     if (!this._forcing && this.subject().isConfused() && this._smartCharmTarget) {
       let targets = [];
+
       // スキルが全体対象の場合、ターゲットが属しているユニットの生存者全体を対象にする
       if (this.isForAll()) {
         const unit = this._smartCharmTarget.friendsUnit();
@@ -192,8 +195,10 @@
       } else {
         targets.push(this.confusionTarget());
       }
+
       return this.repeatTargets(targets);
     }
+
     return _Game_Action_makeTargets.apply(this, arguments);
   };
 
@@ -203,9 +208,9 @@
   const _Game_Action_apply = Game_Action.prototype.apply;
   Game_Action.prototype.apply = function(target) {
     const wasCharmed = target.states().some(s => s.meta.SmartCharm);
-    
+
     _Game_Action_apply.call(this, target);
-    
+
     const isCharmedNow = target.states().some(s => s.meta.SmartCharm);
     if (!wasCharmed && isCharmedNow) {
       target._smartCharmInflicter = this.subject();
@@ -218,6 +223,7 @@
   const _Game_Battler_removeState = Game_Battler.prototype.removeState;
   Game_Battler.prototype.removeState = function(stateId) {
     _Game_Battler_removeState.call(this, stateId);
+
     if (!this.states().some(s => s.meta.SmartCharm)) {
       this._smartCharmInflicter = null;
     }
