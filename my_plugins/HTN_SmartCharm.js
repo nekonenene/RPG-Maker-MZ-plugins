@@ -323,7 +323,7 @@
   };
 
   /**
-   * 魅了を付与した相手を記憶する
+   * 魅了を誰が付与したかを記憶する
    */
   const _Game_Action_apply = Game_Action.prototype.apply;
   Game_Action.prototype.apply = function(target) {
@@ -335,12 +335,13 @@
     if (!wasCharmed && isCharmedNow) {
       const subject = this.subject();
       let inflicter = subject;
-      
-      // 魅了を付与した相手がすでに魅了されている場合、その「元凶」を引き継ぐ
+
+      // 魅了を付与した者がすでに魅了されている場合、その「元凶」を引き継ぐ
+      // （自陣を攻撃したときに魅了付与が起きた場合を想定）
       if (subject.states().some(s => s.meta.SmartCharm) && subject._smartCharmInflicter) {
         inflicter = subject._smartCharmInflicter;
       }
-      
+
       target._smartCharmInflicter = inflicter;
     }
   };
