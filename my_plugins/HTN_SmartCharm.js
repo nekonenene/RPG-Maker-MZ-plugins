@@ -92,15 +92,10 @@
     if (inflicter) {
       if (inflicter.isAlive() && targetUnitForHeal.includes(inflicter)) {
         priorityTargets.push(inflicter);
-      } else if (inflicter.isEnemy()) {
+      } else if (inflicter.isEnemy()) { // 魅了付与者がモンスターの場合
         // 本人がいない場合、同種のモンスターを探す
         priorityTargets = targetUnitForHeal.filter(member =>
           member.isEnemy() && member.enemyId() === inflicter.enemyId()
-        );
-      } else if (inflicter.isActor()) {
-        // (念のため)アクターの場合
-        priorityTargets = targetUnitForHeal.filter(member =>
-          member.isActor() && member.actorId() === inflicter.actorId()
         );
       }
     }
