@@ -289,7 +289,7 @@
   };
 
   /**
-   * スマートアクション用のターゲット指定があれば、それを利用する
+   * _smartCharmTarget の指定があれば、それを利用するよう上書き
    */
   const _Game_Action_confusionTarget = Game_Action.prototype.confusionTarget;
   Game_Action.prototype.confusionTarget = function() {
@@ -345,6 +345,7 @@
     if (this.subject() === target && this.subject().states().some(s => s.meta.SmartCharm)) {
       return 0; // 自傷時は回避率0%
     }
+
     return _Game_Action_itemEva.call(this, target);
   };
 
