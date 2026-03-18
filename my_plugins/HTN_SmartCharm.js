@@ -424,7 +424,7 @@
     if (action && action._isSmartCharmStunned) {
       const stunMessage = action._smartCharmStunMessage;
       if (stunMessage) {
-        this._logWindow.push("addText", stunMessage.format(subject.name()));
+        this._logWindow.push("addText", stunMessage.format(subject.name()).trim());
         this._logWindow.push("wait"); // メッセージを読ませるためのウェイト
         this._logWindow.push("clear");
       }
