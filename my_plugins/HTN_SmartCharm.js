@@ -47,6 +47,7 @@
   const paramHealThreshold = Number(parameters['HealThreshold'] || 50) / 100;
 
   const _Game_Action_setConfusion = Game_Action.prototype.setConfusion;
+
   Game_Action.prototype.setConfusion = function() {
     // デフォルトでは通常攻撃がセットされる
     _Game_Action_setConfusion.call(this);
@@ -64,7 +65,7 @@
     const friends = subject.friendsUnit().aliveMembers();
     const opponents = subject.opponentsUnit().aliveMembers();
 
-    // 魅了: 回復は敵部隊へ、攻撃は味方部隊へ
+    // 回復は敵部隊へ、攻撃は味方部隊へ
     let targetUnitForHeal = opponents;
     let targetUnitForAttack = friends;
 
