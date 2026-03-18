@@ -338,6 +338,17 @@
   };
 
   /**
+   * 自傷時に回避を発生させない
+   */
+  const _Game_Action_itemEva = Game_Action.prototype.itemEva;
+  Game_Action.prototype.itemEva = function(target) {
+    if (this.subject() === target && this.subject().states().some(s => s.meta.SmartCharm)) {
+      return 0; // 自傷時は回避率0%
+    }
+    return _Game_Action_itemEva.call(this, target);
+  };
+
+  /**
    * 魅了が解除されたら記憶を消去する
    */
   const _Game_Battler_removeState = Game_Battler.prototype.removeState;
