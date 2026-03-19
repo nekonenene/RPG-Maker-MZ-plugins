@@ -61,6 +61,12 @@
  * @default %1は幸せな顔で相手に見とれている。
  * @type string
  *
+ * @param CancelActionOnRecover
+ * @text 回復ターンの行動キャンセル
+ * @desc 魅了状態から回復したそのターンに、直前に選ばれていた魅了アクションをキャンセルし、何も行動しないようにするかどうか。
+ * @default true
+ * @type boolean
+ *
  * @help HTN_SmartCharm.js
  *
  * 【使い方】
@@ -99,6 +105,7 @@
  * 3. 攻撃する場合は、通常攻撃・魔法攻撃・必殺技の中から、一番威力の高い攻撃手段を選択して使用します。
  * 4. MP不足などで使えない場合は通常攻撃をおこないます。
  * 5. 自傷（自分を攻撃）する場合の回避確率は0%になっています。
+ * 6. 指定した「回復ターンの行動キャンセル」が有効な場合、行動前に魅了ダメージ等で回復したターンは何も行動しません。
  *
  * 注意：
  * もともとのスキルが「全体」対象の場合、自傷確率に関わらず全体攻撃になります。
@@ -116,6 +123,7 @@
   const paramAllowSpecial = String(parameters['AllowSpecial']) !== 'false';
   const paramStunRate = Number(parameters['StunRate'] || 0);
   const paramStunMessage = String(parameters['StunMessage']);
+  const paramCancelActionOnRecover = String(parameters['CancelActionOnRecover']) !== 'false';
 
   const _Game_Action_setConfusion = Game_Action.prototype.setConfusion;
   Game_Action.prototype.setConfusion = function() {
@@ -131,6 +139,9 @@
       this._smartCharmTarget = null;
       return;
     }
+
+    // ここでSmartCharmにより決定されたアクションであることをマーキング
+    this._isSmartCharmAction = true;
 
     // デフォルトパラメータから初期化
     let currentHealThreshold = paramHealThreshold;
@@ -420,6 +431,16 @@
   BattleManager.startAction = function() {
     const subject = this._subject;
     const action = subject.currentAction();
+
+    // 魅了から回復したターンの行動キャンセル処理
+    if (paramCancelActionOnRecover && action && action._isSmartCharmAction && !subject.states().some(s => s.meta.SmartCharm)) {
+      // Actionフェーズへの移行処理だけおこない、ターゲットを空にして実質的にスキップする
+      this._phase = "action";
+      this._action = action;
+      this._targets = [];
+      subject.cancelMotionRefresh();
+      return;
+    }
 
     if (action && action._isSmartCharmStunned) {
       // 行動不能メッセージのあとに状態異常の継続メッセージが出てしまうので違和感を生む時があるが、
