@@ -87,6 +87,7 @@
  * <SmartCharm_AllowHeal: false> （※敵陣への回復スキルを許可しない場合）
  * <SmartCharm_AllowMagic: false> （※魔法スキルを許可しない場合）
  * <SmartCharm_AllowSpecial: false> （※必殺技を許可しない場合）
+ * <SmartCharm_CancelActionOnRecover: false> （※回復ターンの行動キャンセルを無効にする場合）
  *
  * 設定例：
  * 例えば、敵陣への回復スキルだけ禁止して、あとはデフォルト通りでいい場合は、
@@ -148,6 +149,7 @@
     let currentAllowSpecial = paramAllowSpecial;
     let currentStunRate = paramStunRate;
     let currentStunMessage = paramStunMessage;
+    let currentCancelActionOnRecover = paramCancelActionOnRecover;
 
     // <SmartCharm> の付いた状態異常に複数かかっている場合、「優先度」がもっとも高いステートのタグを採用
     const charmState = smartCharmStates[0];
@@ -174,9 +176,13 @@
     if (charmState.meta.SmartCharm_AllowSpecial !== undefined) {
       currentAllowSpecial = String(charmState.meta.SmartCharm_AllowSpecial).trim().toLowerCase() !== 'false';
     }
+    if (charmState.meta.SmartCharm_CancelActionOnRecover !== undefined) {
+      currentCancelActionOnRecover = String(charmState.meta.SmartCharm_CancelActionOnRecover).trim().toLowerCase() !== 'false';
+    }
 
     // SmartCharmにより決定されたアクションであることをマーキング
     this._isSmartCharmAction = true;
+    this._smartCharmCancelOnRecover = currentCancelActionOnRecover;
 
     // 行動不能(スタン)判定
     if (Math.random() * 100 < currentStunRate) {
@@ -433,7 +439,7 @@
     const action = subject.currentAction();
 
     // 魅了から回復したターンの行動キャンセル処理
-    if (paramCancelActionOnRecover && action && action._isSmartCharmAction && !subject.states().some(s => s.meta.SmartCharm)) {
+    if (action && action._isSmartCharmAction && action._smartCharmCancelOnRecover && !subject.states().some(s => s.meta.SmartCharm)) {
       // Actionフェーズへの移行処理だけおこない、ターゲットを空にして実質的にスキップする
       this._phase = "action";
       this._action = action;
