@@ -61,6 +61,12 @@
  * @default %1は幸せな顔で相手に見とれている。
  * @type string
  *
+ * @param ActOnCharmTurn
+ * @text 魅了付与ターンの即時行動
+ * @desc 魅了状態になったそのターンに手番が回ってきた際、行動をスキップせずに魅了アクションを実行するかどうか。
+ * @default false
+ * @type boolean
+ *
  * @param CancelActionOnRecover
  * @text 回復ターンの行動キャンセル
  * @desc 攻撃を受けるなどで魅了状態から回復したターンに手番が回ってきた場合、何も行動しないようにするか。
@@ -87,6 +93,7 @@
  * <SmartCharm_AllowHeal: false> （※敵陣への回復スキルを許可しない場合）
  * <SmartCharm_AllowMagic: false> （※魔法スキルを許可しない場合）
  * <SmartCharm_AllowSpecial: false> （※必殺技を許可しない場合）
+ * <SmartCharm_ActOnCharmTurn: true> （※魅了付与ターンの即時行動を有効にする場合）
  * <SmartCharm_CancelActionOnRecover: false> （※回復ターンの行動キャンセルを無効にする場合）
  *
  * 設定例：
@@ -124,6 +131,7 @@
   const paramAllowSpecial = String(parameters['AllowSpecial']) !== 'false';
   const paramStunRate = Number(parameters['StunRate'] || 0);
   const paramStunMessage = String(parameters['StunMessage']);
+  const paramActOnCharmTurn = String(parameters['ActOnCharmTurn']) === 'true';
   const paramCancelActionOnRecover = String(parameters['CancelActionOnRecover']) !== 'false';
 
   const _Game_Action_setConfusion = Game_Action.prototype.setConfusion;
@@ -426,6 +434,26 @@
 
     if (!this.states().some(s => s.meta.SmartCharm)) {
       this._smartCharmInflicter = null;
+    }
+  };
+
+  /**
+   * 魅了状態になったターンに即時行動するための再行動設定
+   */
+  const _Game_Battler_onRestrict = Game_Battler.prototype.onRestrict;
+  Game_Battler.prototype.onRestrict = function() {
+    _Game_Battler_onRestrict.call(this);
+
+    const charmStates = this.states().filter(s => s.meta.SmartCharm);
+    if (charmStates.length > 0) {
+      let actOnCharmTurn = paramActOnCharmTurn;
+      if (charmStates[0].meta.SmartCharm_ActOnCharmTurn !== undefined) {
+        actOnCharmTurn = String(charmStates[0].meta.SmartCharm_ActOnCharmTurn).trim().toLowerCase() === 'true';
+      }
+
+      if (actOnCharmTurn && this.canMove()) {
+        this.makeActions();
+      }
     }
   };
 
