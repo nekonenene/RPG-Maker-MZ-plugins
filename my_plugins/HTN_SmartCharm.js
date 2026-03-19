@@ -94,11 +94,11 @@
  * <SmartCharm> （※この記述は必須です）
  * <SmartCharm_HealThreshold: 80> （※回復閾値を80%に設定したい場合）
  * <SmartCharm_SelfAttackRate: 10> （※自傷確率を10%に設定したい場合）
- * <SmartCharm_StunRate: 20> （※行動不能になる確率を20%に設定したい場合）
- * <SmartCharm_StunMessage: %1はぼーっとしている。> （※行動不能時のメッセージを変える場合）
  * <SmartCharm_AllowHeal: false> （※敵陣への回復スキルを許可しない場合）
  * <SmartCharm_AllowMagic: false> （※魔法スキルを許可しない場合）
  * <SmartCharm_AllowSpecial: false> （※必殺技を許可しない場合）
+ * <SmartCharm_StunRate: 20> （※行動不能になる確率を20%に設定したい場合）
+ * <SmartCharm_StunMessage: %1はぼーっとしている。> （※行動不能時のメッセージを変える場合）
  * <SmartCharm_ActOnCharmTurn: true> （※魅了付与ターンの即時行動を有効にする場合）
  * <SmartCharm_CancelActionOnRecover: false> （※回復ターンの行動キャンセルを無効にする場合）
  * <SmartCharm_ShowStateMessageBeforeAction: true> （※継続メッセージを行動前に表示する場合）
@@ -178,12 +178,6 @@
     if (charmState.meta.SmartCharm_SelfAttackRate !== undefined) {
       currentSelfAttackRate = Number(charmState.meta.SmartCharm_SelfAttackRate);
     }
-    if (charmState.meta.SmartCharm_StunRate !== undefined) {
-      currentStunRate = Number(charmState.meta.SmartCharm_StunRate);
-    }
-    if (charmState.meta.SmartCharm_StunMessage !== undefined) {
-      currentStunMessage = String(charmState.meta.SmartCharm_StunMessage);
-    }
     if (charmState.meta.SmartCharm_AllowHeal !== undefined) {
       currentAllowHeal = String(charmState.meta.SmartCharm_AllowHeal).trim().toLowerCase() !== 'false';
     }
@@ -192,6 +186,12 @@
     }
     if (charmState.meta.SmartCharm_AllowSpecial !== undefined) {
       currentAllowSpecial = String(charmState.meta.SmartCharm_AllowSpecial).trim().toLowerCase() !== 'false';
+    }
+    if (charmState.meta.SmartCharm_StunRate !== undefined) {
+      currentStunRate = Number(charmState.meta.SmartCharm_StunRate);
+    }
+    if (charmState.meta.SmartCharm_StunMessage !== undefined) {
+      currentStunMessage = String(charmState.meta.SmartCharm_StunMessage);
     }
     if (charmState.meta.SmartCharm_CancelActionOnRecover !== undefined) {
       currentCancelActionOnRecover = String(charmState.meta.SmartCharm_CancelActionOnRecover).trim().toLowerCase() !== 'false';
