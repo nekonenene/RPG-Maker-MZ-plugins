@@ -180,8 +180,7 @@
       currentCancelActionOnRecover = String(charmState.meta.SmartCharm_CancelActionOnRecover).trim().toLowerCase() !== 'false';
     }
 
-    // SmartCharmにより決定されたアクションであることをマーキング
-    this._isSmartCharmAction = true;
+    // 行動キャンセルするかどうかのフラグをアクションに記憶（SmartCharmによるアクションであることのマーキングも兼ねる）
     this._smartCharmCancelOnRecover = currentCancelActionOnRecover;
 
     // 行動不能(スタン)判定
@@ -439,7 +438,7 @@
     const action = subject.currentAction();
 
     // 魅了から回復したターンの行動キャンセル処理
-    if (action && action._isSmartCharmAction && action._smartCharmCancelOnRecover && !subject.states().some(s => s.meta.SmartCharm)) {
+    if (action && action._smartCharmCancelOnRecover && !subject.states().some(s => s.meta.SmartCharm)) {
       // Actionフェーズへの移行処理だけおこない、ターゲットを空にして実質的にスキップする
       this._phase = "action";
       this._action = action;
