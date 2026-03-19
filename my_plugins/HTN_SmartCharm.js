@@ -16,7 +16,7 @@
  * @param HealThreshold
  * @text 回復閾値(%)
  * @desc 敵陣に、このパーセンテージ以下のHPの相手がいる場合にHP回復スキルを使用します。
- * @default 60
+ * @default 75
  * @type number
  * @min 1
  * @max 99
@@ -58,18 +58,18 @@
  * @param StunMessage
  * @text 行動不能時のメッセージ
  * @desc 行動しなかった際に表示するメッセージです。空欄にするとメッセージをスキップします。%1は行動者の名前に置き換わります。
- * @default %1は幸せな顔で相手に見とれている。
+ * @default %1は相手に見とれている。
  * @type string
  *
  * @param ActOnCharmTurn
- * @text 魅了付与ターンの即時行動
+ * @text 魅了されたターンの行動許可
  * @desc 魅了状態になったターンに手番が回ってきた際、行動をスキップせずに攻撃などを実行するか。
- * @default false
+ * @default true
  * @type boolean
  *
  * @param CancelActionOnRecover
  * @text 回復ターンの行動キャンセル
- * @desc 攻撃を受けるなどで魅了状態から回復したターンに手番が回ってきた場合、何も行動しないようにするか。
+ * @desc 攻撃を受けるなどで魅了状態から回復したターンに手番が回ってきた場合、何も行動しないようにするか。（falseの場合、ランダムな敵への攻撃などが実行される）
  * @default true
  * @type boolean
  *
@@ -114,7 +114,7 @@
  * 以下のような行動をとります。
  *
  * 1. 指定した「行動不能確率(%)」に応じてそのターンは行動不能となります。
- * 2. 敵側に、設定した閾値（デフォルトは60%）以下のHPを持つ対象がいれば、優先してHP回復スキルを使います。
+ * 2. 敵側に、設定した閾値（デフォルトは75%）以下のHPを持つ対象がいれば、優先してHP回復スキルを使います。
  *    このとき、魅了を付与してきた相手の回復を最優先します。もしその相手が戦闘不能などで不在の場合は、
  *    同じ種類のモンスター（同IDの敵キャラ）を優先して回復しようとします。
  * 3. 攻撃する場合は、通常攻撃・魔法攻撃・必殺技の中から、一番威力の高い攻撃手段を選択して使用します。
@@ -131,7 +131,7 @@
 
   const pluginName = "HTN_SmartCharm";
   const parameters = PluginManager.parameters(pluginName);
-  const paramHealThreshold = Number(parameters['HealThreshold'] || 60);
+  const paramHealThreshold = Number(parameters['HealThreshold'] || 75);
   const paramSelfAttackRate = Number(parameters['SelfAttackRate'] || 0);
   const paramAllowHeal = String(parameters['AllowHeal']) !== 'false';
   const paramAllowMagic = String(parameters['AllowMagic']) !== 'false';
