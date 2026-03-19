@@ -73,6 +73,12 @@
  * @default true
  * @type boolean
  *
+ * @param ShowStateMessageBeforeAction
+ * @text 行動前に継続メッセージを表示
+ * @desc ステートの継続メッセージ（「この状態が継続しているとき」欄のメッセージ）を行動前に表示するか。
+ * @default true
+ * @type boolean
+ *
  * @help HTN_SmartCharm.js
  *
  * 【使い方】
@@ -95,6 +101,7 @@
  * <SmartCharm_AllowSpecial: false> （※必殺技を許可しない場合）
  * <SmartCharm_ActOnCharmTurn: true> （※魅了付与ターンの即時行動を有効にする場合）
  * <SmartCharm_CancelActionOnRecover: false> （※回復ターンの行動キャンセルを無効にする場合）
+ * <SmartCharm_ShowStateMessageBeforeAction: true> （※継続メッセージを行動前に表示する場合）
  *
  * 設定例：
  * 例えば、敵陣への回復スキルだけ禁止して、あとはデフォルト通りでいい場合は、
@@ -133,6 +140,7 @@
   const paramStunMessage = String(parameters['StunMessage']);
   const paramActOnCharmTurn = String(parameters['ActOnCharmTurn']) === 'true';
   const paramCancelActionOnRecover = String(parameters['CancelActionOnRecover']) !== 'false';
+  const paramShowStateMessageBeforeAction = String(parameters['ShowStateMessageBeforeAction']) !== 'false';
 
   const _Game_Action_setConfusion = Game_Action.prototype.setConfusion;
   Game_Action.prototype.setConfusion = function() {
@@ -158,6 +166,7 @@
     let currentStunRate = paramStunRate;
     let currentStunMessage = paramStunMessage;
     let currentCancelActionOnRecover = paramCancelActionOnRecover;
+    let currentShowStateMessageBeforeAction = paramShowStateMessageBeforeAction;
 
     // <SmartCharm> の付いた状態異常に複数かかっている場合、「優先度」がもっとも高いステートのタグを採用
     const charmState = smartCharmStates[0];
@@ -187,9 +196,13 @@
     if (charmState.meta.SmartCharm_CancelActionOnRecover !== undefined) {
       currentCancelActionOnRecover = String(charmState.meta.SmartCharm_CancelActionOnRecover).trim().toLowerCase() !== 'false';
     }
+    if (charmState.meta.SmartCharm_ShowStateMessageBeforeAction !== undefined) {
+      currentShowStateMessageBeforeAction = String(charmState.meta.SmartCharm_ShowStateMessageBeforeAction).trim().toLowerCase() !== 'false';
+    }
 
-    // 行動キャンセルするかどうかのフラグをこのActionに記憶
+    // 個別タグでの上書きを再判定しないで済むよう、このActionに記憶
     this._smartCharmCancelOnRecover = currentCancelActionOnRecover;
+    this._showSmartCharmStateMessageBeforeAction = currentShowStateMessageBeforeAction;
 
     // 行動不能(スタン)判定
     if (Math.random() * 100 < currentStunRate) {
@@ -466,6 +479,12 @@
     const subject = this._subject;
     const action = subject.currentAction();
 
+    // 魅了中の継続メッセージを行動前に表示。 displayBattlerStatus 側で本来は表示されるもの
+    if (action && action._showSmartCharmStateMessageBeforeAction && subject.states().some(s => s.meta.SmartCharm)) {
+      this._logWindow.displayCurrentState(subject);
+      subject._shownSmartCharmStateMessageBeforeAction = true;
+    }
+
     // 魅了から回復したターンの行動キャンセル処理
     if (action && action._smartCharmCancelOnRecover && !subject.states().some(s => s.meta.SmartCharm)) {
       // Actionフェーズへの移行処理だけおこない、ターゲットを空にして実質的にスキップする
@@ -497,5 +516,21 @@
     }
 
     _BattleManager_startAction.call(this);
+  };
+
+  /**
+   * 行動前に継続メッセージを表示済みの場合、ターン終了時の重複表示を抑制する
+   */
+  const _BattleManager_displayBattlerStatus = BattleManager.displayBattlerStatus;
+  BattleManager.displayBattlerStatus = function(battler, current) {
+    // displayCurrentState() 以外の表示をおこない早期returnする
+    if (current && battler._shownSmartCharmStateMessageBeforeAction) {
+      this._logWindow.displayAutoAffectedStatus(battler);
+      this._logWindow.displayRegeneration(battler);
+      battler._shownSmartCharmStateMessageBeforeAction = false;
+      return;
+    }
+
+    _BattleManager_displayBattlerStatus.call(this, battler, current);
   };
 })();
