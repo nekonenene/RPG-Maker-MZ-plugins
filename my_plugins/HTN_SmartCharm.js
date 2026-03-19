@@ -16,7 +16,7 @@
  * @param HealThreshold
  * @text 回復閾値(%)
  * @desc 敵陣に、このパーセンテージ以下のHPの相手がいる場合にHP回復スキルを使用します。
- * @default 75
+ * @default 60
  * @type number
  * @min 1
  * @max 99
@@ -114,7 +114,7 @@
  * 以下のような行動をとります。
  *
  * 1. 指定した「行動不能確率(%)」に応じてそのターンは行動不能となります。
- * 2. 敵側に、設定した閾値（デフォルトは75%）以下のHPを持つ対象がいれば、優先してHP回復スキルを使います。
+ * 2. 敵側に、設定した閾値（デフォルトは60%）以下のHPを持つ対象がいれば、優先してHP回復スキルを使います。
  *    このとき、魅了を付与してきた相手の回復を最優先します。もしその相手が戦闘不能などで不在の場合は、
  *    同じ種類のモンスター（同IDの敵キャラ）を優先して回復しようとします。
  * 3. 攻撃する場合は、通常攻撃・魔法攻撃・必殺技の中から、一番威力の高い攻撃手段を選択して使用します。
@@ -131,7 +131,7 @@
 
   const pluginName = "HTN_SmartCharm";
   const parameters = PluginManager.parameters(pluginName);
-  const paramHealThreshold = Number(parameters['HealThreshold'] || 75);
+  const paramHealThreshold = Number(parameters['HealThreshold'] || 60);
   const paramSelfAttackRate = Number(parameters['SelfAttackRate'] || 0);
   const paramAllowHeal = String(parameters['AllowHeal']) !== 'false';
   const paramAllowMagic = String(parameters['AllowMagic']) !== 'false';
