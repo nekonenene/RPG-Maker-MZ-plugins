@@ -63,7 +63,7 @@
  *
  * @param ActOnCharmTurn
  * @text 魅了付与ターンの即時行動
- * @desc 魅了状態になったそのターンに手番が回ってきた際、行動をスキップせずに魅了アクションを実行するかどうか。
+ * @desc 魅了状態になったターンに手番が回ってきた際、行動をスキップせずに攻撃などを実行するか。
  * @default false
  * @type boolean
  *
@@ -442,17 +442,18 @@
    */
   const _Game_Battler_onRestrict = Game_Battler.prototype.onRestrict;
   Game_Battler.prototype.onRestrict = function() {
-    _Game_Battler_onRestrict.call(this);
+    _Game_Battler_onRestrict.call(this); // この中で this.clearActions(); が呼ばれている
 
-    const charmStates = this.states().filter(s => s.meta.SmartCharm);
-    if (charmStates.length > 0) {
+    // <SmartCharm> の付いた状態異常に複数かかっている場合、「優先度」がもっとも高いステートのタグを採用
+    const smartCharmStates = this.states().filter(s => s.meta.SmartCharm);
+    if (smartCharmStates.length > 0) {
       let actOnCharmTurn = paramActOnCharmTurn;
-      if (charmStates[0].meta.SmartCharm_ActOnCharmTurn !== undefined) {
-        actOnCharmTurn = String(charmStates[0].meta.SmartCharm_ActOnCharmTurn).trim().toLowerCase() === 'true';
+      if (smartCharmStates[0].meta.SmartCharm_ActOnCharmTurn !== undefined) {
+        actOnCharmTurn = String(smartCharmStates[0].meta.SmartCharm_ActOnCharmTurn).trim().toLowerCase() === 'true';
       }
 
       if (actOnCharmTurn && this.canMove()) {
-        this.makeActions();
+        this.makeActions(); // this.clearActions(); を打ち消し行動させる
       }
     }
   };
