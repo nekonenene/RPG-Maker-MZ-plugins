@@ -466,7 +466,11 @@
       }
 
       if (actOnCharmTurn && this.canMove()) {
-        this.makeActions(); // this.clearActions(); を打ち消し行動させる
+        if (BattleManager.isTpb()) {
+          this.makeTpbActions(); // TPBでは待機/詠唱状態まで進める必要がある
+        } else {
+          this.makeActions(); // this.clearActions(); を打ち消し行動させる
+        }
       }
     }
   };
