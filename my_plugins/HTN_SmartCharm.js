@@ -451,26 +451,38 @@
   };
 
   /**
-   * 魅了状態になったターンに即時行動するための再行動設定
+   * 魅了状態になったターンの行動制御 (ActOnCharmTurn)
+   *
+   * ActOnCharmTurn が true のとき:
+   * - ターン制バトルでは、魅了されたターンに行動をスキップせず、 makeActions() を呼ぶことで行動させる
+   * - タイムプログレスバトル（TPB）では clearTpbChargeTime() が呼ばれる前のゲージを保存・復元する
+   * - makeTpbActions() は呼ばず、ゲージが満タンになったときの自然なフロー
+   *   (finishTpbCharge → startTpbTurn → makeTpbActions) に任せる
    */
   const _Game_Battler_onRestrict = Game_Battler.prototype.onRestrict;
   Game_Battler.prototype.onRestrict = function() {
-    _Game_Battler_onRestrict.call(this); // この中で this.clearActions(); が呼ばれている
+    // TPBのとき、clearTpbChargeTime() によるゲージリセットに備えて現在のゲージ量を保存する
+    const savedTpbChargeTime = BattleManager.isTpb() ? this._tpbChargeTime : null;
+
+    _Game_Battler_onRestrict.call(this); // この中で clearTpbChargeTime() や clearActions() が呼ばれる
+
+    // <SmartCharm> の付いた状態異常にかかっているか
+    const smartCharmStates = this.states().filter(s => s.meta.SmartCharm);
+    if (smartCharmStates.length === 0) return;
+
+    if (!this.canMove()) return; // 「行動制約：行動できない」などで行動できないなら早期return
 
     // <SmartCharm> の付いた状態異常に複数かかっている場合、「優先度」がもっとも高いステートのタグを採用
-    const smartCharmStates = this.states().filter(s => s.meta.SmartCharm);
-    if (smartCharmStates.length > 0) {
-      let actOnCharmTurn = paramActOnCharmTurn;
-      if (smartCharmStates[0].meta.SmartCharm_ActOnCharmTurn !== undefined) {
-        actOnCharmTurn = String(smartCharmStates[0].meta.SmartCharm_ActOnCharmTurn).trim().toLowerCase() === 'true';
-      }
+    let actOnCharmTurn = paramActOnCharmTurn;
+    if (smartCharmStates[0].meta.SmartCharm_ActOnCharmTurn !== undefined) {
+      actOnCharmTurn = String(smartCharmStates[0].meta.SmartCharm_ActOnCharmTurn).trim().toLowerCase() === 'true';
+    }
 
-      if (actOnCharmTurn && this.canMove()) {
-        if (BattleManager.isTpb()) {
-          this.makeTpbActions(); // TPBでは待機/詠唱状態まで進める必要がある
-        } else {
-          this.makeActions(); // this.clearActions(); を打ち消し行動させる
-        }
+    if (actOnCharmTurn) {
+      if (BattleManager.isTpb()) {
+        this._tpbChargeTime = savedTpbChargeTime; // ゲージをリセットしない
+      } else {
+        this.makeActions(); // clearActions() を打ち消し行動させる
       }
     }
   };
