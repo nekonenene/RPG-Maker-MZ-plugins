@@ -75,7 +75,7 @@
  *
  * @param ShowStateMessageBeforeAction
  * @text 行動前に継続メッセージを表示
- * @desc ステートの継続メッセージ（「この状態が継続しているとき」欄のメッセージ）を行動前に表示するか。
+ * @desc ステートの継続メッセージ（「この状態が継続しているとき」欄のメッセージ）を、攻撃などの行動の前に表示するか。
  * @default true
  * @type boolean
  *
@@ -99,9 +99,9 @@
  * <SmartCharm_AllowSpecial: false> （※必殺技を許可しない場合）
  * <SmartCharm_StunRate: 20> （※行動不能になる確率を20%に設定したい場合）
  * <SmartCharm_StunMessage: %1はぼーっとしている。> （※行動不能時のメッセージを変える場合）
- * <SmartCharm_ActOnCharmTurn: true> （※魅了付与ターンの即時行動を有効にする場合）
+ * <SmartCharm_ActOnCharmTurn: false> （※魅了が付与されたターンには攻撃などの行動を許可しない場合）
  * <SmartCharm_CancelActionOnRecover: false> （※回復ターンの行動キャンセルを無効にする場合）
- * <SmartCharm_ShowStateMessageBeforeAction: true> （※継続メッセージを行動前に表示する場合）
+ * <SmartCharm_ShowStateMessageBeforeAction: false> （※継続メッセージを攻撃などの行動後に表示する場合）
  *
  * 設定例：
  * 例えば、敵陣への回復スキルだけ禁止して、あとはデフォルト通りでいい場合は、
