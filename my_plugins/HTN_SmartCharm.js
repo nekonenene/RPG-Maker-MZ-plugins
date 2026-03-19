@@ -69,13 +69,13 @@
  *
  * @param CancelActionOnRecover
  * @text 回復ターンの行動キャンセル
- * @desc 攻撃を受けるなどで魅了状態から回復したターンに手番が回ってきた場合、何も行動しないようにするか。（falseの場合、ランダムな敵への攻撃などが実行される）
+ * @desc 攻撃を受けるなどで魅了状態から回復したターンに手番が回ってきた場合、何も行動しないようにするか。
  * @default true
  * @type boolean
  *
  * @param ShowStateMessageBeforeAction
  * @text 行動前に継続メッセージを表示
- * @desc ステートの継続メッセージ（「この状態が継続しているとき」欄のメッセージ）を、攻撃などの行動の前に表示するか。
+ * @desc ステートの継続メッセージを、攻撃などの行動の前に表示するか。（falseの場合、行動後に表示）
  * @default true
  * @type boolean
  *
