@@ -496,9 +496,6 @@
     }
 
     if (action && action._isSmartCharmStunned) {
-      // 行動不能メッセージのあとに状態異常の継続メッセージが出てしまうので違和感を生む時があるが、
-      // もともとの魅了や混乱の挙動が「アクション」→「状態異常継続メッセージ」の順なので許容。
-      // commit ID: f53d44b2a65f0272 のときに逆順になる実装も検討したが、一貫性がなくなるので不採用。
       const stunMessage = action._smartCharmStunMessage;
       if (stunMessage) {
         this._logWindow.push("addText", stunMessage.format(subject.name()).trim());
