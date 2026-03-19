@@ -63,7 +63,7 @@
  *
  * @param CancelActionOnRecover
  * @text 回復ターンの行動キャンセル
- * @desc 魅了状態から回復したそのターンに、直前に選ばれていた魅了アクションをキャンセルし、何も行動しないようにするかどうか。
+ * @desc 攻撃を受けるなどで魅了状態から回復したターンに手番が回ってきた場合、何も行動しないようにするか。
  * @default true
  * @type boolean
  *
@@ -105,7 +105,7 @@
  * 3. 攻撃する場合は、通常攻撃・魔法攻撃・必殺技の中から、一番威力の高い攻撃手段を選択して使用します。
  * 4. MP不足などで使えない場合は通常攻撃をおこないます。
  * 5. 自傷（自分を攻撃）する場合の回避確率は0%になっています。
- * 6. 指定した「回復ターンの行動キャンセル」が有効な場合、行動前に魅了ダメージ等で回復したターンは何も行動しません。
+ * 6. 「回復ターンの行動キャンセル」が有効な場合、行動前にダメージ等で魅了から回復したターンには行動しません。
  *
  * 注意：
  * もともとのスキルが「全体」対象の場合、自傷確率に関わらず全体攻撃になります。
@@ -139,9 +139,6 @@
       this._smartCharmTarget = null;
       return;
     }
-
-    // ここでSmartCharmにより決定されたアクションであることをマーキング
-    this._isSmartCharmAction = true;
 
     // デフォルトパラメータから初期化
     let currentHealThreshold = paramHealThreshold;
@@ -177,6 +174,9 @@
     if (charmState.meta.SmartCharm_AllowSpecial !== undefined) {
       currentAllowSpecial = String(charmState.meta.SmartCharm_AllowSpecial).trim().toLowerCase() !== 'false';
     }
+
+    // SmartCharmにより決定されたアクションであることをマーキング
+    this._isSmartCharmAction = true;
 
     // 行動不能(スタン)判定
     if (Math.random() * 100 < currentStunRate) {
