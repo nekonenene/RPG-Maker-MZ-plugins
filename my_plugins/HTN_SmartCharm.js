@@ -180,7 +180,7 @@
       currentCancelActionOnRecover = String(charmState.meta.SmartCharm_CancelActionOnRecover).trim().toLowerCase() !== 'false';
     }
 
-    // 行動キャンセルするかどうかのフラグをアクションに記憶（SmartCharmによるアクションであることのマーキングも兼ねる）
+    // 行動キャンセルするかどうかのフラグをこのActionに記憶
     this._smartCharmCancelOnRecover = currentCancelActionOnRecover;
 
     // 行動不能(スタン)判定
