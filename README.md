@@ -7,7 +7,7 @@
 ダウンロードした `HTN_xxx.js` のような名前のファイルを、プロジェクト内の `js/plugins` フォルダーの中に入れてください。
 
 
-## 作者情報
+## 📝 作者情報
 
 ハトネコエ  
 **[X : @nekonenene](https://x.com/nekonenene)**  
