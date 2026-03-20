@@ -14,7 +14,7 @@
  * @target MZ
  * @plugindesc 魅了の状態異常時に、より適切な（？）行動をとるようにします (v1.0.0)
  * @author ハトネコエ - https://hato-neko.x0.com
- * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins?tab=readme-ov-file#htn_smartcharm
+ * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_SmartCharm
  *
  * @param HealThreshold
  * @text 回復閾値(%)
