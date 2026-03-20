@@ -16,24 +16,27 @@ HP : [https://hato-neko.x0.com](https://hato-neko.x0.com)
 バグ報告や要望などは [X](https://x.com/nekonenene) にメンションでお寄せください。
 
 
-## プラグイン一覧
-
-### HTN_SaveMax
+## HTN_SaveMax
 
 セーブできる最大数を変更するプラグインです。
 
-詳細はこちら：  
-https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_SaveMax
+### 詳しい使い方はこちら：
 
-ダウンロード：  
+**https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_SaveMax**
+
+### ダウンロード：
+
 **[【ここを右クリックして「名前を付けてリンク先を保存」みたいな項目を選んでダウンロード】](https://raw.githubusercontent.com/nekonenene/RPG-Maker-MZ-plugins/main/my_plugins/HTN_SaveMax/HTN_SaveMax.js)**
 
-### HTN_SmartCharm
+
+## HTN_SmartCharm
 
 魅了された対象が、通常攻撃以外のスキルを使うようにするなどの特徴を持つステート（状態異常）を作成できるプラグインです。
 
-詳細はこちら：  
-https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_SmartCharm
+### 詳しい使い方はこちら：
 
-ダウンロード：  
+**https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_SmartCharm**
+
+### ダウンロード：
+
 **[【ここを右クリックして「名前を付けてリンク先を保存」みたいな項目を選んでダウンロード】](https://raw.githubusercontent.com/nekonenene/RPG-Maker-MZ-plugins/main/my_plugins/HTN_SmartCharm/HTN_SmartCharm.js)**
