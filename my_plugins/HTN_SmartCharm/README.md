@@ -4,14 +4,14 @@ RPGツクールMZ用のプラグインです。
 
 魅了された対象が、通常攻撃以外のスキルを使うなどの特徴を持つステート（状態異常）を作成できるようになります。
 
-## 導入方法
+## 🛠️ 導入方法
 
 **[【ここを右クリックして「名前を付けてリンク先を保存」みたいな項目を選んでダウンロード】](https://raw.githubusercontent.com/nekonenene/RPG-Maker-MZ-plugins/main/my_plugins/HTN_SmartCharm/HTN_SmartCharm.js)**
 
 プラグインの導入方法については、[ツクール公式サイトの講座ページ](https://rpgmakerofficial.com/product/mz/plugin/start/dounyu.html)をご参考に！  
 ダウンロードした `HTN_xxx.js` のような名前のファイルを、プロジェクト内の `js/plugins` フォルダーの中に入れてください。
 
-## 使い方
+## 🧭 使い方
 
 「プラグイン管理」画面でこのプラグインを追加した後、  
 ステートの「メモ」欄に `<SmartCharm>` というタグを記入することで、  
@@ -21,7 +21,7 @@ RPGツクールMZ用のプラグインです。
 
 ステートの「行動制約」は、通常の魅了と同じく「味方を攻撃」にしておきましょう。
 
-## 機能詳細
+## 🧩 機能詳細
 
 ツクールMZのもともとの「魅了」と以下の点が異なります。
 
@@ -52,7 +52,7 @@ RPGツクールMZ用のプラグインです。
 設定の異なる２つの魅了ステータスを用いて、うなぎおおとろさん制作の「[StateUpdate](https://raw.githubusercontent.com/unagiootoro/RPGMZ/master/StateUpdate.js)」と組み合わせることで、  
 軽度の魅了ステータスから重度の魅了ステータスへと変化していく表現も可能になることでしょう。
 
-## 注意点
+## ⚠️ 注意点
 
 ツクールMZの「魅了」は「混乱」の派生なので、混乱に関連するプラグインとの相性が悪い場合があります。
 
@@ -73,6 +73,6 @@ HP : [https://hato-neko.x0.com](https://hato-neko.x0.com)
 
 バグ報告や要望などは [X](https://x.com/nekonenene) にメンションでお寄せください。
 
-## ライセンス
+## 📄 ライセンス
 
 MIT License ( https://opensource.org/license/mit )
