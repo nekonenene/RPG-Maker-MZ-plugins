@@ -6,15 +6,15 @@
 // This software is released under the MIT License.
 // https://opensource.org/license/mit
 //
-// 2026/03/18 ver2.0.0 ツクールMZに対応
-// 2016/09/12 ver1.0.0 first release
-// 2016/09/10 ver0.0.1 開発開始
+// 2026/03/18 v2.0.0 ツクールMZに対応
+// 2016/09/12 v1.0.0 First release
+// 2016/09/10 v0.0.1 開発開始
 //
 // --------------------------------------------------------------------------
 
 /*:
  * @target MV MZ
- * @plugindesc Change the maximum number of save slots
+ * @plugindesc Change the maximum number of save slots (v2.0.0)
  * @author hatonekoe - https://hato-neko.x0.com
  *
  * @help
@@ -29,7 +29,7 @@
 
 /*:ja
  * @target MV MZ
- * @plugindesc セーブ最大数を変更します
+ * @plugindesc セーブ最大数を変更します (v2.0.0)
  * @author ハトネコエ - https://hato-neko.x0.com
  *
  * @help

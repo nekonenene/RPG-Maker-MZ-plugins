@@ -6,10 +6,12 @@
 // This software is released under the MIT License.
 // https://opensource.org/license/mit
 //
+// 2026/03/20 v1.0.0 First release
+//
 // --------------------------------------------------------------------------
 
 /*:
- * @plugindesc 魅了の状態異常時に、より適切な（？）行動をとるようにします。
+ * @plugindesc 魅了の状態異常時に、より適切な（？）行動をとるようにします (v1.0.0)
  * @target MZ
  * @author ハトネコエ - https://hato-neko.x0.com
  *
