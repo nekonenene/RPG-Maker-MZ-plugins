@@ -11,9 +11,10 @@
 // --------------------------------------------------------------------------
 
 /*:
- * @plugindesc 魅了の状態異常時に、より適切な（？）行動をとるようにします (v1.0.0)
  * @target MZ
+ * @plugindesc 魅了の状態異常時に、より適切な（？）行動をとるようにします (v1.0.0)
  * @author ハトネコエ - https://hato-neko.x0.com
+ * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins?tab=readme-ov-file#htn_smartcharm
  *
  * @param HealThreshold
  * @text 回復閾値(%)
@@ -81,8 +82,7 @@
  * @default true
  * @type boolean
  *
- * @help HTN_SmartCharm.js
- *
+ * @help
  * 【使い方】
  * このプラグインの挙動をさせたいステート（「魅了」などの状態異常）の「メモ」の欄に
  * <SmartCharm>

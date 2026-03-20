@@ -16,6 +16,7 @@
  * @target MV MZ
  * @plugindesc Change the maximum number of save slots (v2.0.0)
  * @author hatonekoe - https://hato-neko.x0.com
+ * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins?tab=readme-ov-file#htn_savemax
  *
  * @help
  * Change the maximum number of save slots. (Default: 20)
@@ -32,6 +33,7 @@
  * @target MV MZ
  * @plugindesc セーブ最大数を変更します (v2.0.0)
  * @author ハトネコエ - https://hato-neko.x0.com
+ * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins?tab=readme-ov-file#htn_savemax
  *
  * @help
  * セーブできる最大数を変更します。デフォルトは 20 です。
