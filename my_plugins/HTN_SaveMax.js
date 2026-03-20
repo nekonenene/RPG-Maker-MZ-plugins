@@ -22,6 +22,7 @@
  * In RPG Maker MZ, it is counted without including the autosave.
  *
  * @param Max Quantity
+ * @text Max Save Slots
  * @desc The maximum number of save slots
  * @default 20
  *
@@ -38,7 +39,8 @@
  * オートセーブのスロットは含まずにカウントします。
  *
  * @param Max Quantity
- * @desc セーブ最大数
+ * @text セーブ最大数
+ * @desc セーブできるスロットの数
  * @default 20
  *
  */
