@@ -156,12 +156,6 @@
 
   const _Game_Action_itemEffectGainTp = Game_Action.prototype.itemEffectGainTp;
   Game_Action.prototype.itemEffectGainTp = function(target, effect) {
-    // アイテム・スキル以外の呼び出しはそのまま元処理へ委譲
-    if (target == null || (!this.isItem() && !this.isSkill())) {
-      _Game_Action_itemEffectGainTp.call(this, target, effect);
-      return;
-    }
-
     // TP増加の原因を一時フラグで記録し、gainTp 側で許可判定に利用
     if (this.isItem()) {
       target._tpNoRegenStateByItem = true;
