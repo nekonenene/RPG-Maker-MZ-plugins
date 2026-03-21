@@ -130,28 +130,18 @@
     return true;
   };
 
-  const _Game_Battler_gainTp = Game_Battler.prototype.gainTp;
-  Game_Battler.prototype.gainTp = function(value) {
+  const _Game_BattlerBase_setTp = Game_BattlerBase.prototype.setTp;
+  Game_BattlerBase.prototype.setTp = function(tp) {
+    const currentTp = this.tp;
     const isItemRecover = this._tpNoRegenStateByItem === true;
     const isSkillRecover = this._tpNoRegenStateBySkill === true;
 
-    if (value > 0 && shouldBlockTpGain(this, isItemRecover, isSkillRecover)) {
-      value = 0;
+    // 設定しようとしているTPが現在のTPより大きい場合、TPを変化しないように
+    if (tp > currentTp && shouldBlockTpGain(this, isItemRecover, isSkillRecover)) {
+      tp = currentTp;
     }
 
-    _Game_Battler_gainTp.call(this, value);
-  };
-
-  const _Game_Battler_gainSilentTp = Game_Battler.prototype.gainSilentTp;
-  Game_Battler.prototype.gainSilentTp = function(value) {
-    const isItemRecover = this._tpNoRegenStateByItem === true;
-    const isSkillRecover = this._tpNoRegenStateBySkill === true;
-
-    if (value > 0 && shouldBlockTpGain(this, isItemRecover, isSkillRecover)) {
-      value = 0;
-    }
-
-    _Game_Battler_gainSilentTp.call(this, value);
+    _Game_BattlerBase_setTp.call(this, tp);
   };
 
   const _Game_Action_itemEffectGainTp = Game_Action.prototype.itemEffectGainTp;
