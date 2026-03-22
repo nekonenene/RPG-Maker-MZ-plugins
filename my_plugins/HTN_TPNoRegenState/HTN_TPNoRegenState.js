@@ -178,8 +178,10 @@
     const isSkillRecover = this._tpNoRegenStateBySkill === true;
 
     // 設定しようとしているTPが現在のTPより大きい場合、TPを変化しないように。
-    // gainTp, gainSilentTp の value を 0 にする実装方針も考えられたが、
+    // NOTE: gainTp, gainSilentTp の value を 0 にする実装方針も考えられたが、
     // NRP_RecoverAfterAction のように setTp を直接呼び出すプラグインもあるためこの実装を採用。
+    // このプラグインには影響ないが、 itemEffectGainTp 内で makeSuccess が呼ばれ、
+    // TP回復をしていないのに result().success が true になることが他に影響を及ぼさないか少し心配。
     if (tp > currentTp && shouldBlockTpGain(this, isItemRecover, isSkillRecover)) {
       tp = currentTp;
       this.result().tpDamage = 0; // 「TPが20増えた！」のようなメッセージが出ないよう 0 で上書き
