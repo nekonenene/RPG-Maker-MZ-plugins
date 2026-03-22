@@ -7,7 +7,7 @@ AIエージェントはコードの生成、修正、および提案をおこな
 
 - `docs/mz_classes.md` : RPGツクールMZのクラスリストが記載されています。ツクールのクラス構造を理解する際のリファレンスとして使用してください。
 - `mz_scripts/` : ディレクトリの直下に、RPGツクールMZのコアとなるソースファイル（`rmmz_*.js` など）が配置されています。 `mz_scripts/plugins/` 以下には、参考となるプラグインが格納されています。 `mz_scripts/` 以下のファイルを直接変更することは**絶対に禁止**します。参照のみに使用してください。
-- `my_plugins/` : 開発中のオリジナルプラグインを格納するディレクトリです。新しいプラグインを作成する場合は、すべてこのディレクトリ内に配置してください。プラグインは `my_plugins/HTN_xxx/` のように、機能ごとにサブディレクトリを作成して管理してください。サブディレクトリ内には、プラグインのJSファイルと `README.md` を配置します。README.md の書き方は `my_plugins/HTN_SaveMax/README.md` や `my_plugins/HTN_SmartCharm/README.md` を参考にしてください。
+- `my_plugins/` : 開発中のオリジナルプラグインを格納するディレクトリです。新しいプラグインを作成する場合は、すべてこのディレクトリ内に配置してください。プラグインは `my_plugins/HTN_xxx/` のように、機能ごとにサブディレクトリを作成して管理してください。サブディレクトリ内には、プラグインのJSファイルと `README.md` を配置します。README.md の書き方は `my_plugins/HTN_TPNoRegenState/README.md` や `my_plugins/HTN_SmartCharm/README.md` を参考にしてください。
 
 ## ファイル命名規則と作成ルール
 
