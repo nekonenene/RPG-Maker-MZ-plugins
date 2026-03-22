@@ -16,6 +16,15 @@ HP : [https://hato-neko.x0.com](https://hato-neko.x0.com)
 バグ報告や要望などは [X](https://x.com/nekonenene) にメンションでお寄せください。
 
 
+## HTN_EnemyJumpOnAction
+
+敵の攻撃ターンで軽くジャンプするように動き、誰の攻撃かをわかりやすくするプラグインです。
+
+### 詳しい使い方はこちら：
+
+**https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_EnemyJumpOnAction**
+
+
 ## HTN_EscapeRate
 
 逃走成功率をパーセンテージでカンタンに設定できるようになるプラグインです。
