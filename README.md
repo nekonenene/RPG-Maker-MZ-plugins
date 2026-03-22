@@ -24,10 +24,6 @@ HP : [https://hato-neko.x0.com](https://hato-neko.x0.com)
 
 **https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_EscapeRate**
 
-### ダウンロード：
-
-**[【ここを右クリックして「名前を付けてリンク先を保存」みたいな項目を選んでダウンロード】](https://raw.githubusercontent.com/nekonenene/RPG-Maker-MZ-plugins/main/my_plugins/HTN_EscapeRate/HTN_EscapeRate.js)**
-
 
 ## HTN_SaveMax
 
@@ -36,10 +32,6 @@ HP : [https://hato-neko.x0.com](https://hato-neko.x0.com)
 ### 詳しい使い方はこちら：
 
 **https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_SaveMax**
-
-### ダウンロード：
-
-**[【ここを右クリックして「名前を付けてリンク先を保存」みたいな項目を選んでダウンロード】](https://raw.githubusercontent.com/nekonenene/RPG-Maker-MZ-plugins/main/my_plugins/HTN_SaveMax/HTN_SaveMax.js)**
 
 
 ## HTN_SmartCharm
@@ -50,10 +42,6 @@ HP : [https://hato-neko.x0.com](https://hato-neko.x0.com)
 
 **https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_SmartCharm**
 
-### ダウンロード：
-
-**[【ここを右クリックして「名前を付けてリンク先を保存」みたいな項目を選んでダウンロード】](https://raw.githubusercontent.com/nekonenene/RPG-Maker-MZ-plugins/main/my_plugins/HTN_SmartCharm/HTN_SmartCharm.js)**
-
 
 ## HTN_TPNoRegenState
 
@@ -63,6 +51,3 @@ TPの回復ができなくなるステート（状態異常）を作成できる
 
 **https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_TPNoRegenState**
 
-### ダウンロード：
-
-**[【ここを右クリックして「名前を付けてリンク先を保存」みたいな項目を選んでダウンロード】](https://raw.githubusercontent.com/nekonenene/RPG-Maker-MZ-plugins/main/my_plugins/HTN_TPNoRegenState/HTN_TPNoRegenState.js)**
