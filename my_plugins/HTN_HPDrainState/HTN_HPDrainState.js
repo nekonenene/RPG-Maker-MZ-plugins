@@ -306,6 +306,9 @@
       if (!state.meta.HPDrainState) continue;
       if (drainStatesBefore.has(state.id)) continue;
 
+      // initMembers より前にステートが付与される場合に備えて初期化する
+      if (target._hpDrainerInfo == null) target._hpDrainerInfo = {};
+
       if (drainer.isActor()) {
         target._hpDrainerInfo[state.id] = { actorId: drainer.actorId(), enemyIndex: -1 };
       } else {
@@ -322,7 +325,10 @@
   const _Game_Battler_removeState = Game_Battler.prototype.removeState;
   Game_Battler.prototype.removeState = function(stateId) {
     _Game_Battler_removeState.call(this, stateId);
-    delete this._hpDrainerInfo[stateId];
+
+    if (this._hpDrainerInfo != null) {
+      delete this._hpDrainerInfo[stateId];
+    }
   };
 
   /**
@@ -344,7 +350,7 @@
     if (drainStates.length === 0) return;
 
     for (const state of drainStates) {
-      const drainerInfo = this._hpDrainerInfo[state.id];
+      const drainerInfo = this._hpDrainerInfo?.[state.id];
       if (drainerInfo == null) continue;
 
       const drainer = resolveDrainer(drainerInfo);
