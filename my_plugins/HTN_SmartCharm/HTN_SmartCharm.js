@@ -6,13 +6,14 @@
 // This software is released under the MIT License.
 // https://opensource.org/license/mit
 //
+// 2026/03/23 v1.0.1 同じ種類のモンスターを優先して回復する挙動が機能していなかったので修正
 // 2026/03/20 v1.0.0 First release
 //
 // --------------------------------------------------------------------------
 
 /*:
  * @target MZ
- * @plugindesc 魅了の状態異常時に、より適切な（？）行動をとるようにします (v1.0.0)
+ * @plugindesc 魅了の状態異常時に、より適切な（？）行動をとるようにします (v1.0.1)
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_SmartCharm
  *
@@ -275,7 +276,7 @@
         let isPriorityTarget = (member) => false;
 
         if (inflicter) {
-          if (inflicter.isAlive() && targetUnitForHeal.includes(inflicter)) {
+          if (inflicter.isAlive() && targetsNeedingHeal.includes(inflicter)) {
             isPriorityTarget = (member) => member === inflicter;
           } else if (inflicter.isEnemy()) { // 魅了付与者がモンスターの場合
             // 本人がいない場合、同種のモンスターを探す条件
