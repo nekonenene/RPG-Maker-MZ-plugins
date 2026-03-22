@@ -12,7 +12,7 @@
 
 /*:
  * @target MZ
- * @plugindesc Creates a state that drains HP from the afflicted to the caster each turn (v1.0.0)
+ * @plugindesc Creates a state that drains HP from the afflicted to the drainer each turn (v1.0.0)
  * @author hatonekoe - https://hato-neko.x0.com
  * @url https://github.com/nekoneneve/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_HPDrainState
  *
@@ -25,9 +25,9 @@
  * @value absolute
  * @option % of afflicted's max HP
  * @value selfMhp
- * @option % of caster's max HP
- * @value originMhp
- * @option % of caster's missing HP (max HP - current HP)
+ * @option % of drainer's max HP
+ * @value drainerMhp
+ * @option % of drainer's missing HP (max HP - current HP)
  * @value damage
  *
  * @param Amount
@@ -39,7 +39,7 @@
  *
  * @param DrainMessage
  * @text Drain message
- * @desc Message shown when HP drain occurs. %1=afflicted name, %2=caster name, %3=HP label, %4=drain amount.
+ * @desc Message shown when HP drain occurs. %1=afflicted name, %2=drainer name, %3=HP label, %4=drain amount.
  * @default %1 had %4 %3 drained by %2!
  * @type string
  *
@@ -54,14 +54,14 @@
  * <HPDrainState>
  *
  * The state remembers who applied it. At the end of the afflicted battler's
- * turn, HP is transferred from the afflicted to the caster.
- * The state is also removed if the caster is defeated.
+ * turn, HP is transferred from the afflicted to the drainer.
+ * The state is also removed if the drainer is defeated.
  *
  * --- Per-state overrides (all optional) ---
  * <HPDrainState_AmountType: absolute>   Fixed HP value
  * <HPDrainState_AmountType: selfMhp>    % of afflicted's max HP
- * <HPDrainState_AmountType: originMhp>  % of caster's max HP
- * <HPDrainState_AmountType: damage>     % of caster's missing HP (max HP - current HP)
+ * <HPDrainState_AmountType: drainerMhp>  % of drainer's max HP
+ * <HPDrainState_AmountType: damage>     % of drainer's missing HP (max HP - current HP)
  *
  * <HPDrainState_Amount: 100>
  *
@@ -86,9 +86,9 @@
  * @value absolute
  * @option 被付与者の最大HPに対する割合（%）
  * @value selfMhp
- * @option 起源バトラーの最大HPに対する割合（%）
- * @value originMhp
- * @option 起源バトラーの「最大HP−現在HP」に対する割合（%）
+ * @option ドレイン実行者の最大HPに対する割合（%）
+ * @value drainerMhp
+ * @option ドレイン実行者の「最大HP−現在HP」に対する割合（%）
  * @value damage
  *
  * @param Amount
@@ -100,7 +100,7 @@
  *
  * @param DrainMessage
  * @text ドレインメッセージ
- * @desc HP吸収時に表示するメッセージ。%1=被付与者名、%2=起源バトラー名、%3=HPの設定名、%4=吸収量。
+ * @desc HP吸収時に表示するメッセージ。%1=被付与者名、%2=ドレイン実行者名、%3=HPの設定名、%4=吸収量。
  * @default %1は%2に%3を %4 吸収された！
  * @type string
  *
@@ -112,25 +112,25 @@
  *
  * @help
  * 【使い方】
- * HP吸収ステートにしたいステートのメモ欄に、次のタグを記述してください。
+ * HP吸収ステートにしたいステートの「メモ」欄に、次のタグを記述してください。
  * <HPDrainState>
  *
- * ステートを付与した相手（起源バトラー）が記憶され、
- * 被付与者のターン終了時にHPが起源バトラーへ渡されます。
- * 起源バトラーが戦闘不能になった場合もステートは自動解除されます。
+ * ステートを付与した相手（ドレイン実行者）が記憶され、
+ * 被付与者のターン終了時にHPがドレイン実行者へ渡されます。
+ * ドレイン実行者が戦闘不能になった場合にステートは自動解除されます。
  *
  * 【ステートごとの個別設定（すべて省略可）】
  * 省略した場合はプラグインパラメータの設定値が使用されます。
  *
  * <HPDrainState_AmountType: absolute>   固定値
  * <HPDrainState_AmountType: selfMhp>    被付与者の最大HP基準（%）
- * <HPDrainState_AmountType: originMhp>  ステートを付与した相手の最大HP基準（%）
- * <HPDrainState_AmountType: damage>     起源バトラーの「最大HP−現在HP」基準（%）
+ * <HPDrainState_AmountType: drainerMhp> ドレイン実行者の最大HP基準（%）
+ * <HPDrainState_AmountType: damage>     ドレイン実行者の「最大HP−現在HP」基準（%）
  *
  * <HPDrainState_Amount: 100>
  *
  * <HPDrainState_DrainMessage: %1は%2に%3を %4 吸収された！>
- * （%1=被付与者名、%2=起源バトラー名、%3=HPの設定名、%4=吸収量）
+ * （%1=被付与者名、%2=ドレイン実行者名、%3=HPの設定名、%4=吸収量）
  *
  * <HPDrainState_AllowKill: true>   （吸収による戦闘不能を許可）
  * <HPDrainState_AllowKill: false>  （吸収で最低1HPを保持）
@@ -154,25 +154,32 @@
    * @returns {boolean} 変換後の真偽値
    */
   const toBoolean = (value, defaultValue) => {
-    const str = String(value).trim().toLowerCase();
-    if (str === 'true') return true;
-    if (str === 'false') return false;
+    const strValue = String(value).trim().toLowerCase();
+
+    if (strValue === 'true') {
+      return true;
+    } else if (strValue === 'false') {
+      return false;
+    }
+
     return defaultValue;
   };
 
   /**
-   * 起源バトラー情報オブジェクトから実際のバトラーインスタンスを返す
+   * ドレイン実行者の情報オブジェクトから実際のバトラーインスタンスを返す
    *
-   * @param {{ actorId: number, enemyIndex: number }} originInfo 起源バトラー情報
+   * @param {{ actorId: number, enemyIndex: number }} drainerInfo ドレイン実行者の情報
    * @returns {Game_Battler | null} 対応するバトラー。見つからない場合は null
    */
-  const resolveOriginBattler = (originInfo) => {
-    if (originInfo == null) return null;
-    if (originInfo.actorId > 0) {
-      return $gameActors.actor(originInfo.actorId) ?? null;
-    } else if (originInfo.enemyIndex >= 0) {
-      return $gameTroop.members()[originInfo.enemyIndex] ?? null;
+  const resolveDrainer = (drainerInfo) => {
+    if (drainerInfo == null) return null;
+
+    if (drainerInfo.actorId > 0) {
+      return $gameActors.actor(drainerInfo.actorId) ?? null;
+    } else if (drainerInfo.enemyIndex >= 0) {
+      return $gameTroop.members()[drainerInfo.enemyIndex] ?? null;
     }
+
     return null;
   };
 
@@ -180,11 +187,11 @@
    * ステートのメタ情報に基づいてHP吸収量を計算する
    *
    * @param {RPG.State} state 対象ステート
-   * @param {Game_Battler} subject 被付与者（HPを失う側）
-   * @param {Game_Battler} origin 起源バトラー（HPを得る側）
+   * @param {Game_Battler} drainTarget 被付与者（HPを失う側）
+   * @param {Game_Battler} drainer ドレイン実行者（HPを得る側）
    * @returns {number} 吸収するHP量（0以上の整数）
    */
-  const calcDrainAmount = (state, subject, origin) => {
+  const calcDrainAmount = (state, drainTarget, drainer) => {
     const amountType = String(state.meta.HPDrainState_AmountType ?? '').trim() || paramAmountType;
     const amount = Number(state.meta.HPDrainState_Amount ?? paramAmount);
 
@@ -194,14 +201,14 @@
         result = amount;
         break;
       case 'selfMhp':
-        result = Math.ceil(subject.mhp * amount / 100);
+        result = Math.ceil(drainTarget.mhp * amount / 100);
         break;
-      case 'originMhp':
-        result = Math.ceil(origin.mhp * amount / 100);
+      case 'drainerMhp':
+        result = Math.ceil(drainer.mhp * amount / 100);
         break;
       case 'damage':
-        // 起源バトラーの「最大HP − 現在HP」（欠損HP）に対するパーセンテージ
-        result = Math.ceil((origin.mhp - origin.hp) * amount / 100);
+        // ドレイン実行者の「最大HP − 現在HP」（欠損HP）に対するパーセンテージ
+        result = Math.ceil((drainer.mhp - drainer.hp) * amount / 100);
         break;
       default:
         result = amount;
@@ -213,53 +220,46 @@
   /**
    * HP吸収を実行し、メッセージをバッファに積む
    *
-   * @param {Game_Battler} subject 被付与者（HPを失う側）
-   * @param {Game_Battler} origin 起源バトラー（HPを得る側）
+   * @param {Game_Battler} drainTarget 被付与者（HPを失う側）
+   * @param {Game_Battler} drainer ドレイン実行者（HPを得る側）
    * @param {number} amount 吸収するHP量
    * @param {RPG.State} state 対象ステート（ステートごとの個別設定に使用）
    */
-  const applyHpDrain = (subject, origin, amount, state) => {
+  const applyHpDrain = (drainTarget, drainer, amount, state) => {
     const allowKill = toBoolean(state.meta.HPDrainState_AllowKill, paramAllowKill);
 
     let safeAmount = amount;
     if (!allowKill) {
-      safeAmount = Math.min(amount, Math.max(0, subject.hp - 1));
+      safeAmount = Math.min(amount, Math.max(0, drainTarget.hp - 1));
     }
     if (safeAmount <= 0) return;
 
-    subject.gainHp(-safeAmount);
-    origin.gainHp(safeAmount);
-    // 起源バトラーのHP回復ポップアップを即時キューに積む
-    origin.startDamagePopup();
+    drainTarget.gainHp(-safeAmount);
+    drainer.gainHp(safeAmount);
+    // ドレイン実行者のHP回復ポップアップを即時キューに積む
+    drainer.startDamagePopup();
 
-    const drainMessage = state.meta.HPDrainState_DrainMessage != null
-      ? String(state.meta.HPDrainState_DrainMessage).trim()
-      : paramDrainMessage;
-    const message = drainMessage.format(
-      subject.name(),
-      origin.name(),
-      TextManager.hp,
-      safeAmount
-    );
-    subject._hpDrainPendingMessages.push(message);
+    const drainMessage = state.meta.HPDrainState_DrainMessage != null ? String(state.meta.HPDrainState_DrainMessage).trim() : paramDrainMessage;
+    const message = drainMessage.format(drainTarget.name(), drainer.name(), TextManager.hp, safeAmount);
+    drainTarget._hpDrainPendingMessages.push(message);
   };
 
   /**
-   * 指定バトラーを起源とするHPドレインステートを全バトラーから検索して解除する
+   * ドレイン実行者の死亡時に、ドレイン対象者を探して状態異常を解除する
    *
-   * @param {Game_BattlerBase} originBattler 死亡した起源バトラー
+   * @param {Game_BattlerBase} drainer 死亡したドレイン実行者のバトラー
    */
-  const removeHpDrainStatesByOrigin = (originBattler) => {
+  const removeDrainStatesByDrainer = (drainer) => {
     if (!$gameParty.inBattle()) return;
 
     for (const battler of BattleManager.allBattleMembers()) {
-      if (battler._hpDrainOrigins == null) continue;
+      if (battler._hpDrainerInfo == null) continue;
 
       // Object.keys() でコピーを取ることで、ループ中の removeState による変更に対して安全にする
-      for (const stateIdStr of Object.keys(battler._hpDrainOrigins)) {
+      for (const stateIdStr of Object.keys(battler._hpDrainerInfo)) {
         const stateId = Number(stateIdStr);
-        const resolved = resolveOriginBattler(battler._hpDrainOrigins[stateId]);
-        if (resolved === originBattler) {
+        const resolved = resolveDrainer(battler._hpDrainerInfo[stateId]);
+        if (resolved === drainer) {
           battler.removeState(stateId);
         }
       }
@@ -273,12 +273,12 @@
   Game_Battler.prototype.initMembers = function() {
     _Game_Battler_initMembers.call(this);
 
-    this._hpDrainOrigins = {}; // stateId → { actorId, enemyIndex }
+    this._hpDrainerInfo = {}; // stateId → { actorId, enemyIndex }
     this._hpDrainPendingMessages = []; // ドレインメッセージのバッファ
   };
 
   /**
-   * スキル・アイテム効果の適用後、新規付与されたHPドレインステートの起源バトラーを記録する
+   * スキル・アイテム効果の適用後、新規付与されたHPドレインステートのドレイン実行者を記録する
    *
    * @param {Game_Battler} target 対象バトラー
    */
@@ -291,33 +291,33 @@
 
     _Game_Action_apply.call(this, target);
 
-    // 新規付与されたドレインステートに起源バトラーを記録
-    const subject = this.subject();
+    // 新規付与されたドレインステートにドレイン実行者を記録
+    const drainer = this.subject();
     for (const state of target.states()) {
       if (!state.meta.HPDrainState) continue;
       if (drainStatesBefore.has(state.id)) continue;
 
-      if (subject.isActor()) {
-        target._hpDrainOrigins[state.id] = { actorId: subject.actorId(), enemyIndex: -1 };
+      if (drainer.isActor()) {
+        target._hpDrainerInfo[state.id] = { actorId: drainer.actorId(), enemyIndex: -1 };
       } else {
-        target._hpDrainOrigins[state.id] = { actorId: 0, enemyIndex: subject.index() };
+        target._hpDrainerInfo[state.id] = { actorId: 0, enemyIndex: drainer.index() };
       }
     }
   };
 
   /**
-   * ステート解除時に _hpDrainOrigins から対応エントリを削除する
+   * ステート解除時に _hpDrainerInfo から対応エントリを削除する
    *
    * @param {number} stateId 解除するステートID
    */
   const _Game_Battler_removeState = Game_Battler.prototype.removeState;
   Game_Battler.prototype.removeState = function(stateId) {
     _Game_Battler_removeState.call(this, stateId);
-    delete this._hpDrainOrigins[stateId];
+    delete this._hpDrainerInfo[stateId];
   };
 
   /**
-   * HP/MP/TP自然回復後にHP吸収処理を実行し、ターン累積ダメージをリセットする
+   * HP/MP/TP自然回復後にHP吸収処理を実行する
    */
   const _Game_Battler_regenerateAll = Game_Battler.prototype.regenerateAll;
   Game_Battler.prototype.regenerateAll = function() {
@@ -335,24 +335,25 @@
     if (drainStates.length === 0) return;
 
     for (const state of drainStates) {
-      const originInfo = this._hpDrainOrigins[state.id];
-      if (originInfo == null) continue;
+      const drainerInfo = this._hpDrainerInfo[state.id];
+      if (drainerInfo == null) continue;
 
-      const origin = resolveOriginBattler(originInfo);
-      if (origin == null || !origin.isAlive()) continue;
+      const drainer = resolveDrainer(drainerInfo);
+      if (drainer == null || !drainer.isAlive()) continue;
 
-      const amount = calcDrainAmount(state, this, origin);
-      applyHpDrain(this, origin, amount, state);
+      const amount = calcDrainAmount(state, this, drainer);
+      applyHpDrain(this, drainer, amount, state);
     }
   };
 
   /**
-   * バトラーが死亡したとき、そのバトラーを起源とするドレインステートを全バトラーから解除する
+   * バトラーが死亡したとき、そのバトラーをドレイン実行者とするドレインステートを全バトラーから解除する
    */
   const _Game_BattlerBase_die = Game_BattlerBase.prototype.die;
   Game_BattlerBase.prototype.die = function() {
     _Game_BattlerBase_die.call(this);
-    removeHpDrainStatesByOrigin(this);
+
+    removeDrainStatesByDrainer(this);
   };
 
   /**
@@ -361,7 +362,8 @@
   const _Game_Battler_onBattleEnd = Game_Battler.prototype.onBattleEnd;
   Game_Battler.prototype.onBattleEnd = function() {
     _Game_Battler_onBattleEnd.call(this);
-    this._hpDrainOrigins = {};
+
+    this._hpDrainerInfo = {};
     this._hpDrainPendingMessages = [];
   };
 
@@ -380,6 +382,7 @@
     for (const message of messages) {
       this.push('addText', message);
     }
+
     subject._hpDrainPendingMessages = [];
   };
 })();
