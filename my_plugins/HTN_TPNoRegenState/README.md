@@ -21,6 +21,8 @@ TPの回復ができなくなるステート（状態異常）を作成できる
 <TPNoRegenState>
 ```
 
+![TPNoRegenState_memo.png](./images/TPNoRegenState_memo.png)
+
 ## 🧩 機能詳細
 
 TPの回復には「ターン終了時の自動回復」「被ダメージ時」「アイテムやスキルによるTP回復」など、  
