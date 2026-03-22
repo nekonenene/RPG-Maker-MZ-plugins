@@ -18,8 +18,8 @@
  *
  * @param RecoverBlockedMessage
  * @text Blocked TP message
- * @desc Message shown when TP recovery is blocked. %1 is replaced with target name.
- * @default %1はＴＰを回復できない！
+ * @desc Message shown when TP recovery is blocked. %1 is target name, %2 is TP label.
+ * @default %1は%2を回復できない！
  * @type string
  *
  * @param ItemRecover
@@ -39,7 +39,7 @@
  * <TPNoRegenState>
  *
  * You can override blocked message per state:
- * <TPNoRegenState_RecoverBlockedMessage: %1 cannot recover TP!>
+ * <TPNoRegenState_RecoverBlockedMessage: %1 cannot recover %2!>
  *
  * You can override item TP-recover behavior per state:
  * <TPNoRegenState_ItemRecover: true>
@@ -58,8 +58,8 @@
  *
  * @param RecoverBlockedMessage
  * @text TP回復無効メッセージ
- * @desc TP回復が無効化されたときに表示するメッセージです。%1は対象者の名前に置き換わります。
- * @default %1のＴＰを回復できない！
+ * @desc TP回復が無効化されたときに表示するメッセージです。%1は対象者名、%2はTP表示名に置き換わります。
+ * @default %1の%2を回復できない！
  * @type string
  *
  * @param ItemRecover
@@ -80,7 +80,7 @@
  *
  * ステートごとにTP回復無効の挙動を上書きしたい場合は、
  * 次のタグを併記してください。
- * <TPNoRegenState_RecoverBlockedMessage: %1はＴＰを回復できない状態だ！>
+ * <TPNoRegenState_RecoverBlockedMessage: %1は%2を回復できない状態だ！>
  * <TPNoRegenState_ItemRecover: true>
  * <TPNoRegenState_SkillRecover: true>
  *
@@ -93,7 +93,7 @@
 
   const pluginName = 'HTN_TPNoRegenState';
   const parameters = PluginManager.parameters(pluginName);
-  const recoverBlockedMessageDefault = String(parameters.RecoverBlockedMessage || '%1のＴＰを回復できない！');
+  const recoverBlockedMessageDefault = String(parameters.RecoverBlockedMessage || '%1の%2を回復できない！');
   const itemRecoverDefault = String(parameters.ItemRecover) === 'true';
   const skillRecoverDefault = String(parameters.SkillRecover) === 'true';
 
@@ -213,7 +213,7 @@
     const tpNoRegenRecoverBlockedMessage = target.result().tpNoRegenRecoverBlockedMessage;
 
     if (target.isAlive() && tpNoRegenRecoverBlocked && tpNoRegenRecoverBlockedMessage) {
-      this.push('addText', tpNoRegenRecoverBlockedMessage.format(target.name()));
+      this.push('addText', tpNoRegenRecoverBlockedMessage.format(target.name(), TextManager.tp));
     }
   };
 })();
