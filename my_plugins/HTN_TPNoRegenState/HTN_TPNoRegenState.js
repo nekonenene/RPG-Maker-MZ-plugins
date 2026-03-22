@@ -18,19 +18,19 @@
  *
  * @param ItemRecover
  * @text Allow TP gain from items
- * @desc If true, TP gain from item effects is allowed during tagged states.
+ * @desc If true, TP gain from an item's Add TP effect is allowed during tagged states.
  * @default false
  * @type boolean
  *
  * @param SkillRecover
  * @text Allow TP gain from skills
- * @desc If true, TP gain from skill effects is allowed during tagged states.
+ * @desc If true, TP gain from a skill's Add TP effect is allowed during tagged states.
  * @default false
  * @type boolean
  *
  * @param RecoverBlockedMessage
  * @text Blocked TP message
- * @desc Message shown when TP recovery is blocked. %1 is target name, %2 is TP label.
+ * @desc Message shown when item/skill TP recovery is blocked. %1 is target name, %2 is TP label.
  * @default %1 cannot recover %2!
  * @type string
  *
@@ -47,7 +47,7 @@
  * You can override blocked message per state:
  * <TPNoRegenState_RecoverBlockedMessage: %1 cannot recover %2!>
  *
- * If multiple tagged states are active, only the highest-priority tagged state is used.
+ * If multiple tagged states are active, only the tagged state with the highest database priority is used.
  */
 
 /*:ja
