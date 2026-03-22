@@ -40,3 +40,16 @@ HP : [https://hato-neko.x0.com](https://hato-neko.x0.com)
 ### ダウンロード：
 
 **[【ここを右クリックして「名前を付けてリンク先を保存」みたいな項目を選んでダウンロード】](https://raw.githubusercontent.com/nekonenene/RPG-Maker-MZ-plugins/main/my_plugins/HTN_SmartCharm/HTN_SmartCharm.js)**
+
+
+## HTN_TPNoRegenState
+
+TPの回復ができなくなるステート（状態異常）を作成できるプラグインです。
+
+### 詳しい使い方はこちら：
+
+**https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_TPNoRegenState**
+
+### ダウンロード：
+
+**[【ここを右クリックして「名前を付けてリンク先を保存」みたいな項目を選んでダウンロード】](https://raw.githubusercontent.com/nekonenene/RPG-Maker-MZ-plugins/main/my_plugins/HTN_TPNoRegenState/HTN_TPNoRegenState.js)**
