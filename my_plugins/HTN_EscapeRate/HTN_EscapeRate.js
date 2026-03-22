@@ -77,8 +77,8 @@
  * @max 100
  *
  * @param EscapeFailureBonusRate
- * @text 逃走失敗時の逃走成功率の上昇量(%)
- * @desc 逃走に失敗するたびに逃走確率に加算される値です。ツクールのデフォルトは10%です。
+ * @text 逃走失敗時の成功率上昇(%)
+ * @desc 逃走に失敗するたびに逃走成功率に加算される値です。ツクールのデフォルトは10%です。
  * @default 10
  * @type number
  * @min 0
@@ -104,7 +104,7 @@
  * プラグインパラメータの「デフォルト逃走成功率」が使用され、
  * 基本逃走確率は、敵グループ内の全敵キャラの逃走確率の平均値となります。
  *
- * 逃走に失敗するたびに「逃走失敗時の逃走成功率の上昇量」が加算されます。
+ * 逃走に失敗するたびに「逃走失敗時の成功率上昇」が加算されます。
  * デフォルトは 10% で、これはツクールMV/MZの挙動と同じです。
  *
  * さらに、倒した敵の数が多いほど逃走成功率にボーナスが加算されます。
@@ -122,7 +122,7 @@
 
   // デフォルト逃走成功率（0〜100の整数）
   const paramDefaultEscapeRate = Number(parameters['DefaultEscapeRate'] ?? 100);
-  // 逃走失敗時の逃走成功率の上昇量（0〜100の整数）
+  // 逃走失敗時の成功率上昇（0〜100の整数）
   const paramEscapeFailureBonusRate = Number(parameters['EscapeFailureBonusRate'] ?? 10);
   // 倒した敵1体あたりの逃走ボーナス率（0〜100の整数）
   const paramDefeatedEnemyBonusRate = Number(parameters['DefeatedEnemyBonusRate'] ?? 0);
