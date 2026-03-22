@@ -31,7 +31,7 @@
  * @param RecoverBlockedMessage
  * @text Blocked TP message
  * @desc Message shown when TP recovery is blocked. %1 is target name, %2 is TP label.
- * @default %1は%2を回復できない！
+ * @default %1 cannot recover %2!
  * @type string
  *
  * @help
@@ -52,7 +52,7 @@
 
 /*:ja
  * @target MZ
- * @plugindesc TP増加を無効にするステートが作成できます (v1.0.0)
+ * @plugindesc TPの回復ができなくなるステート（状態異常）を作成できます (v1.0.0)
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_TPNoRegenState
  *
