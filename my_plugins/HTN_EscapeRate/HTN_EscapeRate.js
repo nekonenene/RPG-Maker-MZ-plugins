@@ -13,7 +13,7 @@
 /*:
  * @target MV MZ
  * @plugindesc Changes the escape success rate (v1.0.0)
- * @author ハトネコエ - https://hato-neko.x0.com
+ * @author hatonekoe - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_EscapeRate
  *
  * @param DefaultEscapeRate
