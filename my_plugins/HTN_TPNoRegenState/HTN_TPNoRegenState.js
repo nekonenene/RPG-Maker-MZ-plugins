@@ -52,25 +52,25 @@
 
 /*:ja
  * @target MZ
- * @plugindesc 特定ステート中のTP増加を無効化します (v1.0.0)
+ * @plugindesc TP増加を無効にするステートが作成できます (v1.0.0)
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_TPNoRegenState
  *
  * @param BlockedMessage
  * @text TP回復無効メッセージ
- * @desc TP回復が無効化されたときに表示するメッセージです。%1は対象者名に置き換わります。
+ * @desc TP回復が無効化されたときに表示するメッセージです。%1は対象者の名前に置き換わります。
  * @default %1のＴＰを回復できない！
  * @type string
  *
  * @param ItemRecover
- * @text アイテムTP回復を許可
- * @desc trueの場合、タグ付きステート中でもアイテム効果によるTP増加を許可します。
+ * @text アイテムによるTP回復を許可
+ * @desc trueの場合、アイテム効果によるTP増加を許可します。
  * @default false
  * @type boolean
  *
  * @param SkillRecover
- * @text スキルTP回復を許可
- * @desc trueの場合、タグ付きステート中でもスキル効果によるTP増加を許可します。
+ * @text スキルによるTP回復を許可
+ * @desc trueの場合、スキル（魔法・必殺技）の効果によるTP増加を許可します。
  * @default false
  * @type boolean
  *
@@ -83,7 +83,9 @@
  * <TPNoRegenState_BlockedMessage: %1はＴＰを回復できない状態だ！>
  * <TPNoRegenState_ItemRecover: true>
  * <TPNoRegenState_SkillRecover: true>
- * 複数種類のTP回復無効ステートに同時にかかっている場合は、優先度が最も高いステートのタグを参照します。
+ *
+ * なお、 <TPNoRegenState> が設定されたステートに複数種類、同時にかかっている場合は、
+ * 「優先度」が最も高いステートのタグを参照します。
  */
 
 (() => {
