@@ -87,7 +87,7 @@
    * @returns {number} 逃走確率（0〜100の整数）
    */
   function getEscapeRateOfEnemy(enemy) {
-    const metaValue = enemy.enemy().meta['EscapeRate'];
+    const metaValue = enemy.enemy().meta.EscapeRate;
     if (metaValue != null) {
       return Number(metaValue);
     }
