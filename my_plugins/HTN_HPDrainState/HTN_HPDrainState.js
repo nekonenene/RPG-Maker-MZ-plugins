@@ -24,11 +24,13 @@
  * @option Fixed HP value
  * @value absolute
  * @option % of afflicted's max HP
- * @value selfMhp
+ * @value selfMaxHp
+ * @option % of afflicted's current HP
+ * @value selfHp
  * @option % of drainer's max HP
- * @value drainerMhp
+ * @value drainerMaxHp
  * @option % of drainer's missing HP (max HP - current HP)
- * @value damage
+ * @value drainerMissingHp
  *
  * @param Amount
  * @text Default drain value
@@ -58,10 +60,11 @@
  * The state is also removed if the drainer is defeated.
  *
  * --- Per-state overrides (all optional) ---
- * <HPDrainState_AmountType: absolute>   Fixed HP value
- * <HPDrainState_AmountType: selfMhp>    % of afflicted's max HP
- * <HPDrainState_AmountType: drainerMhp>  % of drainer's max HP
- * <HPDrainState_AmountType: damage>     % of drainer's missing HP (max HP - current HP)
+ * <HPDrainState_AmountType: absolute>          Fixed HP value
+ * <HPDrainState_AmountType: selfMaxHp>         % of afflicted's max HP
+ * <HPDrainState_AmountType: selfHp>            % of afflicted's current HP
+ * <HPDrainState_AmountType: drainerMaxHp>      % of drainer's max HP
+ * <HPDrainState_AmountType: drainerMissingHp>  % of drainer's missing HP (max HP - current HP)
  *
  * <HPDrainState_Amount: 100>
  *
@@ -85,11 +88,13 @@
  * @option 固定値（HP）
  * @value absolute
  * @option 被付与者の最大HPに対する割合（%）
- * @value selfMhp
+ * @value selfMaxHp
+ * @option 被付与者の現在HPに対する割合（%）
+ * @value selfHp
  * @option ドレイン実行者の最大HPに対する割合（%）
- * @value drainerMhp
+ * @value drainerMaxHp
  * @option ドレイン実行者の「最大HP−現在HP」に対する割合（%）
- * @value damage
+ * @value drainerMissingHp
  *
  * @param Amount
  * @text デフォルト吸収量
@@ -122,10 +127,11 @@
  * 【ステートごとの個別設定（すべて省略可）】
  * 省略した場合はプラグインパラメータの設定値が使用されます。
  *
- * <HPDrainState_AmountType: absolute>   固定値
- * <HPDrainState_AmountType: selfMhp>    被付与者の最大HP基準（%）
- * <HPDrainState_AmountType: drainerMhp> ドレイン実行者の最大HP基準（%）
- * <HPDrainState_AmountType: damage>     ドレイン実行者の「最大HP−現在HP」基準（%）
+ * <HPDrainState_AmountType: absolute>          固定値
+ * <HPDrainState_AmountType: selfMaxHp>         被付与者の最大HP基準（%）
+ * <HPDrainState_AmountType: selfHp>            被付与者の現在HP基準（%）
+ * <HPDrainState_AmountType: drainerMaxHp>      ドレイン実行者の最大HP基準（%）
+ * <HPDrainState_AmountType: drainerMissingHp>  ドレイン実行者の「最大HP−現在HP」基準（%）
  *
  * <HPDrainState_Amount: 100>
  *
@@ -200,13 +206,16 @@
       case 'absolute':
         result = amount;
         break;
-      case 'selfMhp':
+      case 'selfMaxHp':
         result = Math.ceil(drainTarget.mhp * amount / 100);
         break;
-      case 'drainerMhp':
+      case 'selfHp':
+        result = Math.ceil(drainTarget.hp * amount / 100);
+        break;
+      case 'drainerMaxHp':
         result = Math.ceil(drainer.mhp * amount / 100);
         break;
-      case 'damage':
+      case 'drainerMissingHp':
         // ドレイン実行者の「最大HP − 現在HP」（欠損HP）に対するパーセンテージ
         result = Math.ceil((drainer.mhp - drainer.hp) * amount / 100);
         break;
