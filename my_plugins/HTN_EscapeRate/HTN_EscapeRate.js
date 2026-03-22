@@ -24,7 +24,7 @@
  * @min 0
  * @max 100
  *
- * @param EscapeRateIncrement
+ * @param EscapeFailureBonusRate
  * @text Escape Rate Increment on Failure (%)
  * @desc Amount (%) added to the escape rate after each failed escape attempt.
  * @default 10
@@ -32,7 +32,7 @@
  * @min 0
  * @max 100
  *
- * @param EscapeRateBonus
+ * @param DefeatedEnemyBonusRate
  * @text Escape Rate Bonus per Defeated Enemy (%)
  * @desc Bonus escape rate (%) added per defeated enemy. Formula: defeated enemies * this value.
  * @default 0
@@ -73,7 +73,7 @@
  * @min 0
  * @max 100
  *
- * @param EscapeRateIncrement
+ * @param EscapeFailureBonusRate
  * @text 逃走失敗時の逃走成功率の上昇量(%)
  * @desc 逃走に失敗するたびに逃走確率に加算される値です。ツクールのデフォルトは10%です。
  * @default 10
@@ -81,7 +81,7 @@
  * @min 0
  * @max 100
  *
- * @param EscapeRateBonus
+ * @param DefeatedEnemyBonusRate
  * @text 倒した敵1体ごとの逃走ボーナス率(%)
  * @desc 倒した敵の数 × この値 がボーナスとして逃走成功率に加算されます。
  * @default 0
@@ -116,9 +116,9 @@
   // デフォルト逃走成功率（0〜100の整数）
   const paramDefaultEscapeRate = Number(parameters['DefaultEscapeRate'] ?? 100);
   // 逃走失敗時の逃走成功率の上昇量（0〜100の整数）
-  const paramEscapeRateIncrement = Number(parameters['EscapeRateIncrement'] ?? 10);
+  const paramEscapeFailureBonusRate = Number(parameters['EscapeFailureBonusRate'] ?? 10);
   // 倒した敵1体あたりの逃走ボーナス率（0〜100の整数）
-  const paramEscapeRateBonus = Number(parameters['EscapeRateBonus'] ?? 0);
+  const paramDefeatedEnemyBonusRate = Number(parameters['DefeatedEnemyBonusRate'] ?? 0);
 
   /**
    * 敵キャラ1体の逃走確率(%)を返す。
@@ -153,14 +153,14 @@
 
   /**
    * 撃破した敵の数に基づく逃走成功率ボーナス（0〜1の小数）を返す。
-   * ボーナス = 撃破した敵の数 × paramEscapeRateBonus / 100
+   * ボーナス = 撃破した敵の数 × paramDefeatedEnemyBonusRate / 100
    *
    * @returns {number}
    */
   function calcEscapeBonus() {
     const defeatedCount = $gameTroop.members().length - $gameTroop.aliveMembers().length;
 
-    return defeatedCount * paramEscapeRateBonus / 100;
+    return defeatedCount * paramDefeatedEnemyBonusRate / 100;
   }
 
   /**
@@ -185,7 +185,7 @@
     const result = _BattleManager_processEscape.call(this);
     if (!result) {
       // 逃走に失敗した場合に逃走成功率を上げる
-      this._escapeRatio = ratioWithBonus + paramEscapeRateIncrement / 100;
+      this._escapeRatio = ratioWithBonus + paramEscapeFailureBonusRate / 100;
     }
 
     // 逃走を再びおこなったときにボーナスが二重に加算されないよう、ボーナス分を取り除く
