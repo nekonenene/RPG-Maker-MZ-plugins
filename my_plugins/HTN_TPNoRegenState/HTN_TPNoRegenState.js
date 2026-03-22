@@ -16,7 +16,7 @@
  * @author hatonekoe - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_TPNoRegenState
  *
- * @param BlockedMessage
+ * @param RecoverBlockedMessage
  * @text Blocked TP message
  * @desc Message shown when TP recovery is blocked. %1 is replaced with target name.
  * @default %1はＴＰを回復できない！
@@ -39,7 +39,7 @@
  * <TPNoRegenState>
  *
  * You can override blocked message per state:
- * <TPNoRegenState_BlockedMessage: %1 cannot recover TP!>
+ * <TPNoRegenState_RecoverBlockedMessage: %1 cannot recover TP!>
  *
  * You can override item TP-recover behavior per state:
  * <TPNoRegenState_ItemRecover: true>
@@ -56,7 +56,7 @@
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_TPNoRegenState
  *
- * @param BlockedMessage
+ * @param RecoverBlockedMessage
  * @text TP回復無効メッセージ
  * @desc TP回復が無効化されたときに表示するメッセージです。%1は対象者の名前に置き換わります。
  * @default %1のＴＰを回復できない！
@@ -80,7 +80,7 @@
  *
  * ステートごとにTP回復無効の挙動を上書きしたい場合は、
  * 次のタグを併記してください。
- * <TPNoRegenState_BlockedMessage: %1はＴＰを回復できない状態だ！>
+ * <TPNoRegenState_RecoverBlockedMessage: %1はＴＰを回復できない状態だ！>
  * <TPNoRegenState_ItemRecover: true>
  * <TPNoRegenState_SkillRecover: true>
  *
@@ -93,7 +93,7 @@
 
   const pluginName = 'HTN_TPNoRegenState';
   const parameters = PluginManager.parameters(pluginName);
-  const blockedMessageDefault = String(parameters.BlockedMessage || '%1のＴＰを回復できない！');
+  const recoverBlockedMessageDefault = String(parameters.RecoverBlockedMessage || '%1のＴＰを回復できない！');
   const itemRecoverDefault = String(parameters.ItemRecover) === 'true';
   const skillRecoverDefault = String(parameters.SkillRecover) === 'true';
 
@@ -145,14 +145,14 @@
    * @param {Game_Battler} battler 対象バトラー
    * @returns {string} 表示メッセージ
    */
-  const blockedMessage = (battler) => {
+  const recoverBlockedMessage = (battler) => {
     const state = battler.states().find((s) => s.meta.TPNoRegenState);
     if (!state) return '';
 
-    if (state.meta.TPNoRegenState_BlockedMessage == null) {
-      return blockedMessageDefault.trim();
+    if (state.meta.TPNoRegenState_RecoverBlockedMessage == null) {
+      return recoverBlockedMessageDefault.trim();
     } else {
-      return String(state.meta.TPNoRegenState_BlockedMessage).trim();
+      return String(state.meta.TPNoRegenState_RecoverBlockedMessage).trim();
     }
   };
 
@@ -165,11 +165,13 @@
     // 設定しようとしているTPが現在のTPより大きい場合、TPを変化しないように
     if (tp > currentTp && shouldBlockTpGain(this, isItemRecover, isSkillRecover)) {
       tp = currentTp;
-
       this.result().tpDamage = 0; // 「TPが20増えた！」のようなメッセージが出ないよう 0 で上書き
-      // 独自フラグを立て、 displayTpDamage 側でメッセージ表示をおこなう
-      this.result().tpNoRegenBlocked = true;
-      this.result().tpNoRegenBlockedMessage = blockedMessage(this);
+
+      if (isItemRecover || isSkillRecover) {
+        // 独自フラグを立て、 displayTpDamage 側でメッセージ表示をおこなう
+        this.result().tpNoRegenRecoverBlocked = true;
+        this.result().tpNoRegenRecoverBlockedMessage = recoverBlockedMessage(this);
+      }
     }
 
     _Game_BattlerBase_setTp.call(this, tp);
@@ -199,17 +201,19 @@
     _Game_ActionResult_clear.call(this);
 
     // プラグイン独自のフラグを解放
-    this.tpNoRegenBlocked = null;
-    this.tpNoRegenBlockedMessage = null;
+    this.tpNoRegenRecoverBlocked = null;
+    this.tpNoRegenRecoverBlockedMessage = null;
   };
 
   const _Window_BattleLog_displayTpDamage = Window_BattleLog.prototype.displayTpDamage;
   Window_BattleLog.prototype.displayTpDamage = function(target) {
     _Window_BattleLog_displayTpDamage.call(this, target);
 
-    const tpNoRegenBlockedMessage = target.result().tpNoRegenBlockedMessage;
-    if (target.isAlive() && target.result().tpNoRegenBlocked && tpNoRegenBlockedMessage) {
-      this.push('addText', tpNoRegenBlockedMessage.format(target.name()));
+    const tpNoRegenRecoverBlocked = target.result().tpNoRegenRecoverBlocked;
+    const tpNoRegenRecoverBlockedMessage = target.result().tpNoRegenRecoverBlockedMessage;
+
+    if (target.isAlive() && tpNoRegenRecoverBlocked && tpNoRegenRecoverBlockedMessage) {
+      this.push('addText', tpNoRegenRecoverBlockedMessage.format(target.name()));
     }
   };
 })();

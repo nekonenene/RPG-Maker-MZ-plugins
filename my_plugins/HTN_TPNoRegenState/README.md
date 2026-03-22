@@ -35,7 +35,7 @@ TPの回復には「ターン終了時の自動回復」「被ダメージ時」
 
 ```
 <TPNoRegenState>
-<TPNoRegenState_BlockedMessage: %1はＴＰを回復できない状態だ！>
+<TPNoRegenState_RecoverBlockedMessage: %1はＴＰを回復できない状態だ！>
 <TPNoRegenState_ItemRecover: true>
 <TPNoRegenState_SkillRecover: true>
 ```
