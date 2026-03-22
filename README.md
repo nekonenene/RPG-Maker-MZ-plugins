@@ -16,6 +16,19 @@ HP : [https://hato-neko.x0.com](https://hato-neko.x0.com)
 バグ報告や要望などは [X](https://x.com/nekonenene) にメンションでお寄せください。
 
 
+## HTN_EscapeRate
+
+逃走成功率をパーセンテージでカンタンに設定できるようになるプラグインです。
+
+### 詳しい使い方はこちら：
+
+**https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_EscapeRate**
+
+### ダウンロード：
+
+**[【ここを右クリックして「名前を付けてリンク先を保存」みたいな項目を選んでダウンロード】](https://raw.githubusercontent.com/nekonenene/RPG-Maker-MZ-plugins/main/my_plugins/HTN_EscapeRate/HTN_EscapeRate.js)**
+
+
 ## HTN_SaveMax
 
 セーブできる最大数を変更するプラグインです。
