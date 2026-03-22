@@ -47,7 +47,7 @@
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_EscapeRate
  *
  * @param DefaultEscapeRate
- * @text デフォルト逃走確率(%)
+ * @text デフォルト逃走成功率(%)
  * @desc 敵キャラのメモ欄に <EscapeRate> タグが設定されていない場合の逃走成功率です。
  * @default 100
  * @type number
@@ -57,16 +57,17 @@
  * @help
  * 逃走成功率を変更できるようにします。
  *
- * 敵キャラのメモ欄に以下のタグを記入することで、
+ * 敵キャラの「メモ」欄に以下のタグを記入することで、
  * その敵キャラに対する逃走確率を個別に設定できます。
  *
  *   <EscapeRate: 50>   // 50%の確率で逃走できる
  *
  * タグが設定されていない敵キャラについては、
- * プラグインパラメータの「デフォルト逃走確率」が使用されます（デフォルト: 100%）。
+ * プラグインパラメータの「デフォルト逃走確率」が使用されます。
  *
  * 最終的な逃走確率は、敵グループ内の全敵キャラの逃走確率の平均値になります。
- * 逃走に失敗するたびに、逃走確率が10%ずつ上昇します。
+ *
+ * ツクールMZの仕様として、逃走に失敗するたびに逃走確率は10%ずつ上昇していきます。
  */
 
 (() => {
@@ -74,16 +75,18 @@
 
   const pluginName = "HTN_EscapeRate";
   const parameters = PluginManager.parameters(pluginName);
+
   // デフォルト逃走確率（0〜100の整数）
   const paramDefaultEscapeRate = Number(parameters['DefaultEscapeRate'] ?? 100);
 
   /**
    * 敵キャラ1体の逃走確率(%)を返す。
    * メモ欄に <EscapeRate: N> タグがあればその値を、なければデフォルト値を返す。
+   *
    * @param {Game_Enemy} enemy - 対象の敵キャラ
    * @returns {number} 逃走確率（0〜100の整数）
    */
-  function getEscapeRateForEnemy(enemy) {
+  function getEscapeRateOfEnemy(enemy) {
     const metaValue = enemy.enemy().meta['EscapeRate'];
     if (metaValue != null) {
       return Number(metaValue);
@@ -104,7 +107,7 @@
       return;
     }
 
-    const totalRate = enemies.reduce((sum, enemy) => sum + getEscapeRateForEnemy(enemy), 0);
+    const totalRate = enemies.reduce((sum, enemy) => sum + getEscapeRateOfEnemy(enemy), 0);
     this._escapeRatio = totalRate / enemies.length / 100;
   };
 })();
