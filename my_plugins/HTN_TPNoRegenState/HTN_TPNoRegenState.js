@@ -75,17 +75,32 @@
  * @type string
  *
  * @help
+ * 【使い方】
  * TP増加を禁止したいステートのメモ欄に、次のタグを記述してください。
  * <TPNoRegenState>
  *
- * ステートごとにTP回復無効の挙動を上書きしたい場合は、
- * 次のタグを併記してください。
- * <TPNoRegenState_ItemRecover: true>
+ * 【ステートごとの個別設定】
+ * ステートの「メモ」に以下のように記述することで、
+ * プラグインパラメータの設定をステートごとに上書きできます。
+ *
+ * 設定項目一覧：
+ * <TPNoRegenState> （※この記述は必須です）
+ * <TPNoRegenState_ItemRecover: true> （アイテムによるTP回復を許可する場合）
+ * <TPNoRegenState_SkillRecover: true> （魔法や必殺技によるTP回復を許可する場合）
+ * <TPNoRegenState_RecoverBlockedMessage: %1は%2を回復できない状態だ！> （TP回復に失敗したことを示すメッセージを変更する場合。%1は対象者名、%2はTPの表示名に置き換わる）
+ *
+ * 設定例：
+ * 例えば、以下のように記述すると、スキルでのTP回復は有効な一方、
+ * アイテムでのTP回復ができず、アイテムでのTP回復時に「○○のやる気は上がらなかった！」という
+ * メッセージが表示されるようになります。
+ *
+ * <TPNoRegenState>
+ * <TPNoRegenState_ItemRecover: false>
  * <TPNoRegenState_SkillRecover: true>
  * <TPNoRegenState_RecoverBlockedMessage: %1のやる気は上がらなかった！>
  *
- * なお、 <TPNoRegenState> が設定されたステートに複数種類、同時にかかっている場合は、
- * 「優先度」が最も高いステートのタグを参照します。
+ * なお、 <TPNoRegenState> が設定されたステートが複数種類あって、それらに同時にかかっている場合は、
+ * 「優先度」が最も高いステートのタグが参照されます。
  */
 
 (() => {
