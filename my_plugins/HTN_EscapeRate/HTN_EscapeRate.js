@@ -46,17 +46,20 @@
  * By adding the following tag to an enemy's note field,
  * you can set the escape rate for that specific enemy.
  *
- *   <EscapeRate: 60>   // 60% chance of escaping
+ *   <EscapeRate: 60>   // 60% escape rate
  *
  * For enemies without this tag, the plugin parameter
  * "Default Escape Rate" is used (default: 100%).
  *
- * The base escape rate is the average of all enemies in the troop.
- * A bonus is then added based on the number of defeated enemies:
- *   bonus = defeated enemy count * Escape Rate Bonus (%)
- *
  * Each failed escape attempt increases the escape rate by
  * the "Escape Rate Increment on Failure" value (default: 10%).
+ *
+ * The base escape rate is the average of all enemies in the troop.
+ * During each escape check, a bonus is added based on the number of defeated enemies:
+ *   bonus = defeated enemy count * Escape Rate Bonus (%)
+ *
+ * Final escape rate =
+ *   base rate + (failed attempts * failure increment) + (defeated enemies * defeated enemy bonus)
  */
 
 /*:ja
@@ -101,10 +104,14 @@
  * プラグインパラメータの「デフォルト逃走成功率」が使用され、
  * 基本逃走確率は、敵グループ内の全敵キャラの逃走確率の平均値となります。
  *
- * さらに、倒した敵の数が多いほど逃走成功率にボーナスが加算されます。
- * ボーナス = 撃破した敵の数 × 「倒した敵1体あたりの逃走ボーナス率」
+ * 逃走に失敗するたびに「逃走失敗時の逃走成功率の上昇量」が加算されます。
+ * デフォルトは 10% で、これはツクールMV/MZの挙動と同じです。
  *
- * 逃走に失敗するたびに「逃走失敗時の逃走成功率の上昇量」が加算されます（デフォルト: 10%）。
+ * さらに、倒した敵の数が多いほど逃走成功率にボーナスが加算されます。
+ *
+ * 最終的な逃走成功率は、
+ * 基本逃走確率 + (逃走に失敗した回数 × 逃走失敗ボーナス率) + (撃破した敵の数 × 撃破ボーナス率)
+ * のように算出されます。
  */
 
 (() => {
