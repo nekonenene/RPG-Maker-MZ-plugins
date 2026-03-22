@@ -5,6 +5,11 @@ RPGツクールMZ用のプラグインです。
 敵の攻撃ターンが来たとき、敵が軽く上下にジャンプすることで、  
 誰のターンかを視覚的にわかりやすくすることができます。
 
+動作イメージ：  
+[![紹介動画](https://img.youtube.com/vi/tf6bSG1GXjU/0.jpg)](https://www.youtube.com/watch?v=tf6bSG1GXjU)  
+[↑ クリックすると YouTube に移動します](https://www.youtube.com/watch?v=tf6bSG1GXjU)
+
+
 ## 🛠️ 導入方法
 
 **[【ここを右クリックして「名前を付けてリンク先を保存」みたいな項目を選んでダウンロード】](https://raw.githubusercontent.com/nekonenene/RPG-Maker-MZ-plugins/main/my_plugins/HTN_EnemyJumpOnTurn/HTN_EnemyJumpOnTurn.js)**
