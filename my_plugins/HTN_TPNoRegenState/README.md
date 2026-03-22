@@ -32,7 +32,7 @@ TPの回復には「ターン終了時の自動回復」「被ダメージ時」
 「アイテムやスキルによるTP回復」は、**プラグインパラメータ**や、**ステートごとに設定できるタグ**で許可することもできます。
 
 プラグインパラメータの設定値がデフォルトとなりますが、  
-ステートの「メモ」欄に例えば以下のようにタグを記入することで、個別に設定することもできます。  
+ステートの「メモ」欄にタグを記入することで、個別に設定することも可能です。  
 `<TPNoRegenState>` 以外のタグは、必要なものだけ設定してください。
 
 例えば、以下のように記述すると、スキルでのTP回復は有効な一方、  
@@ -51,6 +51,30 @@ TPの回復には「ターン終了時の自動回復」「被ダメージ時」
 
 ちなみに、TPにダメージを与えるスキルを作れるプラグインとしては  
 NUUNさんの「[TPDamageType](https://github.com/nuun888/MZ/blob/master/NUUN_TPDamageType.js)」があります。ご活用ください。
+
+### タグ一覧
+
+ステートの「メモ」欄に記述できるタグの一覧です。  
+`<TPNoRegenState>` 以外のタグは、  
+プラグインのパラメータで設定した値を上書きしない場合には記述しなくて大丈夫です。
+
+- `<TPNoRegenState>`  
+  このプラグインを有効化するために必要なタグ
+- `<TPNoRegenState_ItemRecover: true/false>`  
+  アイテムによるTP回復の可否を上書き
+- `<TPNoRegenState_SkillRecover: true/false>`  
+  スキルによるTP回復の可否を上書き
+- `<TPNoRegenState_RecoverBlockedMessage: テキスト>`  
+  TP回復が無効化されたときの表示メッセージを上書き（文字列内の `%1` は対象者名、`%2` は「ＴＰ」の表示名に置換されます）
+
+#### コピーしやすい用の一覧
+
+```
+<TPNoRegenState>
+<TPNoRegenState_ItemRecover: false>
+<TPNoRegenState_SkillRecover: false>
+<TPNoRegenState_RecoverBlockedMessage: %1の%2を回復できない！>
+```
 
 ## 📝 作者情報
 
