@@ -11,7 +11,7 @@
 // --------------------------------------------------------------------------
 
 /*:
- * @target MZ
+ * @target MV MZ
  * @plugindesc Changes the escape success rate (v1.0.0)
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_EscapeRate
@@ -30,7 +30,7 @@
  * By adding the following tag to an enemy's note field,
  * you can set the escape rate for that specific enemy.
  *
- *   <EscapeRate: 50>   // 50% chance of escaping
+ *   <EscapeRate: 60>   // 60% chance of escaping
  *
  * For enemies without this tag, the plugin parameter
  * "Default Escape Rate" is used (default: 100%).
@@ -41,8 +41,8 @@
  */
 
 /*:ja
- * @target MZ
- * @plugindesc 逃走成功率を変更できるようにします (v1.0.0)
+ * @target MV MZ
+ * @plugindesc 逃走成功率をパーセンテージでカンタンに設定できます (v1.0.0)
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_EscapeRate
  *
@@ -55,17 +55,16 @@
  * @max 100
  *
  * @help
- * 逃走成功率を変更できるようにします。
+ * 逃走成功率をパーセンテージでカンタンに設定できます。
  *
  * 敵キャラの「メモ」欄に以下のタグを記入することで、
  * その敵キャラに対する逃走確率を個別に設定できます。
  *
- *   <EscapeRate: 50>   // 50%の確率で逃走できる
+ *   <EscapeRate: 60>   // 60%の確率で逃走できる
  *
  * タグが設定されていない敵キャラについては、
- * プラグインパラメータの「デフォルト逃走確率」が使用されます。
- *
- * 最終的な逃走確率は、敵グループ内の全敵キャラの逃走確率の平均値になります。
+ * プラグインパラメータの「デフォルト逃走成功率」が使用され、
+ * 最終的な逃走確率は、敵グループ内の全敵キャラの逃走確率の平均値となります。
  *
  * ツクールMZの仕様として、逃走に失敗するたびに逃走確率は10%ずつ上昇していきます。
  */
@@ -99,6 +98,7 @@
    * 逃走確率を計算してセットする。 BattleManager.setup の中で呼び出される。
    * 敵グループ内の全敵キャラの逃走確率の平均値を使用している。
    * 逃走に失敗すると BattleManager.onEscapeFailure により逃走確率が10%ずつ上昇していく。
+   * （ツクールMVでは BattleManager.processEscape 内の処理で逃走確率が上昇）
    */
   BattleManager.makeEscapeRatio = function() {
     const enemies = $gameTroop.members();
