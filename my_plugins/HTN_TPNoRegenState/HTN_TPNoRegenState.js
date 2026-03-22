@@ -164,12 +164,10 @@
     if (tp > currentTp && shouldBlockTpGain(this, isItemRecover, isSkillRecover)) {
       tp = currentTp;
 
-      if (isItemRecover || isSkillRecover) {
-        this.result().tpDamage = 0; // 「TPが20増えた！」のようなメッセージが出ないよう 0 で上書き
-        // 独自フラグを立て、 displayTpDamage 側でメッセージ表示をおこなう
-        this.result().tpNoRegenBlocked = true;
-        this.result().tpNoRegenBlockedMessage = blockedMessage(this);
-      }
+      this.result().tpDamage = 0; // 「TPが20増えた！」のようなメッセージが出ないよう 0 で上書き
+      // 独自フラグを立て、 displayTpDamage 側でメッセージ表示をおこなう
+      this.result().tpNoRegenBlocked = true;
+      this.result().tpNoRegenBlockedMessage = blockedMessage(this);
     }
 
     _Game_BattlerBase_setTp.call(this, tp);
