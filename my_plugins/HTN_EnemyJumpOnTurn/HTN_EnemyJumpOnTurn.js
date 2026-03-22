@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------
 //
-// HTN_EnemyJumpOnAction.js
+// HTN_EnemyJumpOnTurn.js
 //
 // Copyright (c) 2026 hatonekoe
 // This software is released under the MIT License.
@@ -14,7 +14,7 @@
  * @target MZ
  * @plugindesc Enemies jump slightly when it's their turn to act (v1.0.0)
  * @author hatonekoe - https://hato-neko.x0.com
- * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_EnemyJumpOnAction
+ * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_EnemyJumpOnTurn
  *
  * @param JumpHeight
  * @text Jump Height (px)
@@ -44,7 +44,7 @@
  * @target MZ
  * @plugindesc 敵の攻撃ターンが来たとき、敵が軽くジャンプします (v1.0.0)
  * @author ハトネコエ - https://hato-neko.x0.com
- * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_EnemyJumpOnAction
+ * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_EnemyJumpOnTurn
  *
  * @param JumpHeight
  * @text ジャンプの高さ (px)
@@ -72,7 +72,7 @@
 (() => {
   'use strict';
 
-  const pluginName = "HTN_EnemyJumpOnAction";
+  const pluginName = "HTN_EnemyJumpOnTurn";
   const parameters = PluginManager.parameters(pluginName);
 
   // ジャンプの高さ（ピクセル単位）
