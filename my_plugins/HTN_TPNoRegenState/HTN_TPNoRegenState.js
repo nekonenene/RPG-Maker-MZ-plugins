@@ -16,12 +16,6 @@
  * @author hatonekoe - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_TPNoRegenState
  *
- * @param RecoverBlockedMessage
- * @text Blocked TP message
- * @desc Message shown when TP recovery is blocked. %1 is target name, %2 is TP label.
- * @default %1は%2を回復できない！
- * @type string
- *
  * @param ItemRecover
  * @text Allow TP gain from items
  * @desc If true, TP gain from item effects is allowed during tagged states.
@@ -34,18 +28,24 @@
  * @default false
  * @type boolean
  *
+ * @param RecoverBlockedMessage
+ * @text Blocked TP message
+ * @desc Message shown when TP recovery is blocked. %1 is target name, %2 is TP label.
+ * @default %1は%2を回復できない！
+ * @type string
+ *
  * @help
  * Add the following note tag to a state to block TP gain while that state is active:
  * <TPNoRegenState>
- *
- * You can override blocked message per state:
- * <TPNoRegenState_RecoverBlockedMessage: %1 cannot recover %2!>
  *
  * You can override item TP-recover behavior per state:
  * <TPNoRegenState_ItemRecover: true>
  *
  * You can override skill TP-recover behavior per state:
  * <TPNoRegenState_SkillRecover: true>
+ *
+ * You can override blocked message per state:
+ * <TPNoRegenState_RecoverBlockedMessage: %1 cannot recover %2!>
  *
  * If multiple tagged states are active, only the highest-priority tagged state is used.
  */
@@ -55,12 +55,6 @@
  * @plugindesc TP増加を無効にするステートが作成できます (v1.0.0)
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_TPNoRegenState
- *
- * @param RecoverBlockedMessage
- * @text TP回復無効メッセージ
- * @desc TP回復が無効化されたときに表示するメッセージです。%1は対象者名、%2はTP表示名に置き換わります。
- * @default %1の%2を回復できない！
- * @type string
  *
  * @param ItemRecover
  * @text アイテムによるTP回復を許可
@@ -74,15 +68,21 @@
  * @default false
  * @type boolean
  *
+ * @param RecoverBlockedMessage
+ * @text TP回復無効メッセージ
+ * @desc アイテムやスキルによるTP回復が失敗したことを示すメッセージです。%1は対象者名、%2はTPの表示名に置き換わります。
+ * @default %1の%2を回復できない！
+ * @type string
+ *
  * @help
  * TP増加を禁止したいステートのメモ欄に、次のタグを記述してください。
  * <TPNoRegenState>
  *
  * ステートごとにTP回復無効の挙動を上書きしたい場合は、
  * 次のタグを併記してください。
- * <TPNoRegenState_RecoverBlockedMessage: %1は%2を回復できない状態だ！>
  * <TPNoRegenState_ItemRecover: true>
  * <TPNoRegenState_SkillRecover: true>
+ * <TPNoRegenState_RecoverBlockedMessage: %1のやる気は上がらなかった！>
  *
  * なお、 <TPNoRegenState> が設定されたステートに複数種類、同時にかかっている場合は、
  * 「優先度」が最も高いステートのタグを参照します。
@@ -93,9 +93,9 @@
 
   const pluginName = 'HTN_TPNoRegenState';
   const parameters = PluginManager.parameters(pluginName);
-  const recoverBlockedMessageDefault = String(parameters.RecoverBlockedMessage || '%1の%2を回復できない！');
   const itemRecoverDefault = String(parameters.ItemRecover) === 'true';
   const skillRecoverDefault = String(parameters.SkillRecover) === 'true';
+  const recoverBlockedMessageDefault = String(parameters.RecoverBlockedMessage || '%1の%2を回復できない！');
 
   /**
    * 文字列や真偽値の入力を真偽値へ変換
