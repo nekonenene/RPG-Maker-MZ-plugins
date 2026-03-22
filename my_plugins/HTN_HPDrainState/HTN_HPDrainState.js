@@ -285,6 +285,14 @@
 
         if (drainer === deadBattler) {
           battler.removeState(stateId);
+
+          // displayBattlerStatus をここで直接呼ぶと、ダメージ・倒れるメッセージより先にキューへ積まれてしまう。
+          // そのため「後で表示が必要なバトラー」として pending リストに追加し、
+          // deadBattler の displayBattlerStatus が呼ばれた直後に処理する（後述のエイリアス参照）
+          if (BattleManager._hpDrainPendingRecoveringBattlers == null) {
+            BattleManager._hpDrainPendingRecoveringBattlers = [];
+          }
+          BattleManager._hpDrainPendingRecoveringBattlers.push(battler);
         }
       }
     }
@@ -417,6 +425,30 @@
     }
 
     _Window_BattleLog_displayAutoAffectedStatus.call(this, subject);
+  };
+
+  /**
+   * displayBattlerStatus が呼ばれた直後に、pending リストに積まれたバトラーの状態変化も続けて表示する
+   * ドレイン実行者の死亡によってステートが解除される、被付与者の解除メッセージを、
+   * ドレイン実行者の受けるダメージ表示や、倒れるメッセージの後に出すための仕組み
+   *
+   * @param {Game_Battler} battler 表示対象のバトラー
+   * @param {boolean} current true なら現在の状態も表示する
+   */
+  const _BattleManager_displayBattlerStatus = BattleManager.displayBattlerStatus;
+  BattleManager.displayBattlerStatus = function(battler, current) {
+    _BattleManager_displayBattlerStatus.call(this, battler, current);
+
+    const recoveringBattlers = BattleManager._hpDrainPendingRecoveringBattlers;
+    if (recoveringBattlers == null || recoveringBattlers.length === 0) {
+      return;
+    }
+
+    // 再入防止のため、リストをクリアしてからループ開始
+    BattleManager._hpDrainPendingRecoveringBattlers = [];
+    for (const recoveringBattler of recoveringBattlers) {
+      _BattleManager_displayBattlerStatus.call(this, recoveringBattler, false);
+    }
   };
 
   /**
