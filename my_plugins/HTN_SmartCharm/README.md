@@ -17,9 +17,13 @@ RPGツクールMZ用のプラグインです。
 ステートの「メモ」欄に `<SmartCharm>` というタグを記入することで、  
 そのステートがこのプラグインの効果を持つようになります。
 
-![SmartCharm_memo.png](./images/SmartCharm_memo.png)
+ステートの「行動制約」は、通常の魅了と同じく **「味方を攻撃」** にしておきましょう。
 
-ステートの「行動制約」は、通常の魅了と同じく「味方を攻撃」にしておきましょう。
+```
+<SmartCharm>
+```
+
+![SmartCharm_memo.png](./images/SmartCharm_memo.png)
 
 ## 🧩 機能詳細
 
@@ -51,6 +55,51 @@ RPGツクールMZ用のプラグインです。
 
 設定の異なる２つの魅了ステータスを用いて、うなぎおおとろさん制作の「[StateUpdate](https://raw.githubusercontent.com/unagiootoro/RPGMZ/master/StateUpdate.js)」と組み合わせることで、  
 軽度の魅了ステータスから重度の魅了ステータスへと変化していく表現も可能になることでしょう。
+
+### タグ一覧
+
+ステートの「メモ」欄に記述できるタグの一覧です。  
+`<SmartCharm>` 以外のタグは、  
+プラグインのパラメータで設定した値を上書きしない場合には記述しなくて大丈夫です。
+
+- `<SmartCharm>`  
+  このプラグインを有効化するために必要なタグ
+- `<SmartCharm_HealThreshold: 数値>`  
+  回復閾値(%)を上書き（例: `<SmartCharm_HealThreshold: 80>`）
+- `<SmartCharm_SelfAttackRate: 数値>`  
+  自傷確率(%)を上書き（例: `<SmartCharm_SelfAttackRate: 10>`）
+- `<SmartCharm_AllowHeal: true/false>`  
+  敵陣への回復スキルの使用可否を上書き
+- `<SmartCharm_AllowMagic: true/false>`  
+  魔法スキルの使用可否を上書き
+- `<SmartCharm_AllowSpecial: true/false>`  
+  必殺技スキルの使用可否を上書き
+- `<SmartCharm_StunRate: 数値>`  
+  行動不能確率(%)を上書き（例: `<SmartCharm_StunRate: 20>`）
+- `<SmartCharm_StunMessage: テキスト>`  
+  行動不能時に表示するメッセージを上書き（`%1` は行動者名に置換される。例: `<SmartCharm_StunMessage: %1はぼーっとしている。>`）
+- `<SmartCharm_ActOnCharmTurn: true/false>`  
+  魅了されたターンに手番が回ってきた場合に行動するかの設定を上書き
+- `<SmartCharm_CancelActionOnRecover: true/false>`  
+  魅了から回復したターンの行動をキャンセルするかの設定を上書き（`true`: 行動しない / `false`: ランダムな敵に攻撃）
+- `<SmartCharm_ShowStateMessageBeforeAction: true/false>`  
+  継続メッセージの表示タイミングを上書き（`true`: 行動前に表示 / `false`: 行動後に表示）
+
+#### コピーしやすい用の一覧
+
+```
+<SmartCharm>
+<SmartCharm_HealThreshold: 60>
+<SmartCharm_SelfAttackRate: 0>
+<SmartCharm_AllowHeal: true>
+<SmartCharm_AllowMagic: true>
+<SmartCharm_AllowSpecial: true>
+<SmartCharm_StunRate: 0>
+<SmartCharm_StunMessage: %1は相手に見とれている。>
+<SmartCharm_ActOnCharmTurn: true>
+<SmartCharm_CancelActionOnRecover: true>
+<SmartCharm_ShowStateMessageBeforeAction: true>
+```
 
 ## ⚠️ 注意点
 
