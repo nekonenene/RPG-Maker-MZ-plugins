@@ -263,20 +263,27 @@
   /**
    * ドレイン実行者の死亡時に、ドレイン対象者を探して状態異常を解除する
    *
-   * @param {Game_BattlerBase} drainer 死亡したドレイン実行者のバトラー
+   * @param {Game_BattlerBase} deadBattler 死亡したバトラー
    */
-  const removeDrainStatesByDrainer = (drainer) => {
-    if (!$gameParty.inBattle()) return;
+  const removeDrainStatesByDrainer = (deadBattler) => {
+    // 戦闘中でないなら早期return
+    if (!$gameParty.inBattle()) {
+      return;
+    }
 
+    // 各バトラーに関して、誰にドレインを受けているのかを見ていき、
+    // その中に deadBattler がいるなら、対応するステートを解除する
     for (const battler of BattleManager.allBattleMembers()) {
-      if (battler._hpDrainerInfo == null) continue;
+      if (battler._hpDrainerInfo == null) {
+        continue;
+      }
 
       // Object.keys() でコピーを取ることで、ループ中の removeState による変更に対して安全にする
       for (const stateIdStr of Object.keys(battler._hpDrainerInfo)) {
         const stateId = Number(stateIdStr);
-        const resolved = resolveDrainer(battler._hpDrainerInfo[stateId]);
+        const drainer = resolveDrainer(battler._hpDrainerInfo[stateId]);
 
-        if (resolved === drainer) {
+        if (drainer === deadBattler) {
           battler.removeState(stateId);
         }
       }
@@ -290,37 +297,44 @@
   Game_Battler.prototype.initMembers = function() {
     _Game_Battler_initMembers.call(this);
 
-    this._hpDrainerInfo = {}; // stateId → { actorId, enemyIndex }
-    this._hpDrainPendingMessages = []; // ドレインメッセージのバッファ
+    this._hpDrainerInfo = {}; // { stateId: { actorId:, enemyIndex: } } の形式で apply メソッドにて代入される
+    this._hpDrainPendingMessages = []; // ドレインメッセージの一時保管場所
   };
 
   /**
    * スキル・アイテム効果の適用後、新規付与されたHPドレインステートのドレイン実行者を記録する
    *
-   * @param {Game_Battler} target 対象バトラー
+   * @param {Game_Battler} target スキル・アイテムの使用相手
    */
   const _Game_Action_apply = Game_Action.prototype.apply;
   Game_Action.prototype.apply = function(target) {
-    // 付与前のドレインステートIDセットを記録
-    const drainStatesBefore = new Set(
-      target.states().filter((s) => s.meta.HPDrainState).map((s) => s.id)
-    );
-
     _Game_Action_apply.call(this, target);
 
-    // 新規付与されたドレインステートにドレイン実行者を記録
-    const drainer = this.subject();
+    const actionSubject = this.subject(); // アクションの主体
+
+    // このアクションがドレインステートを付与する効果を持つ場合、ドレイン実行者を記録（再付与時は上書き）
     for (const state of target.states()) {
       if (!state.meta.HPDrainState) continue;
-      if (drainStatesBefore.has(state.id)) continue;
 
-      // initMembers より前にステートが付与される場合に備えて初期化する
-      if (target._hpDrainerInfo == null) target._hpDrainerInfo = {};
+      // item().effects は例えば { code: 21, dataId: 5, value1: 1.0, value2: 0 } のような Object を持ち、
+      // code: 21 (=EFFECT_ADD_STATE) は「ステート付与」効果を示し、
+      // dataId: 5 は付与するステートID、value1: 1.0 は付与確率（100%）を示す。
+      // この分岐で、ドレインステートの付与がおこなわれるアクションなのかを確認している。
+      const hasAddDrainState = this.item().effects.some(
+        (e) => e.code === Game_Action.EFFECT_ADD_STATE && e.dataId === state.id
+      );
+      if (!hasAddDrainState) continue;
 
-      if (drainer.isActor()) {
-        target._hpDrainerInfo[state.id] = { actorId: drainer.actorId(), enemyIndex: -1 };
+      // initMembers より前に呼ばれた場合に備えて初期化
+      if (target._hpDrainerInfo == null) {
+        target._hpDrainerInfo = {};
+      }
+
+      // ドレイン実行者の情報を記録。味方なら actorId, 敵なら enemyIndex に保存
+      if (actionSubject.isActor()) {
+        target._hpDrainerInfo[state.id] = { actorId: actionSubject.actorId(), enemyIndex: -1 };
       } else {
-        target._hpDrainerInfo[state.id] = { actorId: 0, enemyIndex: drainer.index() };
+        target._hpDrainerInfo[state.id] = { actorId: 0, enemyIndex: actionSubject.index() };
       }
     }
   };
@@ -350,7 +364,8 @@
   };
 
   /**
-   * HP吸収ステートによるターン終了時のHP吸収処理
+   * 独自メソッド：ターン終了時のHP吸収処理
+   * this が持っている状態異常の中からHPドレインステートをすべて探し、それぞれのドレイン処理を実行
    */
   Game_Battler.prototype.hpDrainRegenerate = function() {
     if (!this.isAlive()) return;
@@ -360,35 +375,28 @@
 
     for (const state of drainStates) {
       const drainerInfo = this._hpDrainerInfo ? this._hpDrainerInfo[state.id] : null;
-      if (drainerInfo == null) continue;
+      if (drainerInfo == null) {
+        continue;
+      }
 
       const drainer = resolveDrainer(drainerInfo);
-      if (drainer == null || !drainer.isAlive()) continue;
+      if (drainer == null || !drainer.isAlive()) {
+        continue;
+      }
 
       const amount = calcDrainAmount(state, this, drainer);
-      applyHpDrain(this, drainer, amount, state);
+      applyHpDrain(this, drainer, amount, state); // this から drainer に HP を移動させる
     }
   };
 
   /**
-   * バトラーが死亡したとき、そのバトラーをドレイン実行者とするドレインステートを全バトラーから解除する
+   * 誰かが死亡したとき、ドレイン実行者であれば、被付与者からドレインステートを解除
    */
   const _Game_BattlerBase_die = Game_BattlerBase.prototype.die;
   Game_BattlerBase.prototype.die = function() {
     _Game_BattlerBase_die.call(this);
 
     removeDrainStatesByDrainer(this);
-  };
-
-  /**
-   * バトル終了時に独自プロパティをリセットする
-   */
-  const _Game_Battler_onBattleEnd = Game_Battler.prototype.onBattleEnd;
-  Game_Battler.prototype.onBattleEnd = function() {
-    _Game_Battler_onBattleEnd.call(this);
-
-    this._hpDrainerInfo = {};
-    this._hpDrainPendingMessages = [];
   };
 
   /**
@@ -399,14 +407,26 @@
    */
   const _Window_BattleLog_displayAutoAffectedStatus = Window_BattleLog.prototype.displayAutoAffectedStatus;
   Window_BattleLog.prototype.displayAutoAffectedStatus = function(subject) {
-    const messages = subject._hpDrainPendingMessages;
-    if (messages != null && messages.length > 0) {
-      for (const message of messages) {
-        this.push('addText', message);
+    const drainMessages = subject._hpDrainPendingMessages;
+    if (drainMessages != null && drainMessages.length > 0) {
+      for (const drainMessage of drainMessages) {
+        this.push('addText', drainMessage); // ドレインメッセージをバトルログに表示
       }
+
       subject._hpDrainPendingMessages = [];
     }
 
     _Window_BattleLog_displayAutoAffectedStatus.call(this, subject);
+  };
+
+  /**
+   * バトル終了時に独自プロパティをリセットする（ initMembers でやったことと内容は同じ）
+   */
+  const _Game_Battler_onBattleEnd = Game_Battler.prototype.onBattleEnd;
+  Game_Battler.prototype.onBattleEnd = function() {
+    _Game_Battler_onBattleEnd.call(this);
+
+    this._hpDrainerInfo = {};
+    this._hpDrainPendingMessages = [];
   };
 })();
