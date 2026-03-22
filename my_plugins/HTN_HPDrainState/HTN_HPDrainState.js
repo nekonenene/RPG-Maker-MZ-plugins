@@ -237,20 +237,27 @@
   const applyHpDrain = (drainTarget, drainer, amount, state) => {
     const allowKill = toBoolean(state.meta.HPDrainState_AllowKill, paramAllowKill);
 
+    // allowKill が false の場合、被付与者のHPが0にならないように吸収量を制限
     let safeAmount = amount;
     if (!allowKill) {
       safeAmount = Math.min(amount, Math.max(0, drainTarget.hp - 1));
     }
+
+    // HP吸収が発生しない場合はここで処理を終了
     if (safeAmount <= 0) return;
 
     drainTarget.gainHp(-safeAmount);
     drainer.gainHp(safeAmount);
+
     // ドレイン実行者のHP回復ポップアップを即時キューに積む
     drainer.startDamagePopup();
 
-    const drainMessage = state.meta.HPDrainState_DrainMessage != null ? String(state.meta.HPDrainState_DrainMessage).trim() : paramDrainMessage;
-    const message = drainMessage.format(drainTarget.name(), drainer.name(), TextManager.hp, safeAmount);
-    drainTarget._hpDrainPendingMessages.push(message);
+    const drainMessage = state.meta.HPDrainState_DrainMessage != null ? String(state.meta.HPDrainState_DrainMessage) : paramDrainMessage;
+    const message = drainMessage.trim().format(drainTarget.name(), drainer.name(), TextManager.hp, safeAmount);
+
+    if (message !== '') {
+      drainTarget._hpDrainPendingMessages.push(message);
+    }
   };
 
   /**
@@ -268,6 +275,7 @@
       for (const stateIdStr of Object.keys(battler._hpDrainerInfo)) {
         const stateId = Number(stateIdStr);
         const resolved = resolveDrainer(battler._hpDrainerInfo[stateId]);
+
         if (resolved === drainer) {
           battler.removeState(stateId);
         }
@@ -337,6 +345,7 @@
   const _Game_Battler_regenerateAll = Game_Battler.prototype.regenerateAll;
   Game_Battler.prototype.regenerateAll = function() {
     _Game_Battler_regenerateAll.call(this);
+
     this.hpDrainRegenerate();
   };
 
@@ -350,7 +359,7 @@
     if (drainStates.length === 0) return;
 
     for (const state of drainStates) {
-      const drainerInfo = this._hpDrainerInfo?.[state.id];
+      const drainerInfo = this._hpDrainerInfo ? this._hpDrainerInfo[state.id] : null;
       if (drainerInfo == null) continue;
 
       const drainer = resolveDrainer(drainerInfo);
@@ -383,21 +392,21 @@
   };
 
   /**
-   * HP自然回復の表示後に、バッファされたHP吸収メッセージを表示する
+   * 状態変化メッセージの表示前に、バッファされたHP吸収メッセージを先に表示する
+   * displayAutoAffectedStatus より前に出すことで、死亡メッセージの前にドレインメッセージが表示される
    *
    * @param {Game_Battler} subject 対象バトラー
    */
-  const _Window_BattleLog_displayRegeneration = Window_BattleLog.prototype.displayRegeneration;
-  Window_BattleLog.prototype.displayRegeneration = function(subject) {
-    _Window_BattleLog_displayRegeneration.call(this, subject);
-
+  const _Window_BattleLog_displayAutoAffectedStatus = Window_BattleLog.prototype.displayAutoAffectedStatus;
+  Window_BattleLog.prototype.displayAutoAffectedStatus = function(subject) {
     const messages = subject._hpDrainPendingMessages;
-    if (messages == null || messages.length === 0) return;
-
-    for (const message of messages) {
-      this.push('addText', message);
+    if (messages != null && messages.length > 0) {
+      for (const message of messages) {
+        this.push('addText', message);
+      }
+      subject._hpDrainPendingMessages = [];
     }
 
-    subject._hpDrainPendingMessages = [];
+    _Window_BattleLog_displayAutoAffectedStatus.call(this, subject);
   };
 })();
