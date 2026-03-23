@@ -361,7 +361,7 @@
   Game_Battler.prototype.initMembers = function() {
     _Game_Battler_initMembers.call(this);
 
-    this._hpDrainerInfo = {}; // { stateId: { actorId:, enemyIndex: } } の形式で apply メソッドにて代入される
+    this._hpDrainerInfo = {}; // { <stateId>: { actorId:, enemyIndex: } } の形式で apply メソッドにて代入される
     this._hpDrainPendingMessages = []; // ドレインメッセージの一時保管場所
   };
 
