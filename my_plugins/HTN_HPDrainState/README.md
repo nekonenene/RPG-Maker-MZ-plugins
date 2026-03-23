@@ -175,7 +175,7 @@ Math.min(drainer.mhp - drainer.hp, drainTarget.mhp * 0.1)
 <HPDrainState_Amount: (drainTarget.tp &lt;= 10) ? 1000 : 50>
 ```
 
-ドレインされる側のTPが10以下のときは1000ダメージ（ほぼ確実に戦闘不能）を吸い、  
+ドレインされる側のTPが10以下のときは1000ダメージを吸い、  
 それ以外のときは50ダメージを吸います。
 
 タグ内で `<` や `>` を直接書くとタグの解釈に影響が出てしまうため、  
