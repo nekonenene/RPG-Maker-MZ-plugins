@@ -421,6 +421,11 @@
         this.push('addText', drainMessage); // ドレインメッセージをバトルログに表示
       }
 
+      // MZ の標準的なメッセージ表示パターン（addText → wait → clear）に倣い、
+      // ドレインメッセージを表示し終えたらクリアする
+      this.push('wait');
+      this.push('clear');
+
       subject._hpDrainPendingMessages = [];
     }
 
