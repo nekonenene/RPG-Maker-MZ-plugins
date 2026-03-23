@@ -37,8 +37,16 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           tag="${{ steps.tag.outputs.name }}"
+
+          tag_message=$(git tag -l --format='%(contents)' "$tag")
+          generated=$(gh api "repos/${{ github.repository }}/releases/generate-notes" \
+            -f tag_name="$tag" \
+            --jq '.body')
+          notes=$(printf '%s\n\n%s' "$tag_message" "$generated")
+
           files=$(find my_plugins -name '*.js' | sort)
+
           gh release create "$tag" \
             --title "Release $tag" \
-            --generate-notes \
+            --notes "$notes" \
             $files
