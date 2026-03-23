@@ -86,6 +86,7 @@
  * The formula result is rounded up with Math.ceil and clamped to 0 or more.
  * For example, Math.max(drainTarget.mhp / 10, drainer.atk * 2) drains the greater
  * of 1/10 of the afflicted's max HP or twice the drainer's attack power.
+ * Note: In tags, < and > can be written as &lt; and &gt; to avoid parsing issues.
  *
  * <HPDrainState_AmountRandomizer: 0>
  *
@@ -172,6 +173,7 @@
  * 例えば Math.max(drainTarget.mhp / 10, drainer.atk * 2) と設定すると、
  * 「ドレインされる側の最大HPの10分の1」か「ドレインする側の攻撃力の2倍」かの大きい方が吸収量になります。
  * 変数: drainTarget（ドレインされる側）, drainer（ドレインする側）
+ * 文字列内の &lt; は < に、 &gt; は > に変換されますので、タグで式を書くときにご活用ください。
  *
  * <HPDrainState_AmountRandomizer: 0>   （ランダム幅を0%に。計算結果が固定値になる）
  * <HPDrainState_AmountRandomizer: 80>  （ランダム幅を80%に。計算結果に0.2〜1.8倍の乗数が掛かる）
@@ -241,8 +243,8 @@
    */
   const calcDrainAmount = (state, drainTarget, drainer) => {
     const amountType = String(state.meta.HPDrainState_AmountType ?? '').trim() || paramAmountType;
-    // タグ内に " や ' を書く人もいそうなので削除しておく
-    let amount = String(state.meta.HPDrainState_Amount ?? paramAmount).trim().replace(/\'\"/g, '');
+    // タグ内に " や ' を書かれた場合に削除。 &lt; や &gt; は置換して対応
+    let amount = String(state.meta.HPDrainState_Amount ?? paramAmount).trim().replace(/[\'\"]/g, '').replace("&lt;", "<").replace("&gt;", ">");
     const amountRandomizer = Math.min(80, Math.max(0, Number(state.meta.HPDrainState_AmountRandomizer ?? paramAmountRandomizer)));
 
     if (amountType !== 'formula') {
@@ -269,7 +271,13 @@
         result = Math.ceil((drainer.mhp - drainer.hp) * amount / 100);
         break;
       case 'formula':
-        result = Math.ceil(eval(amount));
+        // わかりやすいメッセージに直して例外を投げ直す
+        try {
+          result = Math.ceil(eval(amount));
+        } catch (e) {
+          console.error(`HP吸収の計算式の評価中にエラーが発生しました。式「${amount}」エラー内容「${e.message}」`);
+          throw new Error(`Error evaluating HP drain formula: ${amount}. Original error: ${e.message}`);
+        }
         break;
       default:
         console.warn(`Unknown HP drain amount type: ${amountType}`);
