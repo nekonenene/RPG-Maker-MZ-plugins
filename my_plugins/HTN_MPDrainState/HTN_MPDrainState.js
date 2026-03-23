@@ -365,7 +365,11 @@
             if (BattleManager._mpDrainPendingRecoveringBattlers == null) {
               BattleManager._mpDrainPendingRecoveringBattlers = [];
             }
-            BattleManager._mpDrainPendingRecoveringBattlers.push(battler);
+            // battler だけでなく stateId も保存する。
+            // 被付与者がドレイン実行者を自ら倒した場合、endBattlerActions -> onAllActionsEnd で
+            // 被付与者の _result がクリアされた後に displayBattlerStatus が呼ばれるため、
+            // removedStates が空になってメッセージが表示されない問題を防ぐ
+            BattleManager._mpDrainPendingRecoveringBattlers.push({ battler, stateId });
           } else {
             // ドレイン実行者にまだ生存者がいる場合、リストを更新するだけでステートは解除しない
             battler._mpDrainerInfo[stateId] = remainingDrainers;
@@ -571,7 +575,7 @@
 
     // 再入防止のため、リストをクリアしてからループ開始
     BattleManager._mpDrainPendingRecoveringBattlers = [];
-    for (const recoveringBattler of recoveringBattlers) {
+    for (const { battler: recoveringBattler, stateId: recoveredStateId } of recoveringBattlers) {
       // 付与メッセージ（addedStates）は当該アクションの displayAffectedStatus で既に表示済みのため、
       // ここでは解除メッセージのみ表示したい。
       // addedStates を一時退避してクリアすることで、displayAutoAffectedStatus が
@@ -579,9 +583,18 @@
       const savedAddedStates = recoveringBattler._result.addedStates;
       recoveringBattler._result.addedStates = [];
 
+      // 被付与者がドレイン実行者を自ら倒した場合、endBattlerActions -> onAllActionsEnd -> clearResult() の
+      // 順で呼ばれ、removedStates が空になった状態で displayBattlerStatus に到達する。
+      // そのため、ここで removedStates を再設定して解除メッセージが表示されるようにする
+      const savedRemovedStates = recoveringBattler._result.removedStates;
+      if (!savedRemovedStates.includes(recoveredStateId)) {
+        recoveringBattler._result.removedStates = [recoveredStateId, ...savedRemovedStates];
+      }
+
       _BattleManager_displayBattlerStatus.call(this, recoveringBattler, false);
 
       recoveringBattler._result.addedStates = savedAddedStates;
+      recoveringBattler._result.removedStates = savedRemovedStates;
     }
   };
 
