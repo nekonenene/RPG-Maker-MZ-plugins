@@ -6,6 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/license/mit
 //
+// 2026/03/23 v1.0.2 魅了から回復したターンの行動キャンセルが機能しない場合があったため修正
 // 2026/03/23 v1.0.1 同じ種類のモンスターを優先して回復する挙動が機能していなかったので修正
 // 2026/03/20 v1.0.0 First release
 //
@@ -13,7 +14,7 @@
 
 /*:
  * @target MZ
- * @plugindesc 魅了の状態異常時に、より適切な（？）行動をとるようにします (v1.0.1)
+ * @plugindesc 魅了の状態異常時に、より適切な（？）行動をとるようにします (v1.0.2)
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_SmartCharm
  *
@@ -168,7 +169,6 @@
     let currentAllowSpecial = paramAllowSpecial;
     let currentStunRate = paramStunRate;
     let currentStunMessage = paramStunMessage;
-    let currentCancelActionOnRecover = paramCancelActionOnRecover;
     let currentShowStateMessageBeforeAction = paramShowStateMessageBeforeAction;
 
     // <SmartCharm> の付いた状態異常に複数かかっている場合、「優先度」がもっとも高いステートのタグを採用
@@ -204,7 +204,6 @@
     }
 
     // 個別タグでの上書きを再判定しないで済むよう、このActionに記憶
-    this._smartCharmCancelOnRecover = currentCancelActionOnRecover;
     this._showSmartCharmStateMessageBeforeAction = currentShowStateMessageBeforeAction;
 
     // 行動不能(スタン)判定
@@ -442,15 +441,44 @@
   };
 
   /**
-   * 魅了が解除されたときに、誰から魅了されたかの情報を消去
+   * SmartCharm が解除されるときの処理
    */
   const _Game_Battler_removeState = Game_Battler.prototype.removeState;
   Game_Battler.prototype.removeState = function(stateId) {
+    // 解除されるステート
+    const removingState = $dataStates[stateId];
+
+    // 念のため、Battler に SmarCharm が付与されているか確認（かかっていなくても removeState が呼ばれる可能性もあるため）
+    const wasCharmState = removingState != null && removingState.meta.SmartCharm && this.isStateAffected(stateId);
+
     _Game_Battler_removeState.call(this, stateId);
 
     if (!this.states().some(s => s.meta.SmartCharm)) {
       this._smartCharmInflicter = null;
     }
+
+    // 戦闘中にすべてのSmartCharmステートから解除された場合、CancelActionOnRecoverの設定に従いフラグを立てる
+    if (wasCharmState && !this.states().some(s => s.meta.SmartCharm) && $gameParty.inBattle()) {
+      let cancelOnRecover = paramCancelActionOnRecover;
+      // 解除されたステートの個別タグを使用
+      if (removingState.meta.SmartCharm_CancelActionOnRecover !== undefined) {
+        cancelOnRecover = String(removingState.meta.SmartCharm_CancelActionOnRecover).trim().toLowerCase() !== 'false';
+      }
+
+      if (cancelOnRecover) {
+        this._smartCharmShouldCancelAction = true;
+      }
+    }
+  };
+
+  /**
+   * ターン開始時に行動キャンセルフラグをリセットする
+   */
+  const _Game_Battler_makeActions = Game_Battler.prototype.makeActions;
+  Game_Battler.prototype.makeActions = function() {
+    _Game_Battler_makeActions.call(this);
+
+    this._smartCharmShouldCancelAction = false;
   };
 
   /**
@@ -505,7 +533,10 @@
     }
 
     // 魅了から回復したターンの行動キャンセル処理
-    if (action && action._smartCharmCancelOnRecover && !subject.states().some(s => s.meta.SmartCharm)) {
+    // _smartCharmShouldCancelAction は removeState 内で CancelActionOnRecover の設定を確認してセットされる
+    // SmartCharmが再付与されたケースを考慮し、現在もSmartCharmでないことを併せてチェックする
+    if (action && subject._smartCharmShouldCancelAction && !subject.states().some(s => s.meta.SmartCharm)) {
+      subject._smartCharmShouldCancelAction = false;
       // Actionフェーズへの移行処理だけおこない、ターゲットを空にして実質的にスキップする
       this._phase = "action";
       this._action = action;
