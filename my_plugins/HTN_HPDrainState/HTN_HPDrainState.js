@@ -312,18 +312,12 @@
     // ターンバトルでは endAllBattlersTurn() -> onTurnEnd() -> clearResult() で result を上書きするため、
     // 仮にここで drainer.startDamagePopup() を直接呼んでも、被付与者のステート処理時にはすでに
     // ドレイン実行者の result が空になっており、 shouldPopupDamage が false でポップアップが出ない
-    if (drainTarget._hpDrainPendingPopups == null) {
-      drainTarget._hpDrainPendingPopups = [];
-    }
     drainTarget._hpDrainPendingPopups.push({ drainer, amount: safeAmount });
 
     const drainMessage = state.meta.HPDrainState_DrainMessage != null ? String(state.meta.HPDrainState_DrainMessage) : paramDrainMessage;
     const message = drainMessage.trim().format(drainTarget.name(), drainer.name(), TextManager.hp, safeAmount);
 
     if (message !== '') {
-      if (drainTarget._hpDrainPendingMessages == null) {
-        drainTarget._hpDrainPendingMessages = [];
-      }
       drainTarget._hpDrainPendingMessages.push(message);
     }
   };
@@ -342,10 +336,6 @@
     // 各バトラーに関して、誰にドレインを受けているのかを見ていき、
     // その中に deadBattler がいるなら、対応するステートを解除する
     for (const battler of BattleManager.allBattleMembers()) {
-      if (battler._hpDrainerInfo == null) {
-        continue;
-      }
-
       // Object.keys() でコピーを取ることで、ループ中の removeState による変更に対して安全にする
       for (const stateIdStr of Object.keys(battler._hpDrainerInfo)) {
         const stateId = Number(stateIdStr);
@@ -364,20 +354,6 @@
         }
       }
     }
-  };
-
-  /**
-   * 独自プロパティを初期化する
-   *
-   * セーブデータを呼び出した場合、 initMembers は呼ばれないためプロパティが undefined のままになるので注意
-   */
-  const _Game_Battler_initMembers = Game_Battler.prototype.initMembers;
-  Game_Battler.prototype.initMembers = function() {
-    _Game_Battler_initMembers.call(this);
-
-    this._hpDrainerInfo = {}; // { <stateId>: { actorId:, enemyIndex: } } の形式で apply メソッドにて代入される
-    this._hpDrainPendingMessages = []; // ドレインメッセージの一時保管場所
-    this._hpDrainPendingPopups = []; // { drainer, amount } の形式で、ドレイン実行者のHP回復ポップアップを保管
   };
 
   /**
@@ -404,11 +380,6 @@
       );
       if (!hasAddDrainState) continue;
 
-      // initMembers より前に呼ばれた場合に備えて初期化
-      if (target._hpDrainerInfo == null) {
-        target._hpDrainerInfo = {};
-      }
-
       // ドレイン実行者の情報を記録。味方なら actorId, 敵なら enemyIndex に保存
       if (actionSubject.isActor()) {
         target._hpDrainerInfo[state.id] = { actorId: actionSubject.actorId(), enemyIndex: -1 };
@@ -427,9 +398,7 @@
   Game_Battler.prototype.removeState = function(stateId) {
     _Game_Battler_removeState.call(this, stateId);
 
-    if (this._hpDrainerInfo != null) {
-      delete this._hpDrainerInfo[stateId];
-    }
+    delete this._hpDrainerInfo[stateId];
   };
 
   /**
@@ -552,7 +521,21 @@
   };
 
   /**
-   * バトル終了時に独自プロパティをリセットする（ initMembers でやったことと内容は同じ）
+   * バトル開始時に独自プロパティを初期化する
+   *
+   * @param {boolean} advantageous 先制攻撃かどうか
+   */
+  const _Game_Battler_onBattleStart = Game_Battler.prototype.onBattleStart;
+  Game_Battler.prototype.onBattleStart = function(advantageous) {
+    _Game_Battler_onBattleStart.call(this, advantageous);
+
+    this._hpDrainerInfo = {}; // { <stateId>: { actorId:, enemyIndex: } } の形式で apply メソッドにて代入される
+    this._hpDrainPendingMessages = []; // ドレインメッセージの一時保管場所
+    this._hpDrainPendingPopups = []; // { drainer, amount } の形式で、ドレイン実行者のHP回復ポップアップを保管
+  };
+
+  /**
+   * バトル終了時に独自プロパティをリセットする
    */
   const _Game_Battler_onBattleEnd = Game_Battler.prototype.onBattleEnd;
   Game_Battler.prototype.onBattleEnd = function() {
