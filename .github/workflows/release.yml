@@ -33,9 +33,12 @@ jobs:
           ref: ${{ steps.tag.outputs.name }}
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.tag.outputs.name }}
-          name: Release ${{ steps.tag.outputs.name }}
-          generate_release_notes: true
-          files: my_plugins/**/*.js
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${{ steps.tag.outputs.name }}"
+          files=$(find my_plugins -name '*.js' | sort)
+          gh release create "$tag" \
+            --title "Release $tag" \
+            --generate-notes \
+            $files
