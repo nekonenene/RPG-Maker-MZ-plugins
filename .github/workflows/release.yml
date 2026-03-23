@@ -32,16 +32,10 @@ jobs:
         with:
           ref: ${{ steps.tag.outputs.name }}
 
-      - name: Collect plugin JS files
-        id: collect
-        run: |
-          files=$(find my_plugins -name '*.js' | sort | tr '\n' ' ')
-          echo "files=$files" >> "$GITHUB_OUTPUT"
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.tag.outputs.name }}
           name: Release ${{ steps.tag.outputs.name }}
           generate_release_notes: true
-          files: ${{ steps.collect.outputs.files }}
+          files: my_plugins/**/*.js
