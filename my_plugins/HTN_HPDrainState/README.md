@@ -105,10 +105,10 @@ MPドレインについては
 
 ## 💡 参考情報
 
-このプラグインとMPドレインをおこなう「**[HTN_MPDrainState](https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_MPDrainState)**」と併用した場合で、  
-`<HPDrainState>` `<MPDrainState>` の両方が設定されているステート（状態異常）がある場合、  
-HPドレイン → MPドレイン の順番で処理したい場合は、「プラグイン管理」画面の「プラグインリスト」で  
-`HTN_MPDrainState` が上、 `HTN_HPDrainState` が下の順番になるように並べてください。直感とは逆の順番なので注意です。
+このプラグインとMPドレインをおこなう「**[HTN_MPDrainState](https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_MPDrainState)**」を併用した上で、  
+HPドレイン → MPドレイン の順にメッセージの表示がされるようにしたい場合は、  
+「プラグイン管理」画面の「プラグインリスト」で  
+**`HTN_MPDrainState` (MP) が上、 `HTN_HPDrainState` (HP) が下**の順に並べてください。直感とは逆の順番なので注意です。
 
 ### 式の書き方
 
