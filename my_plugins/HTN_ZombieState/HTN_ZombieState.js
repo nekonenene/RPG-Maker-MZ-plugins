@@ -261,8 +261,13 @@
    */
   const toBoolean = (value, defaultValue) => {
     const strValue = String(value).trim().toLowerCase();
-    if (strValue === 'true') return true;
-    if (strValue === 'false') return false;
+
+    if (strValue === 'true') {
+      return true;
+    } else if (strValue === 'false') {
+      return false;
+    }
+
     return defaultValue;
   };
 
@@ -320,6 +325,7 @@
       _suppressNextDamageSound = false;
       return;
     }
+
     _SoundManager_playActorDamage.call(this);
   };
 
@@ -332,6 +338,7 @@
       _suppressNextDamageSound = false;
       return;
     }
+
     _SoundManager_playEnemyDamage.call(this);
   };
 
@@ -366,6 +373,7 @@
   Game_Battler.prototype.zombieAffectsMp = function() {
     const state = this.zombiePriorityState();
     if (state === null) return false;
+
     return toBoolean(state.meta.ZombieState_AffectMp, paramAffectMpDefault);
   };
 
@@ -378,6 +386,7 @@
   Game_Battler.prototype.zombieAffectsTp = function() {
     const state = this.zombiePriorityState();
     if (state === null) return false;
+
     return toBoolean(state.meta.ZombieState_AffectTp, paramAffectTpDefault);
   };
 
@@ -393,6 +402,7 @@
   const _Game_Battler_onBattleStart = Game_Battler.prototype.onBattleStart;
   Game_Battler.prototype.onBattleStart = function(advantageous) {
     _Game_Battler_onBattleStart.call(this, advantageous);
+
     this._zombieHpDamaged = false;
     this._zombieMpDamaged = false;
   };
@@ -403,6 +413,7 @@
   const _Game_Battler_onBattleEnd = Game_Battler.prototype.onBattleEnd;
   Game_Battler.prototype.onBattleEnd = function() {
     _Game_Battler_onBattleEnd.call(this);
+
     this._zombieHpDamaged = false;
     this._zombieMpDamaged = false;
   };
@@ -421,10 +432,13 @@
   Game_Battler.prototype.gainHp = function(value) {
     if (value > 0 && this.hasZombieState()) {
       this._zombieHpDamaged = true;
+
       _Game_Battler_gainHp.call(this, -value);
       return;
     }
+
     this._zombieHpDamaged = false;
+
     _Game_Battler_gainHp.call(this, value);
   };
 
@@ -437,10 +451,13 @@
   Game_Battler.prototype.gainMp = function(value) {
     if (value > 0 && this.zombieAffectsMp()) {
       this._zombieMpDamaged = true;
+
       _Game_Battler_gainMp.call(this, -value);
       return;
     }
+
     this._zombieMpDamaged = false;
+
     _Game_Battler_gainMp.call(this, value);
   };
 
@@ -455,6 +472,7 @@
       _Game_Battler_gainTp.call(this, -value);
       return;
     }
+
     _Game_Battler_gainTp.call(this, value);
   };
 
@@ -471,6 +489,7 @@
       this.gainTp(value);
       return;
     }
+
     _Game_Battler_gainSilentTp.call(this, value);
   };
 
@@ -522,7 +541,9 @@
   const _Game_Battler_initTp = Game_Battler.prototype.initTp;
   Game_Battler.prototype.initTp = function() {
     this._zombieIgnoreSetTp = true;
+
     _Game_Battler_initTp.call(this);
+
     this._zombieIgnoreSetTp = false;
   };
 
@@ -537,9 +558,11 @@
   Game_BattlerBase.prototype.setTp = function(tp) {
     if (tp > this._tp && !this._zombieIgnoreSetTp && this.zombieAffectsTp?.()) {
       const delta = tp - this._tp;
+
       _Game_BattlerBase_setTp.call(this, this._tp - delta);
       return;
     }
+
     _Game_BattlerBase_setTp.call(this, tp);
   };
 
@@ -556,7 +579,9 @@
     if (this._zombieHpDamaged) {
       this._zombieHpDamaged = false;
       _suppressNextDamageSound = true; // playActorDamage を抑制
+
       _Game_Actor_performDamage.call(this); // ダメージモーション + 抑制された音
+
       playZombieDamageSound();
     } else {
       _Game_Actor_performDamage.call(this);
@@ -571,7 +596,9 @@
     if (this._zombieHpDamaged) {
       this._zombieHpDamaged = false;
       _suppressNextDamageSound = true; // playEnemyDamage を抑制
+
       _Game_Enemy_performDamage.call(this); // ブリンクエフェクト + 抑制された音
+
       playZombieDamageSound();
     } else {
       _Game_Enemy_performDamage.call(this);
@@ -608,6 +635,7 @@
       target._zombieMpDamaged = false;
       this.push('playZombieMpDamageSound');
     }
+
     _Window_BattleLog_displayMpDamage.call(this, target);
   };
 
