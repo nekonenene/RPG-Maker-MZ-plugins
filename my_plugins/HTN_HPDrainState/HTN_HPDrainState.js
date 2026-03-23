@@ -17,7 +17,7 @@
  * @url https://github.com/nekoneneve/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_HPDrainState
  *
  * @param AmountType
- * @text Default drain type
+ * @text Drain amount type
  * @desc The drain calculation method when no note tag is specified.
  * @default selfMaxHp
  * @type select
@@ -31,13 +31,14 @@
  * @value drainerMaxHp
  * @option % of drainer's missing HP (max HP - current HP)
  * @value drainerMissingHp
+ * @option Formula (advanced)
+ * @value formula
  *
  * @param Amount
- * @text Default drain value
- * @desc The drain amount when no note tag is specified. A fixed HP value or a percentage (0-100).
- * @default 10
- * @type number
- * @min 0
+ * @text Drain amount
+ * @desc A fixed HP value or a percentage. When type is "formula", this field accepts a JavaScript formula string.
+ * @default 12.5
+ * @type string
  *
  * @param AmountRandomizer
  * @text Drain amount randomizer (%)
@@ -73,8 +74,15 @@
  * <HPDrainState_AmountType: selfHp>            % of afflicted's current HP
  * <HPDrainState_AmountType: drainerMaxHp>      % of drainer's max HP
  * <HPDrainState_AmountType: drainerMissingHp>  % of drainer's missing HP (max HP - current HP)
+ * <HPDrainState_AmountType: formula>           JavaScript formula (advanced)
  *
- * <HPDrainState_Amount: 100>
+ * <HPDrainState_Amount: 50>
+ * <HPDrainState_Amount: Math.max(drainTarget.mhp / 10, drainer.atk * 2)>
+ *
+ * When AmountType is "formula", set the formula in Amount. (This is for advanced users)
+ * variables: drainTarget, drainer
+ * For example, Math.max(drainTarget.mhp / 10, drainer.atk * 2) drains the greater
+ * of 1/10 of the afflicted's max HP or twice the drainer's attack power.
  *
  * <HPDrainState_AmountRandomizer: 0>
  *
@@ -91,27 +99,28 @@
  * @url https://github.com/nekoneneve/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_HPDrainState
  *
  * @param AmountType
- * @text デフォルト吸収タイプ
- * @desc タグ未指定時の吸収量の計算タイプです。
+ * @text 吸収タイプ
+ * @desc 吸収量の計算タイプです。
  * @default selfMaxHp
  * @type select
  * @option 固定値（HP）
  * @value absolute
- * @option 被付与者の最大HPに対する割合（%）
+ * @option ドレインされる側の最大HPに対する割合（%）
  * @value selfMaxHp
- * @option 被付与者の現在HPに対する割合（%）
+ * @option ドレインされる側の現在HPに対する割合（%）
  * @value selfHp
- * @option ドレイン実行者の最大HPに対する割合（%）
+ * @option ドレインする側の最大HPに対する割合（%）
  * @value drainerMaxHp
- * @option ドレイン実行者の「最大HP−現在HP」に対する割合（%）
+ * @option ドレインする側の「最大HP−現在HP」に対する割合（%）
  * @value drainerMissingHp
+ * @option 計算式（上級者向け）
+ * @value formula
  *
  * @param Amount
- * @text デフォルト吸収量
- * @desc タグ未指定時の吸収量。固定値の場合はHP量、割合の場合はパーセンテージ（0〜100）を指定します。
- * @default 10
- * @type number
- * @min 0
+ * @text 吸収量
+ * @desc HP量の固定値かパーセンテージの数値を指定します。タイプが計算式(formula)の場合、JavaScript式を記述します。
+ * @default 12.5
+ * @type string
  *
  * @param AmountRandomizer
  * @text 吸収量のランダム幅（%）
@@ -129,7 +138,7 @@
  *
  * @param AllowKill
  * @text 吸収による戦闘不能を許可
- * @desc falseにすると、HP吸収で被付与者のHPが0にならないよう制限し、最低1HPを保持します。
+ * @desc falseにすると、HP吸収で被付与者のHPが0にならないよう吸収量を制限します。
  * @default true
  * @type boolean
  *
@@ -146,12 +155,20 @@
  * 省略した場合はプラグインパラメータの設定値が使用されます。
  *
  * <HPDrainState_AmountType: absolute>          固定値
- * <HPDrainState_AmountType: selfMaxHp>         被付与者の最大HP基準（%）
- * <HPDrainState_AmountType: selfHp>            被付与者の現在HP基準（%）
- * <HPDrainState_AmountType: drainerMaxHp>      ドレイン実行者の最大HP基準（%）
- * <HPDrainState_AmountType: drainerMissingHp>  ドレイン実行者の「最大HP−現在HP」基準（%）
+ * <HPDrainState_AmountType: selfMaxHp>         ドレインされる側の最大HP基準（%）
+ * <HPDrainState_AmountType: selfHp>            ドレインされる側の現在HP基準（%）
+ * <HPDrainState_AmountType: drainerMaxHp>      ドレインする側の最大HP基準（%）
+ * <HPDrainState_AmountType: drainerMissingHp>  ドレインする側の「最大HP−現在HP」基準（%）
+ * <HPDrainState_AmountType: formula>           計算式（上級者向け）
  *
- * <HPDrainState_Amount: 100>
+ * <HPDrainState_Amount: 50>
+ * <HPDrainState_Amount: Math.max(drainTarget.mhp / 10, drainer.atk * 2)>
+ *
+ * AmountType が「formula（計算式）」のとき、Amount に JavaScript 式を記述します。
+ * （難しいので、ツクールに慣れている人向けです）
+ * 例えば Math.max(drainTarget.mhp / 10, drainer.atk * 2) と設定すると、
+ * 「ドレインされる側の最大HPの10分の1」か「ドレインする側の攻撃力の2倍」かの大きい方の値が吸収量になります。
+ * 変数: drainTarget（ドレインされる側）, drainer（ドレインする側）
  *
  * <HPDrainState_AmountRandomizer: 0>   （ランダム幅を0%に。計算結果が固定値になる）
  * <HPDrainState_AmountRandomizer: 80>  （ランダム幅を80%に。計算結果に0.2〜1.8倍の乗数が掛かる）
@@ -169,7 +186,7 @@
   const pluginName = 'HTN_HPDrainState';
   const parameters = PluginManager.parameters(pluginName);
   const paramAmountType = String(parameters.AmountType || 'selfMaxHp');
-  const paramAmount = Number(parameters.Amount ?? 10);
+  const paramAmount = String(parameters.Amount ?? '12.5');
   const paramAmountRandomizer = Math.min(80, Math.max(0, Number(parameters.AmountRandomizer ?? 0)));
   const paramDrainMessage = String(parameters.DrainMessage || '%1は%2に%3を %4 吸収された！');
   const paramAllowKill = String(parameters.AllowKill) !== 'false';
@@ -221,10 +238,16 @@
    */
   const calcDrainAmount = (state, drainTarget, drainer) => {
     const amountType = String(state.meta.HPDrainState_AmountType ?? '').trim() || paramAmountType;
-    const amount = Number(state.meta.HPDrainState_Amount ?? paramAmount);
-    const amountRandomizer = Number(state.meta.HPDrainState_AmountRandomizer ?? paramAmountRandomizer);
+    // タグ内に " や ' を書く人もいそうなので削除しておく
+    let amount = String(state.meta.HPDrainState_Amount ?? paramAmount).trim().replace(/\'\"/g, '');
+    const amountRandomizer = Math.min(80, Math.max(0, Number(state.meta.HPDrainState_AmountRandomizer ?? paramAmountRandomizer)));
+
+    if (amountType !== 'formula') {
+      amount = Number(amount);
+    }
 
     let result = 0;
+
     switch (amountType) {
       case 'absolute':
         result = amount;
@@ -242,7 +265,11 @@
         // ドレイン実行者の「最大HP − 現在HP」（欠損HP）に対するパーセンテージ
         result = Math.ceil((drainer.mhp - drainer.hp) * amount / 100);
         break;
+      case 'formula':
+        result = Math.ceil(eval(amount));
+        break;
       default:
+        console.warn(`Unknown HP drain amount type: ${amountType}`);
         result = amount;
     }
 
