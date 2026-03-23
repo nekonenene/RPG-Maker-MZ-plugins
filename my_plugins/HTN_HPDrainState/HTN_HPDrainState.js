@@ -39,6 +39,14 @@
  * @type number
  * @min 0
  *
+ * @param AmountRandomizer
+ * @text Drain amount randomizer (%)
+ * @desc Randomness applied to the drain amount. 0 = fixed. At 80, the result is multiplied by a random value between 0.2 and 1.8.
+ * @default 0
+ * @type number
+ * @min 0
+ * @max 80
+ *
  * @param DrainMessage
  * @text Drain message
  * @desc Message shown when HP drain occurs. %1=afflicted name, %2=drainer name, %3=HP label, %4=drain amount.
@@ -67,6 +75,8 @@
  * <HPDrainState_AmountType: drainerMissingHp>  % of drainer's missing HP (max HP - current HP)
  *
  * <HPDrainState_Amount: 100>
+ *
+ * <HPDrainState_AmountRandomizer: 0>
  *
  * <HPDrainState_DrainMessage: %1 had %4 %3 drained by %2!>
  *
@@ -103,6 +113,14 @@
  * @type number
  * @min 0
  *
+ * @param AmountRandomizer
+ * @text 吸収量のランダム幅（%）
+ * @desc 吸収量に与えるランダム性。0で固定値。80のとき、計算結果に0.2〜1.8倍のランダムな乗数が掛かります。
+ * @default 0
+ * @type number
+ * @min 0
+ * @max 80
+ *
  * @param DrainMessage
  * @text ドレインメッセージ
  * @desc HP吸収時に表示するメッセージ。%1=被付与者名、%2=ドレイン実行者名、%3=HPの設定名、%4=吸収量。
@@ -135,6 +153,9 @@
  *
  * <HPDrainState_Amount: 100>
  *
+ * <HPDrainState_AmountRandomizer: 0>   （ランダム幅を0%に。計算結果が固定値になる）
+ * <HPDrainState_AmountRandomizer: 80>  （ランダム幅を80%に。計算結果に0.2〜1.8倍の乗数が掛かる）
+ *
  * <HPDrainState_DrainMessage: %1は%2に%3を %4 吸収された！>
  * （%1=被付与者名、%2=ドレイン実行者名、%3=HPの設定名、%4=吸収量）
  *
@@ -149,6 +170,7 @@
   const parameters = PluginManager.parameters(pluginName);
   const paramAmountType = String(parameters.AmountType || 'selfMaxHp');
   const paramAmount = Number(parameters.Amount ?? 10);
+  const paramAmountRandomizer = Math.min(80, Math.max(0, Number(parameters.AmountRandomizer ?? 0)));
   const paramDrainMessage = String(parameters.DrainMessage || '%1は%2に%3を %4 吸収された！');
   const paramAllowKill = String(parameters.AllowKill) !== 'false';
 
@@ -200,6 +222,7 @@
   const calcDrainAmount = (state, drainTarget, drainer) => {
     const amountType = String(state.meta.HPDrainState_AmountType ?? '').trim() || paramAmountType;
     const amount = Number(state.meta.HPDrainState_Amount ?? paramAmount);
+    const amountRandomizer = Number(state.meta.HPDrainState_AmountRandomizer ?? paramAmountRandomizer);
 
     let result = 0;
     switch (amountType) {
@@ -221,6 +244,12 @@
         break;
       default:
         result = amount;
+    }
+
+    // AmountRandomizer が 0 より大きい場合、(1 - r/100) 〜 (1 + r/100) の乗数をランダムに掛ける
+    if (amountRandomizer > 0) {
+      const multiplier = 1 + (Math.random() * 2 - 1) * amountRandomizer / 100;
+      result = Math.ceil(result * multiplier);
     }
 
     return Math.max(0, result);
