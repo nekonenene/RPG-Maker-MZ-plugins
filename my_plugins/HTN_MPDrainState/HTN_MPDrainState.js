@@ -369,7 +369,7 @@
             // 被付与者がドレイン実行者を自ら倒した場合、endBattlerActions -> onAllActionsEnd で
             // 被付与者の _result がクリアされた後に displayBattlerStatus が呼ばれるため、
             // removedStates が空になってメッセージが表示されない問題を防ぐ
-            BattleManager._mpDrainPendingRecoveringBattlers.push({ battler, stateId });
+            BattleManager._mpDrainPendingRecoveringBattlers.push({ battler: battler, stateId: stateId });
           } else {
             // ドレイン実行者にまだ生存者がいる場合、リストを更新するだけでステートは解除しない
             battler._mpDrainerInfo[stateId] = remainingDrainers;
