@@ -572,7 +572,16 @@
     // 再入防止のため、リストをクリアしてからループ開始
     BattleManager._mpDrainPendingRecoveringBattlers = [];
     for (const recoveringBattler of recoveringBattlers) {
+      // 付与メッセージ（addedStates）は当該アクションの displayAffectedStatus で既に表示済みのため、
+      // ここでは解除メッセージのみ表示したい。
+      // addedStates を一時退避してクリアすることで、displayAutoAffectedStatus が
+      // 解除メッセージだけをキューに積むようにする
+      const savedAddedStates = recoveringBattler._result.addedStates;
+      recoveringBattler._result.addedStates = [];
+
       _BattleManager_displayBattlerStatus.call(this, recoveringBattler, false);
+
+      recoveringBattler._result.addedStates = savedAddedStates;
     }
   };
 
