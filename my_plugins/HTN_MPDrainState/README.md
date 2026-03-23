@@ -4,6 +4,9 @@ RPGツクールMZ用のプラグインです。
 
 ターンが終わるたびにMPを吸収されるステート（状態異常）を作成できるようになります。
 
+HPドレインについては  
+**[HTN_HPDrainState](https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_HPDrainState)** をお使いください。
+
 ## 🛠️ 導入方法
 
 **[【ここを右クリックして「名前を付けてリンク先を保存」みたいな項目を選んでダウンロード】](https://raw.githubusercontent.com/nekoneneve/RPG-Maker-MZ-plugins/main/my_plugins/HTN_MPDrainState/HTN_MPDrainState.js)**
