@@ -83,8 +83,9 @@
  * highest database priority is used for per-state settings.
  *
  * --- Known Limitations ---
- * Direct calls to setHp() or setMp() by third-party plugins are not
- * intercepted. Direct setTp() calls are handled correctly.
+ * When setHp() or setMp() are called directly, HP/MP is reversed correctly
+ * but no damage popup or sound will be shown.
+ * Revival via setHp(1) on a dead battler is not reversed.
  */
 
 /*~struct~Sound:
@@ -193,8 +194,9 @@
  * データベース上の優先度が最も高いステートのタグ設定が参照されます。
  *
  * 【制限事項】
- * サードパーティプラグインが setHp() や setMp() を直接呼び出してHP・MPを増加させる場合、
- * ゾンビ効果が発動しません。setTp() の直接呼び出しは正しく処理されます。
+ * setHp() や setMp() が直接呼び出されてHP・MPが増加する場合、ゾンビ反転は正しく機能しますが、
+ * ダメージポップアップや音は表示されません。
+ * 戦闘不能バトラーへの setHp(1)（蘇生）はゾンビ反転の対象外です。
  */
 
 /*~struct~Sound:ja
@@ -473,9 +475,46 @@
   };
 
   // ============================================================
-  // setTp の直接呼び出しへの対応
-  // gainTp / gainSilentTp を経由しないサードパーティプラグイン向け
+  // setHp / setMp / setTp の直接呼び出しへの対応
+  // gain系メソッドを経由しないサードパーティプラグイン向け
   // ============================================================
+
+  /**
+   * HP増加をゾンビHPダメージに反転する（ゾンビステートを持ち生存中のとき）
+   * gainHp 経由の呼び出しはゾンビ反転後に hp < this._hp になるためこのフックを通過しない
+   * this._hp === 0 のとき（戦闘不能からの蘇生）はスキップする
+   *
+   * @param {number} hp 設定するHP値
+   */
+  const _Game_BattlerBase_setHp = Game_BattlerBase.prototype.setHp;
+  Game_BattlerBase.prototype.setHp = function(hp) {
+    if (hp > this._hp && this._hp > 0 && this.hasZombieState?.()) {
+      const delta = hp - this._hp;
+
+      _Game_BattlerBase_setHp.call(this, this._hp - delta);
+      return;
+    }
+
+    _Game_BattlerBase_setHp.call(this, hp);
+  };
+
+  /**
+   * MP増加をゾンビMPダメージに反転する（AffectMp が有効なとき）
+   * gainMp 経由の呼び出しはゾンビ反転後に mp < this._mp になるためこのフックを通過しない
+   *
+   * @param {number} mp 設定するMP値
+   */
+  const _Game_BattlerBase_setMp = Game_BattlerBase.prototype.setMp;
+  Game_BattlerBase.prototype.setMp = function(mp) {
+    if (mp > this._mp && this.zombieAffectsMp?.()) {
+      const delta = mp - this._mp;
+
+      _Game_BattlerBase_setMp.call(this, this._mp - delta);
+      return;
+    }
+
+    _Game_BattlerBase_setMp.call(this, mp);
+  };
 
   /**
    * initTp の setTp 呼び出しをゾンビ反転から除外するためのフラグを設定する
