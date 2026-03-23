@@ -53,14 +53,14 @@
  * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
  *
  * @param AffectMpDefault
- * @text Reverse MP recovery by default
- * @desc If true, MP recovery also becomes MP damage for zombie states by default.
+ * @text Reverse MP recovery
+ * @desc If true, MP recovery also becomes MP damage for zombie states.
  * @default false
  * @type boolean
  *
  * @param AffectTpDefault
- * @text Reverse TP gain by default
- * @desc If true, TP gain also becomes TP damage for zombie states by default.
+ * @text Reverse TP gain
+ * @desc If true, TP gain also becomes TP damage for zombie states.
  * @default false
  * @type boolean
  *
@@ -159,14 +159,14 @@
  * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
  *
  * @param AffectMpDefault
- * @text MP回復を反転（デフォルト）
- * @desc trueにすると、MP回復もMPダメージに変換されます（デフォルト値）。
+ * @text MP回復を反転
+ * @desc trueにすると、MP回復もMPダメージに変換されます。
  * @default false
  * @type boolean
  *
  * @param AffectTpDefault
- * @text TP回復を反転（デフォルト）
- * @desc trueにすると、TP増加もTPダメージに変換されます（デフォルト値）。
+ * @text TP回復を反転
+ * @desc trueにすると、TP増加もTPダメージに変換されます。
  * @default false
  * @type boolean
  *
