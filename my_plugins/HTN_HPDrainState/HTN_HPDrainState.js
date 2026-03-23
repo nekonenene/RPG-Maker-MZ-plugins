@@ -493,7 +493,18 @@
       }
 
       // MultiDrainer 有効時は drainerInfoList.length が 2 以上になっている場合がある
-      for (const drainerInfo of drainerInfoList) {
+      // パーティー順 → エネミーインデックス順でソートし、メッセージ表示順を一定にする
+      const sortedDrainerInfoList = [...drainerInfoList].sort((a, b) => {
+        const orderOf = (info) => {
+          if (info.actorId > 0) {
+            return $gameParty.members().findIndex(m => m.actorId() === info.actorId);
+          }
+          return 1000 + info.enemyIndex; // エネミーはアクターの後
+        };
+        return orderOf(a) - orderOf(b);
+      });
+
+      for (const drainerInfo of sortedDrainerInfoList) {
         const drainer = resolveDrainer(drainerInfo);
         if (drainer == null || !drainer.isAlive()) {
           continue;
