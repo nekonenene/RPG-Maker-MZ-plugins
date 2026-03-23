@@ -423,11 +423,15 @@
       if (!state.meta.HPDrainState) continue;
 
       // item().effects は例えば { code: 21, dataId: 5, value1: 1.0, value2: 0 } のような Object を持ち、
-      // code: 21 (=EFFECT_ADD_STATE) は「ステート付与」効果を示し、
-      // dataId: 5 は付与するステートID、value1: 1.0 は付与確率（100%）を示す。
+      // code: 21 (=EFFECT_ADD_STATE) は「ステート付与」効果を示すし、value1: 1.0 は付与確率（100%）を示す。
+      // dataId が 0 の場合は「通常攻撃によるステート付与」を意味し、実際に付与されるステートIDは
+      // subject().attackStates()（武器などの特性から取得）で決まる。
+      // dataId が 0 以外の場合は、dataId が付与するステートIDを直接示す。
       // この分岐で、ドレインステートの付与がおこなわれるアクションなのかを確認している。
       const hasAddDrainState = this.item().effects.some(
-        (e) => e.code === Game_Action.EFFECT_ADD_STATE && e.dataId === state.id
+        (e) =>
+          e.code === Game_Action.EFFECT_ADD_STATE &&
+          (e.dataId === state.id || (e.dataId === 0 && this.subject().attackStates().includes(state.id)))
       );
       if (!hasAddDrainState) continue;
 
