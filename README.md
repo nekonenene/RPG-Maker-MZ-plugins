@@ -34,6 +34,15 @@ HP : [https://hato-neko.x0.com](https://hato-neko.x0.com)
 **https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_EscapeRate**
 
 
+## HTN_HPDrainState
+
+ターンが終わるたびにHPを吸収されるステート（状態異常）を作成できるプラグインです。
+
+### 詳しい使い方はこちら：
+
+**https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_HPDrainState**
+
+
 ## HTN_SaveMax
 
 セーブできる最大数を変更するプラグインです。
