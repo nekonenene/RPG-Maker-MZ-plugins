@@ -521,6 +521,7 @@
    */
   const _Game_BattlerBase_setHp = Game_BattlerBase.prototype.setHp;
   Game_BattlerBase.prototype.setHp = function(hp) {
+    // 指定HPが現在HPより大きく、かつ現在HPが0より大きく（戦闘不能でない）、ゾンビステートを持つ場合に反転処理
     if (hp > this._hp && this._hp > 0 && this.hasZombieState?.()) {
       const delta = hp - this._hp;
 
@@ -539,6 +540,7 @@
    */
   const _Game_BattlerBase_setMp = Game_BattlerBase.prototype.setMp;
   Game_BattlerBase.prototype.setMp = function(mp) {
+    // 指定MPが現在MPより大きく、かつゾンビMP反転が有効な場合に反転処理
     if (mp > this._mp && this.zombieAffectsMp?.()) {
       const delta = mp - this._mp;
 
