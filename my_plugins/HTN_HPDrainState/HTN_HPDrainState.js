@@ -18,7 +18,7 @@
  *
  * @param AmountType
  * @text Drain amount type
- * @desc The drain calculation method when no note tag is specified.
+ * @desc Determines how the drain amount is calculated.
  * @default selfMaxHp
  * @type select
  * @option Fixed HP value
@@ -42,7 +42,7 @@
  *
  * @param AmountRandomizer
  * @text Drain amount randomizer (%)
- * @desc Randomness applied to the drain amount. 0 = fixed. At 80, the result is multiplied by a random value between 0.2 and 1.8.
+ * @desc Random multiplier width (%). 0=fixed, 80=0.2 to 1.8x.
  * @default 0
  * @type number
  * @min 0
@@ -55,17 +55,19 @@
  * @type string
  *
  * @param AllowKill
- * @text Allow draining to death
+ * @text Allow draining target to 0 HP
  * @desc If false, the afflicted will retain at least 1 HP after draining.
  * @default true
  * @type boolean
  *
  * @help
- * Add the following note tag to a state to make it an HP drain state:
+ * Add the following note tag in a state's Note box to make it an HP drain state:
  * <HPDrainState>
  *
- * The state remembers who applied it. At the end of the afflicted battler's
- * turn, HP is transferred from the afflicted to the drainer.
+ * The state remembers who applied it. If multiple battlers apply it, only the
+ * most recent applier is remembered.
+ * At the end of the afflicted battler's turn, HP is drained from the afflicted
+ * and recovered by the drainer (up to the drainer's max HP).
  * The state is also removed if the drainer is defeated.
  *
  * --- Per-state overrides (all optional) ---
@@ -79,8 +81,9 @@
  * <HPDrainState_Amount: 50>
  * <HPDrainState_Amount: Math.max(drainTarget.mhp / 10, drainer.atk * 2)>
  *
- * When AmountType is "formula", set the formula in Amount. (This is for advanced users)
- * variables: drainTarget, drainer
+ * When AmountType is "formula", set a JavaScript formula in Amount.
+ * Variables: drainTarget, drainer
+ * The formula result is rounded up with Math.ceil and clamped to 0 or more.
  * For example, Math.max(drainTarget.mhp / 10, drainer.atk * 2) drains the greater
  * of 1/10 of the afflicted's max HP or twice the drainer's attack power.
  *
