@@ -19,7 +19,7 @@
  * @param AmountType
  * @text Default drain type
  * @desc The drain calculation method when no note tag is specified.
- * @default absolute
+ * @default selfMaxHp
  * @type select
  * @option Fixed HP value
  * @value absolute
@@ -35,7 +35,7 @@
  * @param Amount
  * @text Default drain value
  * @desc The drain amount when no note tag is specified. A fixed HP value or a percentage (0-100).
- * @default 50
+ * @default 10
  * @type number
  * @min 0
  *
@@ -83,7 +83,7 @@
  * @param AmountType
  * @text デフォルト吸収タイプ
  * @desc タグ未指定時の吸収量の計算タイプです。
- * @default absolute
+ * @default selfMaxHp
  * @type select
  * @option 固定値（HP）
  * @value absolute
@@ -98,8 +98,8 @@
  *
  * @param Amount
  * @text デフォルト吸収量
- * @desc タグ未指定時の吸収量。固定値の場合はHP量、割合の場合はパーセンテージ（0〜100）で指定します。
- * @default 50
+ * @desc タグ未指定時の吸収量。固定値の場合はHP量、割合の場合はパーセンテージ（0〜100）を指定します。
+ * @default 10
  * @type number
  * @min 0
  *
@@ -147,8 +147,8 @@
 
   const pluginName = 'HTN_HPDrainState';
   const parameters = PluginManager.parameters(pluginName);
-  const paramAmountType = String(parameters.AmountType || 'absolute');
-  const paramAmount = Number(parameters.Amount ?? 50);
+  const paramAmountType = String(parameters.AmountType || 'selfMaxHp');
+  const paramAmount = Number(parameters.Amount ?? 10);
   const paramDrainMessage = String(parameters.DrainMessage || '%1は%2に%3を %4 吸収された！');
   const paramAllowKill = String(parameters.AllowKill) !== 'false';
 
