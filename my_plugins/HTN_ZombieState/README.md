@@ -48,9 +48,9 @@ TPを上昇させたくないという目的の場合は「[HTN_TPNoRegenState](
 
 - `<ZombieState>`
   このプラグインを有効化するために必要なタグ
-- `<ZombieState_AffectMp: true/false>`
+- `<ZombieState_MpReverse: true/false>`
   MP回復反転の可否を上書き（`true`でMP回復がMPダメージになる）
-- `<ZombieState_AffectTp: true/false>`
+- `<ZombieState_TpReverse: true/false>`
   TP回復反転の可否を上書き（`true`でTP増加がTPダメージになる）
 
 `<ZombieState>` が設定されたステートが複数あり、  
@@ -61,8 +61,8 @@ TPを上昇させたくないという目的の場合は「[HTN_TPNoRegenState](
 
 ```
 <ZombieState>
-<ZombieState_AffectMp: false>
-<ZombieState_AffectTp: false>
+<ZombieState_MpReverse: false>
+<ZombieState_TpReverse: false>
 ```
 
 ## ⚠️ 注意点

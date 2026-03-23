@@ -52,13 +52,13 @@
  * @type struct<Sound>
  * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
  *
- * @param AffectMpDefault
+ * @param MpReverse
  * @text Reverse MP recovery
  * @desc If true, MP recovery also becomes MP damage for zombie states.
  * @default false
  * @type boolean
  *
- * @param AffectTpDefault
+ * @param TpReverse
  * @text Reverse TP gain
  * @desc If true, TP gain also becomes TP damage for zombie states.
  * @default false
@@ -73,11 +73,11 @@
  * The zombie effect is always active, including outside of battle.
  *
  * --- Per-state overrides (all optional) ---
- * <ZombieState_AffectMp: true>   Also reverse MP recovery for this state
- * <ZombieState_AffectMp: false>  Do not reverse MP recovery for this state
+ * <ZombieState_MpReverse: true>   Also reverse MP recovery for this state
+ * <ZombieState_MpReverse: false>  Do not reverse MP recovery for this state
  *
- * <ZombieState_AffectTp: true>   Also reverse TP gain for this state
- * <ZombieState_AffectTp: false>  Do not reverse TP gain for this state
+ * <ZombieState_TpReverse: true>   Also reverse TP gain for this state
+ * <ZombieState_TpReverse: false>  Do not reverse TP gain for this state
  *
  * If multiple zombie states are active simultaneously, the one with the
  * highest database priority is used for per-state settings.
@@ -159,13 +159,13 @@
  * @type struct<Sound>
  * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
  *
- * @param AffectMpDefault
+ * @param MpReverse
  * @text MP回復を反転
  * @desc trueにすると、MP回復もMPダメージに変換されます。
  * @default false
  * @type boolean
  *
- * @param AffectTpDefault
+ * @param TpReverse
  * @text TP回復を反転
  * @desc trueにすると、TP増加もTPダメージに変換されます。
  * @default false
@@ -184,11 +184,11 @@
  * ステートの「メモ」に以下のように記述することで、
  * プラグインパラメータの設定をステートごとに上書きできます。
  *
- * <ZombieState_AffectMp: true>   このステートでMP回復反転を有効化
- * <ZombieState_AffectMp: false>  このステートでMP回復反転を無効化
+ * <ZombieState_MpReverse: true>   このステートでMP回復反転を有効化
+ * <ZombieState_MpReverse: false>  このステートでMP回復反転を無効化
  *
- * <ZombieState_AffectTp: true>   このステートでTP回復反転を有効化
- * <ZombieState_AffectTp: false>  このステートでTP回復反転を無効化
+ * <ZombieState_TpReverse: true>   このステートでTP回復反転を有効化
+ * <ZombieState_TpReverse: false>  このステートでTP回復反転を無効化
  *
  * ゾンビステートが複数同時に付与されている場合は、
  * データベース上の優先度が最も高いステートのタグ設定が参照されます。
@@ -249,8 +249,8 @@
       return {};
     }
   })();
-  const paramAffectMpDefault = String(parameters.AffectMpDefault) === 'true';
-  const paramAffectTpDefault = String(parameters.AffectTpDefault) === 'true';
+  const paramMpReverse = String(parameters.MpReverse) === 'true';
+  const paramTpReverse = String(parameters.TpReverse) === 'true';
 
   /**
    * 文字列や真偽値の入力を真偽値へ変換
@@ -374,7 +374,7 @@
     const state = this.zombiePriorityState();
     if (state === null) return false;
 
-    return toBoolean(state.meta.ZombieState_AffectMp, paramAffectMpDefault);
+    return toBoolean(state.meta.ZombieState_MpReverse, paramMpReverse);
   };
 
   /**
@@ -387,7 +387,7 @@
     const state = this.zombiePriorityState();
     if (state === null) return false;
 
-    return toBoolean(state.meta.ZombieState_AffectTp, paramAffectTpDefault);
+    return toBoolean(state.meta.ZombieState_TpReverse, paramTpReverse);
   };
 
   // ============================================================
