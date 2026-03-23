@@ -41,13 +41,17 @@ AIエージェントはコードの生成、修正、および提案をおこな
      - **構造体定義**: 構造体パラメータを使用する際は、メインのブロックとは別に `/*~struct~構造体名:`（日本語用は `/*~struct~構造体名:ja`）のブロックを作成し、その中で個々の `@param` や `@text` などを定義する
 3. **既存メソッドの拡張**
    - ツクールの既存クラス（例: `Window_Base` 等）のメソッドを書き換える場合は、可能な限り「エイリアス」を利用する
+   - 以下の例のように、この場合はメソッドコメントを、メソッドのすぐ上ではなく、エイリアスの定義の上に記述すること。
    - 例: 
      ```javascript
-     const _Window_Base_initialize = Window_Base.prototype.initialize;
-     Window_Base.prototype.initialize = function(rect) {
-         _Window_Base_initialize.call(this, rect);
-         // 追加の処理
-     };
+        /**
+         * バトル終了時に独自プロパティをリセットする
+        */
+        const _Game_Battler_onBattleEnd = Game_Battler.prototype.onBattleEnd;
+        Game_Battler.prototype.onBattleEnd = function() {
+            _Game_Battler_onBattleEnd.call(this);
+            this._pluginNameSomePropertyName = false;
+        };
      ```
 4. **パラメータの受け取り**
    - プラグインパラメータを受け取る際は `PluginManager.parameters("HTN_xxx")` を使用し、必要に応じて型変換をおこなう
@@ -58,7 +62,7 @@ AIエージェントはコードの生成、修正、および提案をおこな
    - 条件式における暗黙的なBoolean型への型変換は避け、空配列や null 等のチェックは明示的におこなう
 6. **コメントのルール**
    - コードの説明は日本語のコメントでおこなう。簡潔にすぐ理解できる文章で、「です・ます」の表現は排し、末尾の句点も不要
-   - メソッドにはJSDoc形式でのコメントを付ける
+   - メソッドにはJSDoc形式でのコメントを付ける。「エイリアス」を用いる場合は、メソッド自体のすぐ上ではなく、エイリアスの定義の上にコメントを記述すること
 7. **.editorconfig の遵守**
     - コード生成・修正時は、必ずリポジトリ直下の `.editorconfig` を参照し、設定に従うこと
     - 生成した内容が `.editorconfig` に反していないかを自己点検する
