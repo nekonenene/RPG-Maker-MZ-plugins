@@ -83,8 +83,6 @@ RPGツクールMZ用のプラグインです。
   吸収量のランダム幅（%）を上書き（0〜80。例: `20` と設定すると計算結果に 0.8〜1.2 倍のランダムな乗数が掛かる）  
 - `<MPDrainState_DrainMessage: テキスト>`  
   MP吸収時のメッセージを上書き（`%1` はドレインされる側の名前、`%2` はドレインする側の名前、`%3` は「ＭＰ」の表示名、`%4` は吸収量に置換される）  
-- `<MPDrainState_AllowDeplete: true/false>`  
-  吸収によってドレインされる側のMPを0にすることを許可するか上書き（`false` にすると最低 1MP を保持する）
 - `<MPDrainState_MultiDrainer: true/false>`  
   複数のドレイン実行者を許可するか上書き（`true` にすると、ステートが治る前に別のキャラから再付与された場合、複数のキャラからMPドレインがされるようになる。付与者全員が倒された際にステートが自動解除される）
 
@@ -96,7 +94,6 @@ RPGツクールMZ用のプラグインです。
 <MPDrainState_Amount: 10>
 <MPDrainState_AmountRandomizer: 0>
 <MPDrainState_DrainMessage: %1は%2に%3を %4 吸収された！>
-<MPDrainState_AllowDeplete: true>
 <MPDrainState_MultiDrainer: false>
 ```
 

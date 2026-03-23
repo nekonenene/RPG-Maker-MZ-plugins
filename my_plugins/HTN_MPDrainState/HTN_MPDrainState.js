@@ -54,12 +54,6 @@
  * @default %1 had %4 %3 drained by %2!
  * @type string
  *
- * @param AllowDeplete
- * @text Allow draining target to 0 MP
- * @desc If false, the afflicted will retain at least 1 MP after draining.
- * @default true
- * @type boolean
- *
  * @param MultiDrainer
  * @text Allow multiple drainers
  * @desc If true, re-applying the state to the same target accumulates drainers instead of replacing. MP is drained to all of them. The state is only removed when all drainers are defeated.
@@ -97,9 +91,6 @@
  * <MPDrainState_AmountRandomizer: 0>
  *
  * <MPDrainState_DrainMessage: %1 had %4 %3 drained by %2!>
- *
- * <MPDrainState_AllowDeplete: true>
- * <MPDrainState_AllowDeplete: false>
  *
  * <MPDrainState_MultiDrainer: true>   Enable multi-drainer for this state
  * <MPDrainState_MultiDrainer: false>  Disable multi-drainer for this state
@@ -149,12 +140,6 @@
  * @default %1は%2に%3を %4 吸収された！
  * @type string
  *
- * @param AllowDeplete
- * @text 吸収によるMP枯渇を許可
- * @desc falseにすると、MP吸収で被付与者のMPが0にならないよう吸収量を制限します。
- * @default true
- * @type boolean
- *
  * @param MultiDrainer
  * @text 複数のドレイン実行者を許可
  * @desc 許可すると、ステートが治る前に他のキャラから付与された場合に、そのキャラからもMP吸収を受けるようになります。
@@ -201,9 +186,6 @@
  * <MPDrainState_DrainMessage: %1は%2に%3を %4 吸収された！>
  * （%1=被付与者名、%2=ドレイン実行者名、%3=MPの設定名、%4=吸収量）
  *
- * <MPDrainState_AllowDeplete: true>   （吸収によるMP枯渇を許可）
- * <MPDrainState_AllowDeplete: false>  （吸収で最低1MPを保持）
- *
  * <MPDrainState_MultiDrainer: true>   （複数のドレイン実行者を許可）
  * <MPDrainState_MultiDrainer: false>  （最後に付与した１人だけを記憶）
  */
@@ -217,7 +199,6 @@
   const paramAmount = String(parameters.Amount ?? '12.5');
   const paramAmountRandomizer = Math.min(80, Math.max(0, Number(parameters.AmountRandomizer ?? 0)));
   const paramDrainMessage = String(parameters.DrainMessage || '%1は%2に%3を %4 吸収された！');
-  const paramAllowDeplete = String(parameters.AllowDeplete) !== 'false';
   const paramMultiDrainer = String(parameters.MultiDrainer) === 'true';
 
   /**
@@ -326,28 +307,20 @@
    * @param {RPG.State} state 対象ステート（ステートごとの個別設定に使用）
    */
   const applyMpDrain = (drainTarget, drainer, amount, state) => {
-    const allowDeplete = toBoolean(state.meta.MPDrainState_AllowDeplete, paramAllowDeplete);
-
-    // allowDeplete が false の場合、被付与者のMPが0にならないように吸収量を制限
-    let safeAmount = amount;
-    if (!allowDeplete) {
-      safeAmount = Math.min(amount, Math.max(0, drainTarget.mp - 1));
-    }
-
     // MP吸収が発生しない場合はここで処理を終了
-    if (safeAmount <= 0) return;
+    if (amount <= 0) return;
 
-    drainTarget.gainMp(-safeAmount);
-    drainer.gainMp(safeAmount);
+    drainTarget.gainMp(-amount);
+    drainer.gainMp(amount);
 
     // ドレイン実行者のポップアップはバトルログのキュー経由で表示する（後述の showMpDrainGainPopup 参照）
     // ターンバトルでは endAllBattlersTurn() -> onTurnEnd() -> clearResult() で result を上書きするため、
     // 仮にここで drainer.startDamagePopup() を直接呼んでも、被付与者のステート処理時にはすでに
     // ドレイン実行者の result が空になっており、 shouldPopupDamage が false でポップアップが出ない
-    drainTarget._mpDrainPendingPopups.push({ drainer, amount: safeAmount });
+    drainTarget._mpDrainPendingPopups.push({ drainer, amount: amount });
 
     const drainMessage = state.meta.MPDrainState_DrainMessage != null ? String(state.meta.MPDrainState_DrainMessage) : paramDrainMessage;
-    const message = drainMessage.trim().format(drainTarget.name(), drainer.name(), TextManager.mp, safeAmount);
+    const message = drainMessage.trim().format(drainTarget.name(), drainer.name(), TextManager.mp, amount);
 
     if (message !== '') {
       drainTarget._mpDrainPendingMessages.push(message);
