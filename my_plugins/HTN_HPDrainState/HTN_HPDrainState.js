@@ -60,12 +60,18 @@
  * @default true
  * @type boolean
  *
+ * @param MultiDrainer
+ * @text Allow multiple drainers
+ * @desc If true, re-applying the state to the same target accumulates drainers instead of replacing. HP is drained to all of them. The state is only removed when all drainers are defeated.
+ * @default false
+ * @type boolean
+ *
  * @help
  * Add the following note tag in a state's Note box to make it an HP drain state:
  * <HPDrainState>
  *
- * The state remembers who applied it. If multiple battlers apply it, only the
- * most recent applier is remembered.
+ * The state remembers who applied it. By default, only the most recent applier
+ * is remembered. With MultiDrainer enabled, all appliers are remembered.
  * At the end of the afflicted battler's turn, HP is drained from the afflicted
  * and recovered by the drainer (up to the drainer's max HP).
  * The state is also removed if the drainer is defeated.
@@ -94,6 +100,9 @@
  *
  * <HPDrainState_AllowKill: true>
  * <HPDrainState_AllowKill: false>
+ *
+ * <HPDrainState_MultiDrainer: true>   Enable multi-drainer for this state
+ * <HPDrainState_MultiDrainer: false>  Disable multi-drainer for this state
  */
 
 /*:ja
@@ -146,14 +155,25 @@
  * @default true
  * @type boolean
  *
+ * @param MultiDrainer
+ * @text 複数のドレイン実行者を許可
+ * @desc 許可すると、ステートが治る前に他のキャラから付与された場合に、そのキャラからもHP吸収を受けるようになります。
+ * @default false
+ * @type boolean
+ *
  * @help
  * 【使い方】
  * HP吸収ステートにしたいステートの「メモ」欄に、次のタグを記述してください。
  * <HPDrainState>
  *
- * ステートを付与した相手が記憶され、（最後に付与した１人だけが記憶されます）
+ * ステートを付与した相手が記憶され、
  * 被付与者のターン終了時に、HPが付与した相手に渡されます。
  * 付与した者が戦闘不能になった場合、ステートは自動解除されます。
+ *
+ * デフォルトでは最後に付与した１人だけが記憶されますが、
+ * 「複数のドレイン実行者を許可」を true にすると複数人を記憶できます。
+ * その場合はターン終了時に複数人からHPがドレインされ、
+ * また、付与した全員が倒されたときにステートが自動解除されます。
  *
  * 【ステートごとの個別設定（すべて省略可）】
  * 省略した場合はプラグインパラメータの設定値が使用されます。
@@ -183,6 +203,9 @@
  *
  * <HPDrainState_AllowKill: true>   （吸収による戦闘不能を許可）
  * <HPDrainState_AllowKill: false>  （吸収で最低1HPを保持）
+ *
+ * <HPDrainState_MultiDrainer: true>   （複数のドレイン実行者を許可）
+ * <HPDrainState_MultiDrainer: false>  （最後に付与した１人だけを記憶）
  */
 
 (() => {
@@ -195,6 +218,7 @@
   const paramAmountRandomizer = Math.min(80, Math.max(0, Number(parameters.AmountRandomizer ?? 0)));
   const paramDrainMessage = String(parameters.DrainMessage || '%1は%2に%3を %4 吸収された！');
   const paramAllowKill = String(parameters.AllowKill) !== 'false';
+  const paramMultiDrainer = String(parameters.MultiDrainer) === 'true';
 
   /**
    * 文字列や真偽値の入力を真偽値へ変換する
@@ -352,18 +376,27 @@
       // Object.keys() でコピーを取ることで、ループ中の removeState による変更に対して安全にする
       for (const stateIdStr of Object.keys(battler._hpDrainerInfo)) {
         const stateId = Number(stateIdStr);
-        const drainer = resolveDrainer(battler._hpDrainerInfo[stateId]);
+        const drainerInfoList = battler._hpDrainerInfo[stateId];
+        const remainingDrainers = drainerInfoList.filter(info => resolveDrainer(info) !== deadBattler);
 
-        if (drainer === deadBattler) {
-          battler.removeState(stateId);
+        // ドレイン実行者のうち倒された人がいた場合の処理
+        if (remainingDrainers.length < drainerInfoList.length) {
+          // ドレイン実行者が全員倒されたときの処理
+          if (remainingDrainers.length === 0) {
+            // 全員倒れた場合はステート解除
+            battler.removeState(stateId);
 
-          // displayBattlerStatus をここで直接呼ぶと、ダメージ・倒れるメッセージより先にキューへ積まれてしまう。
-          // そのため「後で表示が必要なバトラー」として pending リストに追加し、
-          // deadBattler の displayBattlerStatus が呼ばれた直後に処理する（後述のエイリアス参照）
-          if (BattleManager._hpDrainPendingRecoveringBattlers == null) {
-            BattleManager._hpDrainPendingRecoveringBattlers = [];
+            // displayBattlerStatus をここで直接呼ぶと、
+            // 状態異常から回復したメッセージが、ドレイン実行者が受けたダメージや倒れるメッセージよりも先に出てしまう。
+            // そのため一時変数に追加し、ドレイン実行者の displayBattlerStatus が呼ばれたときに処理する
+            if (BattleManager._hpDrainPendingRecoveringBattlers == null) {
+              BattleManager._hpDrainPendingRecoveringBattlers = [];
+            }
+            BattleManager._hpDrainPendingRecoveringBattlers.push(battler);
+          } else {
+            // ドレイン実行者にまだ生存者がいる場合、リストを更新するだけでステートは解除しない
+            battler._hpDrainerInfo[stateId] = remainingDrainers;
           }
-          BattleManager._hpDrainPendingRecoveringBattlers.push(battler);
         }
       }
     }
@@ -385,7 +418,7 @@
 
     const actionSubject = this.subject(); // アクションの主体
 
-    // このアクションがドレインステートを付与する効果を持つ場合、ドレイン実行者を記録（再付与時は上書き）
+    // このアクションがドレインステートを付与する効果を持つ場合、ドレイン実行者を記録
     for (const state of target.states()) {
       if (!state.meta.HPDrainState) continue;
 
@@ -399,10 +432,21 @@
       if (!hasAddDrainState) continue;
 
       // ドレイン実行者の情報を記録。味方なら actorId, 敵なら enemyIndex に保存
-      if (actionSubject.isActor()) {
-        target._hpDrainerInfo[state.id] = { actorId: actionSubject.actorId(), enemyIndex: -1 };
+      const multiDrainer = toBoolean(state.meta.HPDrainState_MultiDrainer, paramMultiDrainer);
+      const newInfo = actionSubject.isActor()
+        ? { actorId: actionSubject.actorId(), enemyIndex: -1 }
+        : { actorId: 0, enemyIndex: actionSubject.index() };
+
+      if (multiDrainer) {
+        // MultiDrainer 有効時：既存リストに追記（同一バトラーの重複追加はスキップ）
+        const existing = target._hpDrainerInfo[state.id] ?? [];
+        const alreadyIn = existing.some(info => resolveDrainer(info) === actionSubject);
+        if (!alreadyIn) {
+          target._hpDrainerInfo[state.id] = [...existing, newInfo];
+        }
       } else {
-        target._hpDrainerInfo[state.id] = { actorId: 0, enemyIndex: actionSubject.index() };
+        // MultiDrainer 無効時：上書き（従来の挙動）
+        target._hpDrainerInfo[state.id] = [newInfo];
       }
     }
   };
@@ -443,18 +487,21 @@
     if (drainStates.length === 0) return;
 
     for (const state of drainStates) {
-      const drainerInfo = this._hpDrainerInfo ? this._hpDrainerInfo[state.id] : null;
-      if (drainerInfo == null) {
+      const drainerInfoList = this._hpDrainerInfo ? this._hpDrainerInfo[state.id] : null;
+      if (drainerInfoList == null || drainerInfoList.length === 0) {
         continue;
       }
 
-      const drainer = resolveDrainer(drainerInfo);
-      if (drainer == null || !drainer.isAlive()) {
-        continue;
-      }
+      // MultiDrainer 有効時は drainerInfoList.length が 2 以上になっている場合がある
+      for (const drainerInfo of drainerInfoList) {
+        const drainer = resolveDrainer(drainerInfo);
+        if (drainer == null || !drainer.isAlive()) {
+          continue;
+        }
 
-      const amount = calcDrainAmount(state, this, drainer);
-      applyHpDrain(this, drainer, amount, state); // this から drainer に HP を移動させる
+        const amount = calcDrainAmount(state, this, drainer);
+        applyHpDrain(this, drainer, amount, state); // this （被付与者）から drainer に HP を移動させる
+      }
     }
   };
 
@@ -550,7 +597,7 @@
   Game_Battler.prototype.onBattleStart = function(advantageous) {
     _Game_Battler_onBattleStart.call(this, advantageous);
 
-    this._hpDrainerInfo = {}; // { <stateId>: { actorId:, enemyIndex: } } の形式で apply メソッドにて代入される
+    this._hpDrainerInfo = {}; // { <stateId>: [{ actorId:, enemyIndex: }, ...] } の形式で apply メソッドにて代入される
     this._hpDrainPendingMessages = []; // ドレインメッセージの一時保管場所
     this._hpDrainPendingPopups = []; // { drainer, amount } の形式で、ドレイン実行者のHP回復ポップアップを保管
   };
