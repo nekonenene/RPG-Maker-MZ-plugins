@@ -201,6 +201,27 @@ const enemy = $gameTroop.members()[enemyIndex];
 
 ---
 
+## エネミーは `level` を持たない
+
+`Game_Actor` は `level` プロパティを持つが、**`Game_Enemy` には `level` が存在しない**（`undefined`）。
+
+`formula` タイプのダメージ計算式など、`drainer.level` や `drainTarget.level` を参照する処理では、
+対象がエネミーの場合に `undefined` が返り、計算結果が `NaN` になったりエラーが発生したりする。
+
+ドキュメントやヘルプテキストで `level` を使える変数として紹介する場合は、
+「エネミーには `level` がないため注意」と明記すること。
+式の中で使いたい場合は `battler.level ?? 1` のようにフォールバックを設けると安全。
+
+```javascript
+// 危険：drainer がエネミーのとき undefined になる
+drainer.level * 10
+
+// 安全：フォールバックを設ける
+(drainer.level ?? 1) * 10
+```
+
+---
+
 ## アクターの並び順は actorId とは異なる
 
 `actor.actorId()` はデータベース上の固定IDだが、
