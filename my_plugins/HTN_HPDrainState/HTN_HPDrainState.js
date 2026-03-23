@@ -336,6 +336,11 @@
     // 各バトラーに関して、誰にドレインを受けているのかを見ていき、
     // その中に deadBattler がいるなら、対応するステートを解除する
     for (const battler of BattleManager.allBattleMembers()) {
+      // 戦闘中でないときの早期returnがあるので大丈夫なはずだけど、念のため未定義時はスキップ
+      if (battler._hpDrainerInfo == null) {
+        continue;
+      }
+
       // Object.keys() でコピーを取ることで、ループ中の removeState による変更に対して安全にする
       for (const stateIdStr of Object.keys(battler._hpDrainerInfo)) {
         const stateId = Number(stateIdStr);
@@ -364,6 +369,11 @@
   const _Game_Action_apply = Game_Action.prototype.apply;
   Game_Action.prototype.apply = function(target) {
     _Game_Action_apply.call(this, target);
+
+    // バトル中でないならドレイン実行者の記録は不要なので早期return
+    if (!$gameParty.inBattle()) {
+      return;
+    }
 
     const actionSubject = this.subject(); // アクションの主体
 
@@ -398,7 +408,10 @@
   Game_Battler.prototype.removeState = function(stateId) {
     _Game_Battler_removeState.call(this, stateId);
 
-    delete this._hpDrainerInfo[stateId];
+    // removeState は setupNewGame -> Game_Battler.prototype.refresh 起点でゲーム開始時にも呼ばれるため分岐が必須
+    if (this._hpDrainerInfo != null) {
+      delete this._hpDrainerInfo[stateId];
+    }
   };
 
   /**
