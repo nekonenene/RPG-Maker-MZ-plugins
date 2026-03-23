@@ -9,7 +9,7 @@ MPドレインについては
 
 ## 🛠️ 導入方法
 
-**[【ここを右クリックして「名前を付けてリンク先を保存」みたいな項目を選んでダウンロード】](https://raw.githubusercontent.com/nekoneneve/RPG-Maker-MZ-plugins/main/my_plugins/HTN_HPDrainState/HTN_HPDrainState.js)**
+**[【ここを右クリックして「名前を付けてリンク先を保存」みたいな項目を選んでダウンロード】](https://raw.githubusercontent.com/nekonenene/RPG-Maker-MZ-plugins/main/my_plugins/HTN_HPDrainState/HTN_HPDrainState.js)**
 
 プラグインの導入方法については、[ツクール公式サイトの講座ページ](https://rpgmakerofficial.com/product/mz/plugin/start/dounyu.html)をご参考に！  
 ダウンロードした `HTN_xxx.js` のような名前のファイルを、プロジェクト内の `js/plugins` フォルダーの中に入れてください。

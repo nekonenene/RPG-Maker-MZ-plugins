@@ -14,7 +14,7 @@
  * @target MZ
  * @plugindesc Creates a state that drains HP from the afflicted to the drainer each turn (v1.0.0)
  * @author hatonekoe - https://hato-neko.x0.com
- * @url https://github.com/nekoneneve/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_HPDrainState
+ * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_HPDrainState
  *
  * @param AmountType
  * @text Drain amount type
@@ -109,7 +109,7 @@
  * @target MZ
  * @plugindesc HPを吸収され続けるステート（状態異常）を作成できます (v1.0.0)
  * @author ハトネコエ - https://hato-neko.x0.com
- * @url https://github.com/nekoneneve/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_HPDrainState
+ * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_HPDrainState
  *
  * @param AmountType
  * @text 吸収タイプ
