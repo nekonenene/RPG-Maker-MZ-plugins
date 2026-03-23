@@ -281,3 +281,115 @@ battler._result.addedStates = [];
 _displayBattlerStatus.call(this, battler, false);
 battler._result.addedStates = saved;
 ```
+
+---
+
+## `displayRegeneration` はダメージ音を鳴らさない
+
+スキル・アイテムによるHP変化は `displayHpDamage` → `push("performDamage")` → `target.performDamage()` の流れで
+ダメージ音（`playActorDamage` / `playEnemyDamage`）が鳴る。
+
+一方、ターン終了時のリジェネは `displayRegeneration` → `push("popupDamage")` のみで、
+**`performDamage` は呼ばれない。つまりダメージ音は鳴らない。**
+
+リジェネに対してカスタムな音を鳴らしたい場合は、`displayRegeneration` をフックして
+`Window_BattleLog.push` 経由で独自メソッドを積む。
+
+```javascript
+Window_BattleLog.prototype.mySound = function() {
+  SoundManager.playEnemyDamage(); // 任意の音
+};
+
+const _displayRegeneration = Window_BattleLog.prototype.displayRegeneration;
+Window_BattleLog.prototype.displayRegeneration = function(subject) {
+  if (/* 対象バトラーへの条件 */) {
+    this.push('mySound'); // ポップアップより前に積む
+  }
+  _displayRegeneration.call(this, subject);
+};
+```
+
+---
+
+## `gainSilentTp` は result に記録しない
+
+`gainTp` は `result.tpDamage` に値を記録しTPのポップアップ・メッセージが出るが、
+`gainSilentTp` は `setTp` を直接呼ぶだけで **result に何も記録しない**。
+
+ターン終了のTPリジェネ（`regenerateTp`）は `gainSilentTp` を使うため、
+TPリジェネをポップアップ表示させたい場合は `gainSilentTp` を `gainTp` 経由に切り替える必要がある。
+
+```javascript
+const _Game_Battler_gainSilentTp = Game_Battler.prototype.gainSilentTp;
+Game_Battler.prototype.gainSilentTp = function(value) {
+  if (/* 条件 */) {
+    this.gainTp(value); // gainTp 経由で result に記録させる
+    return;
+  }
+  _Game_Battler_gainSilentTp.call(this, value);
+};
+```
+
+---
+
+## `gainTp` だけフックしても TP 変化を完全には捕捉できない
+
+`gainTp` / `gainSilentTp` を経由せず `setTp` を直接呼んでTPを変化させるプラグインが存在する
+（例：`NRP_RecoverAfterAction`）。
+
+TP変化を全パターンで捕捉したい場合は `setTp` 自体をフックする必要がある。
+ただし `initTp`（バトル開始時のTP初期化）も `setTp` を呼ぶため、
+`initTp` フックでバイパスフラグを設定して除外する。
+
+```javascript
+// initTp の setTp 呼び出しを除外するフラグ
+const _Game_Battler_initTp = Game_Battler.prototype.initTp;
+Game_Battler.prototype.initTp = function() {
+  this._myIgnoreSetTp = true;
+  _Game_Battler_initTp.call(this);
+  this._myIgnoreSetTp = false;
+};
+
+const _Game_BattlerBase_setTp = Game_BattlerBase.prototype.setTp;
+Game_BattlerBase.prototype.setTp = function(tp) {
+  if (tp > this._tp && !this._myIgnoreSetTp && /* 条件 */) {
+    // TP が増加する呼び出しへの処理
+  }
+  _Game_BattlerBase_setTp.call(this, tp);
+};
+```
+
+`gainTp` → `setTp(this.tp + value)` と `gainSilentTp` → `setTp(this.tp + value)` も
+この `setTp` フックを通るが、`gainTp` / `gainSilentTp` 側で先に値を反転していれば
+`tp <= this._tp`（減少）になるためフックを素通りする。
+
+---
+
+## ダメージ音のカスタマイズは SoundManager フックで行う
+
+`performDamage` 内で呼ばれる `playActorDamage` / `playEnemyDamage` を差し替えたい場合、
+`performDamage` 自体をオーバーライドすると音以外のアニメーション処理も複製する必要があり保守が難しい。
+
+代わりに `SoundManager.playActorDamage` / `playEnemyDamage` を一時フラグで抑制し、
+カスタム音を後から鳴らすパターンが簡潔。
+
+```javascript
+let _suppress = false;
+
+const _SoundManager_playActorDamage = SoundManager.playActorDamage;
+SoundManager.playActorDamage = function() {
+  if (_suppress) { _suppress = false; return; }
+  _SoundManager_playActorDamage.call(this);
+};
+
+const _Game_Actor_performDamage = Game_Actor.prototype.performDamage;
+Game_Actor.prototype.performDamage = function() {
+  if (/* 条件 */) {
+    _suppress = true;
+    _Game_Actor_performDamage.call(this); // アニメーションは通常通り、音は抑制
+    SoundManager.playEnemyDamage();       // 代わりの音
+  } else {
+    _Game_Actor_performDamage.call(this);
+  }
+};
+```
