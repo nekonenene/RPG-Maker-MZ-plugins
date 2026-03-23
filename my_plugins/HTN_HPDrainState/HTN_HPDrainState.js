@@ -42,7 +42,7 @@
  *
  * @param AmountRandomizer
  * @text Drain amount randomizer (%)
- * @desc Random multiplier width (%). 0=fixed, 80=0.2 to 1.8x.
+ * @desc Random multiplier width (%). 0=fixed, 20=0.8 to 1.2x.
  * @default 0
  * @type number
  * @min 0
@@ -127,7 +127,7 @@
  *
  * @param AmountRandomizer
  * @text 吸収量のランダム幅（%）
- * @desc 吸収量に与えるランダム性。0で固定値。80のとき、計算結果に0.2〜1.8倍のランダムな乗数が掛かります。
+ * @desc 吸収量に与えるランダム性。例えば20のとき、計算結果に0.8〜1.2倍のランダムな乗数が掛かります。
  * @default 0
  * @type number
  * @min 0
