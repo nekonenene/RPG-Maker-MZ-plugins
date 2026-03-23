@@ -16,20 +16,38 @@
  * @author hatonekoe - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_ZombieState
  *
- * @param DamageSoundType
- * @text Zombie damage sound
+ * @param HPDamageSoundType
+ * @text Zombie HP damage sound
  * @desc Sound played when a zombie-state battler takes HP damage from recovery.
- * @default enemy_damage
+ * @default actorDamage
  * @type select
- * @option Enemy Damage (system sound)
- * @value enemy_damage
  * @option Actor Damage (system sound)
- * @value actor_damage
+ * @value actorDamage
+ * @option Enemy Damage (system sound)
+ * @value enemyDamage
  * @option Custom SE
  * @value custom
  *
- * @param CustomDamageSound
- * @text Custom damage SE
+ * @param HPDamageSound
+ * @text Custom HP damage SE
+ * @desc Used when "Custom SE" is selected above.
+ * @type struct<Sound>
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
+ *
+ * @param MPDamageSoundType
+ * @text Zombie MP damage sound
+ * @desc Sound played when a zombie-state battler takes MP damage from recovery.
+ * @default actorDamage
+ * @type select
+ * @option Actor Damage (system sound)
+ * @value actorDamage
+ * @option Enemy Damage (system sound)
+ * @value enemyDamage
+ * @option Custom SE
+ * @value custom
+ *
+ * @param MPDamageSound
+ * @text Custom MP damage SE
  * @desc Used when "Custom SE" is selected above.
  * @type struct<Sound>
  * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
@@ -104,20 +122,38 @@
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_ZombieState
  *
- * @param DamageSoundType
- * @text ダメージ音の種類
+ * @param HPDamageSoundType
+ * @text HPダメージ音の種類
  * @desc ゾンビ状態でHPダメージを受けたときに鳴る音です。
- * @default enemy_damage
+ * @default actorDamage
  * @type select
- * @option 敵ダメージ音（システムサウンド）
- * @value enemy_damage
  * @option アクターダメージ音（システムサウンド）
- * @value actor_damage
+ * @value actorDamage
+ * @option 敵ダメージ音（システムサウンド）
+ * @value enemyDamage
  * @option カスタムSE
  * @value custom
  *
- * @param CustomDamageSound
- * @text カスタムダメージSE
+ * @param HPDamageSound
+ * @text カスタムHPダメージSE
+ * @desc ダメージ音の種類が「カスタムSE」のときに使用するSEです。
+ * @type struct<Sound>
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
+ *
+ * @param MPDamageSoundType
+ * @text MPダメージ音の種類
+ * @desc ゾンビ状態でMPダメージを受けたときに鳴る音です。
+ * @default actorDamage
+ * @type select
+ * @option アクターダメージ音（システムサウンド）
+ * @value actorDamage
+ * @option 敵ダメージ音（システムサウンド）
+ * @value enemyDamage
+ * @option カスタムSE
+ * @value custom
+ *
+ * @param MPDamageSound
+ * @text カスタムMPダメージSE
  * @desc ダメージ音の種類が「カスタムSE」のときに使用するSEです。
  * @type struct<Sound>
  * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
@@ -195,10 +231,18 @@
 
   const pluginName = 'HTN_ZombieState';
   const parameters = PluginManager.parameters(pluginName);
-  const paramDamageSoundType = String(parameters.DamageSoundType || 'enemy_damage');
-  const paramCustomDamageSound = (() => {
+  const paramHpDamageSoundType = String(parameters.HPDamageSoundType || 'actorDamage');
+  const paramMpDamageSoundType = String(parameters.MPDamageSoundType || 'actorDamage');
+  const paramHpDamageSound = (() => {
     try {
-      return JSON.parse(parameters.CustomDamageSound || '{}');
+      return JSON.parse(parameters.HPDamageSound || '{}');
+    } catch (e) {
+      return {};
+    }
+  })();
+  const paramMpDamageSound = (() => {
+    try {
+      return JSON.parse(parameters.MPDamageSound || '{}');
     } catch (e) {
       return {};
     }
@@ -224,14 +268,35 @@
    * ゾンビHPダメージ時の音を再生する
    */
   const playZombieDamageSound = () => {
-    if (paramDamageSoundType === 'actor_damage') {
+    if (paramHpDamageSoundType === 'actorDamage') {
       SoundManager.playActorDamage();
-    } else if (paramDamageSoundType === 'custom') {
+    } else if (paramHpDamageSoundType === 'custom') {
       const se = {
-        name: String(paramCustomDamageSound.name || ''),
-        volume: Number(paramCustomDamageSound.volume ?? 90),
-        pitch: Number(paramCustomDamageSound.pitch ?? 100),
-        pan: Number(paramCustomDamageSound.pan ?? 0),
+        name: String(paramHpDamageSound.name || ''),
+        volume: Number(paramHpDamageSound.volume ?? 90),
+        pitch: Number(paramHpDamageSound.pitch ?? 100),
+        pan: Number(paramHpDamageSound.pan ?? 0),
+      };
+      if (se.name !== '') {
+        AudioManager.playSe(se);
+      }
+    } else {
+      SoundManager.playEnemyDamage();
+    }
+  };
+
+  /**
+   * ゾンビMPダメージ時の音を再生する
+   */
+  const playZombieMpDamageSound = () => {
+    if (paramMpDamageSoundType === 'actorDamage') {
+      SoundManager.playActorDamage();
+    } else if (paramMpDamageSoundType === 'custom') {
+      const se = {
+        name: String(paramMpDamageSound.name || ''),
+        volume: Number(paramMpDamageSound.volume ?? 90),
+        pitch: Number(paramMpDamageSound.pitch ?? 100),
+        pan: Number(paramMpDamageSound.pan ?? 0),
       };
       if (se.name !== '') {
         AudioManager.playSe(se);
@@ -327,6 +392,7 @@
   Game_Battler.prototype.onBattleStart = function(advantageous) {
     _Game_Battler_onBattleStart.call(this, advantageous);
     this._zombieHpDamaged = false;
+    this._zombieMpDamaged = false;
   };
 
   /**
@@ -336,6 +402,7 @@
   Game_Battler.prototype.onBattleEnd = function() {
     _Game_Battler_onBattleEnd.call(this);
     this._zombieHpDamaged = false;
+    this._zombieMpDamaged = false;
   };
 
   // ============================================================
@@ -367,9 +434,11 @@
   const _Game_Battler_gainMp = Game_Battler.prototype.gainMp;
   Game_Battler.prototype.gainMp = function(value) {
     if (value > 0 && this.zombieAffectsMp()) {
+      this._zombieMpDamaged = true;
       _Game_Battler_gainMp.call(this, -value);
       return;
     }
+    this._zombieMpDamaged = false;
     _Game_Battler_gainMp.call(this, value);
   };
 
@@ -480,6 +549,27 @@
    */
   Window_BattleLog.prototype.playZombieDamageSound = function() {
     playZombieDamageSound();
+  };
+
+  /**
+   * ゾンビMPダメージ音をバトルログキュー経由で再生する
+   */
+  Window_BattleLog.prototype.playZombieMpDamageSound = function() {
+    playZombieMpDamageSound();
+  };
+
+  /**
+   * MPダメージ表示をフックし、ゾンビMPダメージ時にダメージ音をキューへ追加する
+   *
+   * @param {Game_Battler} target 対象バトラー
+   */
+  const _Window_BattleLog_displayMpDamage = Window_BattleLog.prototype.displayMpDamage;
+  Window_BattleLog.prototype.displayMpDamage = function(target) {
+    if (target._zombieMpDamaged === true && target.result().mpDamage > 0) {
+      target._zombieMpDamaged = false;
+      this.push('playZombieMpDamageSound');
+    }
+    _Window_BattleLog_displayMpDamage.call(this, target);
   };
 
   /**
