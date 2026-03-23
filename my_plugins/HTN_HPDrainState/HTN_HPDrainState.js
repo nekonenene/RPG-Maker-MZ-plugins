@@ -308,13 +308,22 @@
     drainTarget.gainHp(-safeAmount);
     drainer.gainHp(safeAmount);
 
-    // ドレイン実行者のHP回復ポップアップを即時キューに積む
-    drainer.startDamagePopup();
+    // ドレイン実行者のポップアップはバトルログのキュー経由で表示する（後述の showHpDrainGainPopup 参照）
+    // ターンバトルでは endAllBattlersTurn() -> onTurnEnd() -> clearResult() で result を上書きするため、
+    // 仮にここで drainer.startDamagePopup() を直接呼んでも、被付与者のステート処理時にはすでに
+    // ドレイン実行者の result が空になっており、 shouldPopupDamage が false でポップアップが出ない
+    if (drainTarget._hpDrainPendingPopups == null) {
+      drainTarget._hpDrainPendingPopups = [];
+    }
+    drainTarget._hpDrainPendingPopups.push({ drainer, amount: safeAmount });
 
     const drainMessage = state.meta.HPDrainState_DrainMessage != null ? String(state.meta.HPDrainState_DrainMessage) : paramDrainMessage;
     const message = drainMessage.trim().format(drainTarget.name(), drainer.name(), TextManager.hp, safeAmount);
 
     if (message !== '') {
+      if (drainTarget._hpDrainPendingMessages == null) {
+        drainTarget._hpDrainPendingMessages = [];
+      }
       drainTarget._hpDrainPendingMessages.push(message);
     }
   };
@@ -359,6 +368,8 @@
 
   /**
    * 独自プロパティを初期化する
+   *
+   * セーブデータを呼び出した場合、 initMembers は呼ばれないためプロパティが undefined のままになるので注意
    */
   const _Game_Battler_initMembers = Game_Battler.prototype.initMembers;
   Game_Battler.prototype.initMembers = function() {
@@ -366,6 +377,7 @@
 
     this._hpDrainerInfo = {}; // { <stateId>: { actorId:, enemyIndex: } } の形式で apply メソッドにて代入される
     this._hpDrainPendingMessages = []; // ドレインメッセージの一時保管場所
+    this._hpDrainPendingPopups = []; // { drainer, amount } の形式で、ドレイン実行者のHP回復ポップアップを保管
   };
 
   /**
@@ -467,13 +479,37 @@
   };
 
   /**
-   * 状態変化メッセージの表示前に、バッファされたHP吸収メッセージを先に表示する
+   * 独自メソッド：ドレイン実行者のHP回復ポップアップをバトルログのキュー経由で表示する
+   * キューで処理されるタイミングで result を再セットすることで、
+   * onTurnEnd() の clearResult() で result が消えてしまっている問題を回避
+   *
+   * @param {Game_Battler} drainer ドレイン実行者（HPを得る側）
+   * @param {number} amount 回復したHP量
+   */
+  Window_BattleLog.prototype.showHpDrainGainPopup = function(drainer, amount) {
+    drainer._result.hpAffected = true;
+    drainer._result.hpDamage = -amount; // 負の値 = HP回復
+    drainer.startDamagePopup();
+  };
+
+  /**
+   * ドレイン実行者のポップアップとドレインメッセージを、状態変化メッセージの前にキューへ積む
    * displayAutoAffectedStatus より前に出すことで、死亡メッセージの前にドレインメッセージが表示される
    *
    * @param {Game_Battler} subject 対象バトラー
    */
   const _Window_BattleLog_displayAutoAffectedStatus = Window_BattleLog.prototype.displayAutoAffectedStatus;
   Window_BattleLog.prototype.displayAutoAffectedStatus = function(subject) {
+    // ドレイン実行者のHP回復ポップアップを、テキストメッセージより先にキューへ積む
+    const drainPopups = subject._hpDrainPendingPopups;
+    if (drainPopups != null && drainPopups.length > 0) {
+      for (const { drainer, amount } of drainPopups) {
+        this.push('showHpDrainGainPopup', drainer, amount);
+      }
+
+      subject._hpDrainPendingPopups = [];
+    }
+
     const drainMessages = subject._hpDrainPendingMessages;
     if (drainMessages != null && drainMessages.length > 0) {
       for (const drainMessage of drainMessages) {
@@ -524,5 +560,6 @@
 
     this._hpDrainerInfo = {};
     this._hpDrainPendingMessages = [];
+    this._hpDrainPendingPopups = [];
   };
 })();
