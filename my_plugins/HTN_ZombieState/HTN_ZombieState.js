@@ -434,6 +434,13 @@
       this._zombieHpDamaged = true;
 
       _Game_Battler_gainHp.call(this, -value);
+
+      // バトル外では performDamage が呼ばれないため直接再生（ただし、回復音とかぶって再生される）
+      if (!$gameParty.inBattle()) {
+        this._zombieHpDamaged = false;
+        playZombieDamageSound();
+      }
+
       return;
     }
 
@@ -453,6 +460,13 @@
       this._zombieMpDamaged = true;
 
       _Game_Battler_gainMp.call(this, -value);
+
+      // バトル外では displayMpDamage が呼ばれないため直接再生（ただし、回復音とかぶって再生される）
+      if (!$gameParty.inBattle()) {
+        this._zombieMpDamaged = false;
+        playZombieMpDamageSound();
+      }
+
       return;
     }
 
