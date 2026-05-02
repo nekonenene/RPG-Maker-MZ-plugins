@@ -8,10 +8,10 @@
 
 'use strict';
 
-HTN_MonsterMessage.register(1, ({ skillId, subject, _targets, actor, messages }) => {
+HTN_MonsterMessage.register(1, ({ skill, subject, _targets, actor, messages }) => {
   const rand = Math.random();
 
-  if (skillId === 16) {
+  if (skill.name === '混乱の歌') {
     if (rand < 0.3) {
       messages.push('頭の中をカラッポにいたしましょう？');
     } else if (rand < 0.6) {
@@ -25,7 +25,7 @@ HTN_MonsterMessage.register(1, ({ skillId, subject, _targets, actor, messages })
     }
   }
 
-  if (skillId === 17) {
+  if (skill.name === '誘惑の歌') {
     if (actor?.isStateAffected(33)) {
       messages.push('もっとわたくしに夢中になって♥');
     } else {
@@ -33,7 +33,7 @@ HTN_MonsterMessage.register(1, ({ skillId, subject, _targets, actor, messages })
     }
   }
 
-  if (skillId === 18) {
+  if (skill.name === '子守唄') {
     if (actor?.isStateAffected(34)) {
       messages.push('ふふふ、かわいらしい寝顔ですね♥\nこのままずっと眠っていてもいいのですよ？');
     } else {

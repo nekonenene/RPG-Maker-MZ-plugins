@@ -16,7 +16,7 @@
  * 自動で読み込みます（プラグイン管理への登録不要）。
  *
  * モンスターデータファイルでは以下のようにコールバックを登録します。
- *   HTN_MonsterMessage.register(エネミーID, ({ skillId, subject, targets, actor, messages }) => {
+ *   HTN_MonsterMessage.register(エネミーID, ({ skill, subject, targets, actor, messages }) => {
  *     messages.name = '話者名';
  *     messages.face = ['顔グラ名', index];   // 省略可
  *     messages.background = 1;              // 省略可: 0=通常 1=暗く 2=透明 (省略時 1)
@@ -31,7 +31,7 @@
  *   });
  *
  * コールバック引数:
- *   skillId  : 使用スキルID
+ *   skill    : 使用スキル ($dataSkills の要素。skill.id や skill.name で参照)
  *   subject  : 行動エネミー (Game_Enemy)
  *   targets  : 対象バトラーの配列
  *   actor    : targets[0]（単体攻撃向けショートハンド。対象なしの場合 null）
@@ -134,7 +134,7 @@
         };
 
         fn({
-          skillId: action.item().id,
+          skill: action.item(),
           subject,
           targets,
           actor: targets[0] ?? null,
