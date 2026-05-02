@@ -116,11 +116,11 @@
       if (fn != null) {
         const pending = [];
         const messages = {
-          name:       '',
-          face:       ['', 0],
-          background: 1,
-          position:   2,
-          pending,
+          name:       subject.name(), // デフォルト話者名はモンスター名。空文字にすると話者名なしになる
+          face:       ['', 0], // 顔グラ。例えば妖精は ['Nature', 5]
+          background: 1, // 0: 通常, 1: 暗く, 2: 透明
+          position:   2, // 0: 上, 1: 中, 2: 下
+          pending,       // 内部で保持するメッセージのバッファ。flush() でまとめて表示され空に戻る
           push(text) {
             pending.push({
               text,
@@ -150,7 +150,7 @@
     _Window_BattleLog_startAction.call(this, subject, action, targets);
   };
 
-  // NW.js 環境では js/plugins/HTN_MonsterMessage/ 以下の JS ファイルを自動ロードする
+  // NW.js 環境では js/plugins/HTN_MonsterMessage/data/ 以下の JS ファイルを自動ロードする
   if (typeof require !== 'undefined') {
     const fs   = require('fs');
     const path = require('path');
