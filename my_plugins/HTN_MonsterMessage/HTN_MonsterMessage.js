@@ -3,17 +3,23 @@
 // HTN_MonsterMessage
 //
 // Copyright (c) 2026 hatonekoe
+// This software is released under the MIT License.
+// https://opensource.org/license/mit
+//
+// 2026/05/03 v0.0.1 開発開始...
 //
 // --------------------------------------------------------------------------
 
 /*:ja
  * @target MZ
  * @plugindesc モンスターが行動する際にメッセージウィンドウでセリフを表示するプラグイン
- * @author hatonekoe
+ * @author ハトネコエ - https://hato-neko.x0.com
+ * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_MonsterMessage
  *
  * @help
- * js/plugins/HTN_MonsterMessage/data/ ディレクトリに配置した JS ファイルを
- * 自動で読み込みます（プラグイン管理への登録不要）。
+ * js/plugins/HTN_MonsterMessage/data/ ディレクトリに配置された
+ * JS ファイルを自動で読み込みます。
+ * プラグイン管理には、このファイルだけ登録すればあとは登録不要です。
  *
  * --- 登録メソッド ---
  *
@@ -22,7 +28,6 @@
  *
  * HTN_MonsterMessage.registerAfterAttack(エネミーID, fn)
  *   行動後（モンスターが元の位置に戻ったあと）のセリフを登録する
- *   状態異常の付与など副作用はここで行うと自然
  *
  * --- コールバック引数 ---
  *
@@ -33,13 +38,13 @@
  *   targets  : 対象バトラーの配列
  *   target   : targets[0]（単体攻撃向けショートハンド。対象なしの場合 null）
  *   messages : メッセージビルダー
- *     .name         話者名（デフォルト: モンスター名）
- *     .face         顔グラ [faceName, faceIndex]（デフォルト ['', 0]）
- *     .background   背景種別（0=通常 1=暗く 2=透明、デフォルト 1）
- *     .position     表示位置（0=上 1=中 2=下、デフォルト 2）
- *     .pending      積み上がったメッセージの配列（length で件数確認可）
+ *     .name         話者名（デフォルト: モンスター名）。空文字にすると話者名なしになる
+ *     .face         顔グラ [faceName, faceIndex] 。デフォルトは ['', 0] （顔グラなし）。例えば妖精は ['Nature', 5]
+ *     .background   背景種別（0: 通常, 1: 暗く, 2: 透明）。デフォルトは 1
+ *     .position     表示位置（0: 上, 1: 中, 2: 下）。デフォルトは 2
  *     .push(text)   メッセージをバッファに追加
- *     .flush()      no-op（グループの区切りとして任意で呼ぶ）
+ *     .pending      バッファにあるメッセージの配列（length で件数確認可）
+ *     .flush()      バッファにあるメッセージをまとめて表示し、バッファを空にする
  */
 
 (() => {
