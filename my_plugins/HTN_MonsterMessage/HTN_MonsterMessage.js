@@ -15,57 +15,100 @@
  * js/plugins/HTN_MonsterMessage/data/ ディレクトリに配置した JS ファイルを
  * 自動で読み込みます（プラグイン管理への登録不要）。
  *
- * モンスターデータファイルでは以下のようにコールバックを登録します。
- *   HTN_MonsterMessage.register(エネミーID, ({ skill, subject, targets, target, messages }) => {
- *     messages.name = '話者名';
- *     messages.face = ['顔グラ名', index];   // 省略可
- *     messages.background = 1;              // 省略可: 0=通常 1=暗く 2=透明 (省略時 1)
- *     messages.position   = 2;              // 省略可: 0=上 1=中 2=下 (省略時 2)
+ * --- 登録メソッド ---
  *
- *     if (skillId === 5 && target && target.hp / target.mhp < 0.5) {
- *       messages.push('ちょうどいい……弱っているな！');
- *     } else {
- *       messages.push('かかれ！');
- *     }
- *     messages.flush(); // 省略可（スタイル上の区切り）
- *   });
+ * HTN_MonsterMessage.registerBeforeAttack(エネミーID, fn)
+ *   行動前（スキル発動前）のセリフを登録する
  *
- * コールバック引数:
+ * HTN_MonsterMessage.registerAfterAttack(エネミーID, fn)
+ *   行動後（モンスターが元の位置に戻ったあと）のセリフを登録する
+ *   状態異常の付与など副作用はここで行うと自然
+ *
+ * --- コールバック引数 ---
+ *
+ *   fn({ skill, subject, targets, target, messages })
+ *
  *   skill    : 使用スキル ($dataSkills の要素。skill.id や skill.name で参照)
  *   subject  : 行動エネミー (Game_Enemy)
  *   targets  : 対象バトラーの配列
  *   target   : targets[0]（単体攻撃向けショートハンド。対象なしの場合 null）
  *   messages : メッセージビルダー
- *     .name       話者名（文字列）
- *     .face       顔グラ [faceName, faceIndex]（デフォルト ['', 0]）
- *     .background 背景種別
- *     .position   表示位置
- *     .push(text) メッセージをバッファに追加
- *     .flush()    no-op（グループの区切りとして任意で呼ぶ）
+ *     .name         話者名（デフォルト: モンスター名）
+ *     .face         顔グラ [faceName, faceIndex]（デフォルト ['', 0]）
+ *     .background   背景種別（0=通常 1=暗く 2=透明、デフォルト 1）
+ *     .position     表示位置（0=上 1=中 2=下、デフォルト 2）
+ *     .pending      積み上がったメッセージの配列（length で件数確認可）
+ *     .push(text)   メッセージをバッファに追加
+ *     .flush()      no-op（グループの区切りとして任意で呼ぶ）
  */
 
 (() => {
   'use strict';
 
   // エネミーIDをキーとするコールバックのレジストリ
-  const _registry = {};
+  const _beforeRegistry = {};
+  const _afterRegistry  = {};
 
   const _api = {
     /**
-     * エネミーIDに対応するセリフコールバックを登録する
+     * 行動前のセリフコールバックを登録する
      *
      * @param {number} enemyId
      * @param {function} fn
      */
-    register(enemyId, fn) {
-      _registry[enemyId] = fn;
-    }
+    registerBeforeAttack(enemyId, fn) {
+      _beforeRegistry[enemyId] = fn;
+    },
+
+    /**
+     * 行動後のセリフコールバックを登録する
+     *
+     * @param {number} enemyId
+     * @param {function} fn
+     */
+    registerAfterAttack(enemyId, fn) {
+      _afterRegistry[enemyId] = fn;
+    },
   };
 
   // ブラウザ文脈と Node.js require() 文脈の両方からアクセスできるよう両方に登録する
   window.HTN_MonsterMessage = _api;
   if (typeof global !== 'undefined') {
     global.HTN_MonsterMessage = _api;
+  }
+
+  /**
+   * コールバックを呼び出し、結果のメッセージをバトルログキューへ積む
+   *
+   * @param {function} fn
+   * @param {{skill: object, subject: Game_Enemy, targets: Game_Battler[], target: Game_Battler|null}} ctx
+   * @param {Window_BattleLog} logWindow
+   */
+  function buildAndQueueMessages(fn, ctx, logWindow) {
+    const pending = [];
+    const messages = {
+      name:       ctx.subject.name(), // デフォルト話者名はモンスター名。空文字にすると話者名なしになる
+      face:       ['', 0],            // 顔グラ。例えば妖精は ['Nature', 5]
+      background: 1,                  // 0: 通常, 1: 暗く, 2: 透明
+      position:   2,                  // 0: 上, 1: 中, 2: 下
+      pending,                        // 内部で保持するメッセージのバッファ。flush() でまとめて表示され空に戻る
+      push(text) {
+        pending.push({
+          text,
+          name:       this.name,
+          face:       [...this.face],
+          background: this.background,
+          position:   this.position,
+        });
+      },
+      flush() {},
+    };
+
+    fn({ ...ctx, messages });
+
+    for (const m of pending) {
+      logWindow.push('showMonsterMessage', m.text, m.name, m.face[0], m.face[1], m.background, m.position);
+    }
   }
 
   /**
@@ -103,51 +146,44 @@
 
       return false;
     }
+
     return _Window_BattleLog_updateWaitMode.call(this);
   };
 
   /**
-   * 行動開始時にモンスターのセリフをメッセージウィンドウへ表示する
+   * 行動開始時に行動前セリフを表示し、action と targets を保存する
    */
   const _Window_BattleLog_startAction = Window_BattleLog.prototype.startAction;
   Window_BattleLog.prototype.startAction = function(subject, action, targets) {
     if (subject.isEnemy()) {
-      const fn = _registry[subject.enemyId()];
+      this._HTN_MonstarMessage_LastAction  = action;
+      this._HTN_MonstarMessage_LastTargets = [...targets]; // BattleManager が shift() で同配列を空にするためコピーを保持
+
+      const fn = _beforeRegistry[subject.enemyId()];
       if (fn != null) {
-        const pending = [];
-        const messages = {
-          name:       subject.name(), // デフォルト話者名はモンスター名。空文字にすると話者名なしになる
-          face:       ['', 0], // 顔グラ。例えば妖精は ['Nature', 5]
-          background: 1, // 0: 通常, 1: 暗く, 2: 透明
-          position:   2, // 0: 上, 1: 中, 2: 下
-          pending,       // 内部で保持するメッセージのバッファ。flush() でまとめて表示され空に戻る
-          push(text) {
-            pending.push({
-              text,
-              name:       this.name,
-              face:       [...this.face],
-              background: this.background,
-              position:   this.position,
-            });
-          },
-          flush() {},
-        };
-
-        fn({
-          skill: action.item(),
-          subject,
-          targets,
-          target: targets[0] ?? null,
-          messages,
-        });
-
-        for (const m of pending) {
-          this.push('showMonsterMessage', m.text, m.name, m.face[0], m.face[1], m.background, m.position);
-        }
+        buildAndQueueMessages(fn, { skill: action.item(), subject, targets, target: targets[0] ?? null }, this);
       }
     }
 
     _Window_BattleLog_startAction.call(this, subject, action, targets);
+  };
+
+  /**
+   * 行動終了時（モンスターが元の位置に戻ったあと）に行動後セリフを表示する
+   */
+  const _Window_BattleLog_endAction = Window_BattleLog.prototype.endAction;
+  Window_BattleLog.prototype.endAction = function(subject) {
+    _Window_BattleLog_endAction.call(this, subject);
+
+    if (subject.isEnemy()) {
+      const fn = _afterRegistry[subject.enemyId()];
+
+      if (fn != null) {
+        const action  = this._HTN_MonstarMessage_LastAction;
+        const targets = this._HTN_MonstarMessage_LastTargets;
+        buildAndQueueMessages(fn, { skill: action.item(), subject, targets, target: targets[0] ?? null }, this);
+      }
+    }
   };
 
   // NW.js 環境では js/plugins/HTN_MonsterMessage/data/ 以下の JS ファイルを自動ロードする

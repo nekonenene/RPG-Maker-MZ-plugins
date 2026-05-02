@@ -8,7 +8,10 @@
 
 'use strict';
 
-HTN_MonsterMessage.register(1, ({ skill, subject, _targets, target, messages }) => {
+const ENEMY_ID = 1;
+
+// 攻撃前のセリフ
+HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, _targets, target, messages }) => {
   const rand = Math.random();
 
   if (skill.name === '混乱の歌') {
@@ -44,6 +47,17 @@ HTN_MonsterMessage.register(1, ({ skill, subject, _targets, target, messages }) 
   // デフォルトメッセージ
   if (messages.pending.length === 0) {
     messages.push('いきますわ！');
+  }
+
+  messages.flush();
+});
+
+// 攻撃後のセリフ
+HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, _targets, target, messages }) => {
+  if (skill.name === '誘惑の歌') {
+    if (target?.isStateAffected(33)) {
+      messages.push('うっとりとした素敵な表情になりましたね♥\nかわいい♥');
+    }
   }
 
   messages.flush();
