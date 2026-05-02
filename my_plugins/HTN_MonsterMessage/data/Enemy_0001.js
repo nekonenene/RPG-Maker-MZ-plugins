@@ -72,13 +72,13 @@ HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, target, mess
       messages.push('かわいらしい寝顔ですが、\nそろそろ起こしてあげたほうがいいかしら？');
       messages.flush();
 
-      messages.addComboAttack(20);
+      messages.addComboAttack('往復ビンタ');
       return;
     } else if (skill.name === '往復ビンタ' && comboCount > 0 && comboCount < 5) {
       messages.push('まだ眠ってるんですか？\nお寝坊さんですね〜\nもう１回しちゃいますよ？');
       messages.flush();
 
-      messages.addComboAttack(20);
+      messages.addComboAttack('往復ビンタ');
       return;
     }
   }

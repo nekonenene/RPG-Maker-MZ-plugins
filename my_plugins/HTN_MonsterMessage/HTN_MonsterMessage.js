@@ -51,9 +51,9 @@
  *     .push(text)        メッセージをバッファに追加
  *     .pending           バッファにあるメッセージの配列（length で件数確認可）
  *     .flush()           バッファにあるメッセージをまとめて表示し、バッファを空にする
- *     .addComboAttack(skillId?)
+ *     .addComboAttack(skillName?)
  *                        連撃を予約する（registerAfterAttack のみ有効）
- *                        skillId を指定するとそのスキルを強制使用、省略時は AI に委ねる
+ *                        スキル名を指定するとそのスキルを強制使用、省略時は AI に委ねる
  *                        コールバック内で comboCount をチェックすることで連撃回数を制限できる
  */
 
@@ -214,15 +214,20 @@
    * 連撃用の強制アクションを設定して BattleManager.forceAction を呼ぶ
    *
    * @param {Game_Enemy} subject
-   * @param {number|null} skillId 指定時はそのスキルを強制使用、null の場合は AI に委ねる
+   * @param {string|null} skillName スキル名。指定時はそのスキルを強制使用、null の場合は AI に委ねる
    */
-  Window_BattleLog.prototype.setupComboAttack = function(subject, skillId) {
+  Window_BattleLog.prototype.setupComboAttack = function(subject, skillName) {
     subject.clearActions();
 
-    if (skillId != null) {
-      const action = new Game_Action(subject, true); // forcing = true で混乱の影響を受けない
-      action.setSkill(skillId);
-      subject._actions = [action];
+    if (skillName != null) {
+      const skill = $dataSkills.find(s => s != null && s.name === skillName);
+      const skillId = skill != null ? skill.id : null;
+
+      if (skillId != null) {
+        const action = new Game_Action(subject, true); // forcing = true で混乱の影響を受けない
+        action.setSkill(skillId);
+        subject._actions = [action];
+      }
     } else {
       subject.makeActions(); // AI に行動を選択させる
     }
