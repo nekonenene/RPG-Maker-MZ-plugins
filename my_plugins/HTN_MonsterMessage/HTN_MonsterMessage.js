@@ -12,18 +12,18 @@
  * @author hatonekoe
  *
  * @help
- * モンスターごとにメッセージルールを定義するJSファイルと組み合わせて使用します。
- * 本プラグインをモンスター定義ファイルより先に登録してください。
+ * js/plugins/HTN_MonsterMessage/ ディレクトリに配置した JS ファイルを
+ * 自動で読み込みます（プラグイン管理への登録不要）。
  *
- * モンスター定義ファイルでは以下のようにルールを登録します。
+ * モンスターデータファイルでは以下のようにルールを登録します。
  *   HTN_MonsterMessage.register(エネミーID, [
  *     {
- *       skill:      スキルID,     // 省略可: 使用スキルIDが一致するとき
- *       state:      ステートID,   // 省略可: 対象のいずれかがこのステートを持つとき
- *       name:       "話者名",      // 省略可: メッセージウィンドウの名前欄
- *       face:       ["顔グラ名", インデックス], // 省略可
- *       background: 0,            // 省略可: 0=通常 1=暗く 2=透明 (省略時1)
- *       position:   2,            // 省略可: 0=上 1=中 2=下 (省略時2)
+ *       skill:      スキルID,              // 省略可: 使用スキルIDが一致するとき
+ *       state:      ステートID,            // 省略可: 対象のいずれかがこのステートを持つとき
+ *       name:       "話者名",              // 省略可: メッセージウィンドウの名前欄
+ *       face:       ["顔グラ名", index],   // 省略可
+ *       background: 0,                    // 省略可: 0=通常 1=暗く 2=透明 (省略時 1)
+ *       position:   2,                    // 省略可: 0=上 1=中 2=下 (省略時 2)
  *       message:    "セリフ本文",
  *     },
  *   ]);
@@ -38,19 +38,27 @@
   // エネミーIDをキーとするルール配列のレジストリ
   const _registry = {};
 
-  /**
-   * エネミーIDに対応するメッセージルールを登録する
-   * @param {number} enemyId
-   * @param {Array<{skill?: number, state?: number, name?: string, face?: [string, number], background?: number, position?: number, message: string}>} rules
-   */
-  window.HTN_MonsterMessage = {
+  const _api = {
+    /**
+     * エネミーIDに対応するメッセージルールを登録する
+     *
+     * @param {number} enemyId
+     * @param {Array<{skill?: number, state?: number, name?: string, face?: [string, number], background?: number, position?: number, message: string}>} rules
+     */
     register(enemyId, rules) {
       _registry[enemyId] = rules;
     }
   };
 
+  // ブラウザ文脈と Node.js require() 文脈の両方からアクセスできるよう両方に登録する
+  window.HTN_MonsterMessage = _api;
+  if (typeof global !== 'undefined') {
+    global.HTN_MonsterMessage = _api;
+  }
+
   /**
    * 条件に合うルールを解決して返す。一致なしは null を返す
+   *
    * @param {number} enemyId
    * @param {number} skillId
    * @param {number[]} targetStateIds
@@ -72,6 +80,7 @@
 
   /**
    * $gameMessage にメッセージをセットしてバトルログキューを停止する
+   *
    * @param {string} message
    * @param {string} name
    * @param {string} faceName
@@ -126,4 +135,17 @@
     _Window_BattleLog_startAction.call(this, subject, action, targets);
   };
 
+  // NW.js 環境では js/plugins/HTN_MonsterMessage/ 以下の JS ファイルを自動ロードする
+  if (typeof require !== 'undefined') {
+    const fs   = require('fs');
+    const path = require('path');
+    const dir  = path.join(process.cwd(), 'js', 'plugins', 'HTN_MonsterMessage', 'data');
+
+    if (fs.existsSync(dir)) {
+      fs.readdirSync(dir)
+        .filter(f => f.endsWith('.js'))
+        .sort()
+        .forEach(f => require(path.join(dir, f)));
+    }
+  }
 })();
