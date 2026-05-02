@@ -23,6 +23,10 @@
  *
  * --- 登録メソッド ---
  *
+ * HTN_MonsterMessage.registerEncountering(エネミーID, fn)
+ *   バトル開始時（「○○があらわれた！」の直後）のセリフを登録する
+ *   同一エネミーIDが複数体いるトループでは、1体分のみ表示される
+ *
  * HTN_MonsterMessage.registerBeforeAttack(エネミーID, fn)
  *   行動前（スキル発動前）のセリフを登録する
  *
@@ -32,6 +36,7 @@
  * --- コールバック引数 ---
  *
  *   fn({ skill, subject, targets, target, messages })
+ *   ※ registerEncountering の fn は skill を持たない
  *
  *   skill    : 使用スキル ($dataSkills の要素。skill.id や skill.name で参照)
  *   subject  : 行動エネミー (Game_Enemy)
@@ -51,10 +56,21 @@
   'use strict';
 
   // エネミーIDをキーとするコールバックのレジストリ
-  const _beforeRegistry = {};
-  const _afterRegistry  = {};
+  const _encounterRegistry = {};
+  const _beforeRegistry    = {};
+  const _afterRegistry     = {};
 
   const _api = {
+    /**
+     * 遭遇時のセリフコールバックを登録する
+     *
+     * @param {number} enemyId
+     * @param {function} fn
+     */
+    registerEncountering(enemyId, fn) {
+      _encounterRegistry[enemyId] = fn;
+    },
+
     /**
      * 行動前のセリフコールバックを登録する
      *
@@ -80,23 +96,49 @@
   window.HTN_MonsterMessage = _api;
   if (typeof global !== 'undefined') {
     global.HTN_MonsterMessage = _api;
+
+    // require() 文脈からツクールのグローバルオブジェクトにアクセスできるよう橋渡し。
+    // getter を介すことで、$gameVariables 等が初期化された後も常に最新の値を返す
+    const _bridgedGlobals = [
+      '$gameVariables', '$gameSwitches', '$gameActors',
+      '$gameParty', '$gameTroop', '$gameMap',
+      '$dataSkills', '$dataEnemies', '$dataActors', '$dataStates',
+    ];
+
+    for (const name of _bridgedGlobals) {
+      Object.defineProperty(global, name, {
+        get() { return window[name]; },
+        configurable: true,
+      });
+    }
   }
 
   /**
-   * コールバックを呼び出し、結果のメッセージをバトルログキューへ積む
+   * パーティーの並び順にソートして返す
    *
-   * @param {function} fn
-   * @param {{skill: object, subject: Game_Enemy, targets: Game_Battler[], target: Game_Battler|null}} ctx
-   * @param {Window_BattleLog} logWindow
+   * @param {Game_Battler[]} targets
+   * @returns {Game_Battler[]}
    */
-  function buildAndQueueMessages(fn, ctx, logWindow) {
+  function sortByPartyOrder(targets) {
+    const partyOrder = $gameParty.battleMembers();
+    return [...targets].sort((a, b) => partyOrder.indexOf(a) - partyOrder.indexOf(b));
+  }
+
+  /**
+   * messages ビルダーオブジェクトと内部バッファを生成して返す
+   *
+   * @param {Game_Enemy} subject
+   * @param {number} [defaultBackground=1] background のデフォルト値
+   * @returns {{ pending: object[], messages: object }}
+   */
+  function createMessagesBuilder(subject, defaultBackground = 1) {
     const pending = [];
     const messages = {
-      name:       ctx.subject.name(), // デフォルト話者名はモンスター名。空文字にすると話者名なしになる
-      face:       ['', 0],            // 顔グラ。例えば妖精は ['Nature', 5]
-      background: 1,                  // 0: 通常, 1: 暗く, 2: 透明
-      position:   2,                  // 0: 上, 1: 中, 2: 下
-      pending,                        // 内部で保持するメッセージのバッファ。flush() でまとめて表示され空に戻る
+      name:       subject.name(),    // デフォルト話者名はモンスター名。空文字にすると話者名なしになる
+      face:       ['', 0],           // 顔グラ。例えば妖精は ['Nature', 5]
+      background: defaultBackground, // 0: 通常, 1: 暗く, 2: 透明
+      position:   2,                 // 0: 上, 1: 中, 2: 下
+      pending,                       // 内部で保持するメッセージのバッファ。flush() でまとめて表示され空に戻る
       push(text) {
         pending.push({
           text,
@@ -109,7 +151,21 @@
       flush() {},
     };
 
-    fn({ ...ctx, messages });
+    return { pending, messages };
+  }
+
+  /**
+   * コールバックを呼び出し、結果のメッセージをバトルログキューへ積む
+   *
+   * @param {function} fn
+   * @param {{skill: object, subject: Game_Enemy, targets: Game_Battler[], target: Game_Battler|null}} ctx
+   * @param {Window_BattleLog} logWindow
+   */
+  function buildAndQueueMessages(fn, ctx, logWindow) {
+    const { pending, messages } = createMessagesBuilder(ctx.subject);
+    const targets = sortByPartyOrder(ctx.targets);
+
+    fn({ ...ctx, targets, target: targets[0] ?? null, messages });
 
     for (const m of pending) {
       logWindow.push('showMonsterMessage', m.text, m.name, m.face[0], m.face[1], m.background, m.position);
@@ -153,6 +209,57 @@
     }
 
     return _Window_BattleLog_updateWaitMode.call(this);
+  };
+
+  /**
+   * バトル開始時、遭遇時セリフをキューに積む（表示は updateStart で行う）
+   * 同一エネミーIDが複数体いる場合は最初の1体分のみ表示する
+   */
+  const _BattleManager_displayStartMessages = BattleManager.displayStartMessages;
+  BattleManager.displayStartMessages = function() {
+    _BattleManager_displayStartMessages.call(this);
+
+    this._HTN_MonsterMessage_EncounterQueue = [];
+
+    const seenIds = new Set();
+
+    for (const enemy of $gameTroop.members()) {
+      const enemyId = enemy.enemyId();
+      if (seenIds.has(enemyId)) continue;
+      seenIds.add(enemyId);
+
+      const fn = _encounterRegistry[enemyId];
+      if (fn != null) {
+        const targets = $gameParty.battleMembers();
+        // 遭遇時のメッセージウィンドウは通常のものを使うのが違和感ないので、第２引数は 0 を指定
+        const { pending, messages } = createMessagesBuilder(enemy, 0);
+
+        fn({ subject: enemy, targets, target: targets[0] ?? null, messages });
+
+        this._HTN_MonsterMessage_EncounterQueue.push(...pending);
+      }
+    }
+  };
+
+  /**
+   * "start" フェーズ更新時、遭遇時セリフキューが残っていれば 1 件ずつ表示してフェーズを止める
+   * キューが空になったら元の処理（フェーズ遷移）へ進む
+   */
+  const _BattleManager_updateStart = BattleManager.updateStart;
+  BattleManager.updateStart = function() {
+    const queue = this._HTN_MonsterMessage_EncounterQueue;
+
+    if (queue != null && queue.length > 0) {
+      const m = queue.shift();
+      $gameMessage.setBackground(m.background);
+      $gameMessage.setPositionType(m.position);
+      $gameMessage.setSpeakerName(m.name);
+      $gameMessage.setFaceImage(m.face[0], m.face[1]);
+      $gameMessage.add(m.text);
+      return;
+    }
+
+    _BattleManager_updateStart.call(this);
   };
 
   /**

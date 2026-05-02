@@ -1,11 +1,27 @@
 'use strict';
 
 const ENEMY_ID = 1;
-const S = HTN_MonsterMessage.STATE;
+const S  = HTN_MonsterMessage.STATE;
+const GV = HTN_MonsterMessage.GAME_VARIABLES;
 let targetBeforeAttackStateIds = [];
 
+// 遭遇時のセリフ
+HTN_MonsterMessage.registerEncountering(ENEMY_ID, ({ subject, target, messages }) => {
+  const metCount = $gameVariables.value(GV.MET_ENEMY_0001);
+
+  if (metCount === 0) {
+    messages.push('あら、はじめまして');
+  } else {
+    messages.push('またお会いできて光栄ですわ♥');
+  }
+
+  $gameVariables.setValue(GV.MET_ENEMY_0001, metCount + 1);
+
+  messages.flush();
+});
+
 // 攻撃前のセリフ
-HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, _targets, target, messages }) => {
+HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, target, messages }) => {
   const rand = Math.random();
   targetBeforeAttackStateIds = target ? target.states().map(state => state.id) : [];
 
@@ -48,7 +64,7 @@ HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, _targets, t
 });
 
 // 攻撃後のセリフ
-HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, _targets, target, messages }) => {
+HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, target, messages }) => {
   if (skill.name === '混乱の歌') {
     if (targetBeforeAttackStateIds.includes(S.CONFUSION) && !target?.isStateAffected(S.CHARM)) {
       messages.push('あら〜？\n混乱が深くなったら誘惑されちゃいました？');
