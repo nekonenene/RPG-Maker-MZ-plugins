@@ -16,13 +16,13 @@
  * 自動で読み込みます（プラグイン管理への登録不要）。
  *
  * モンスターデータファイルでは以下のようにコールバックを登録します。
- *   HTN_MonsterMessage.register(エネミーID, ({ skill, subject, targets, actor, messages }) => {
+ *   HTN_MonsterMessage.register(エネミーID, ({ skill, subject, targets, target, messages }) => {
  *     messages.name = '話者名';
  *     messages.face = ['顔グラ名', index];   // 省略可
  *     messages.background = 1;              // 省略可: 0=通常 1=暗く 2=透明 (省略時 1)
  *     messages.position   = 2;              // 省略可: 0=上 1=中 2=下 (省略時 2)
  *
- *     if (skillId === 5 && actor && actor.hp / actor.mhp < 0.5) {
+ *     if (skillId === 5 && target && target.hp / target.mhp < 0.5) {
  *       messages.push('ちょうどいい……弱っているな！');
  *     } else {
  *       messages.push('かかれ！');
@@ -34,7 +34,7 @@
  *   skill    : 使用スキル ($dataSkills の要素。skill.id や skill.name で参照)
  *   subject  : 行動エネミー (Game_Enemy)
  *   targets  : 対象バトラーの配列
- *   actor    : targets[0]（単体攻撃向けショートハンド。対象なしの場合 null）
+ *   target   : targets[0]（単体攻撃向けショートハンド。対象なしの場合 null）
  *   messages : メッセージビルダー
  *     .name       話者名（文字列）
  *     .face       顔グラ [faceName, faceIndex]（デフォルト ['', 0]）
@@ -137,7 +137,7 @@
           skill: action.item(),
           subject,
           targets,
-          actor: targets[0] ?? null,
+          target: targets[0] ?? null,
           messages,
         });
 
