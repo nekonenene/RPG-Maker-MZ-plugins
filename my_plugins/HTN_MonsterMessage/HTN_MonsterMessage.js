@@ -51,8 +51,7 @@
  *     .push(text)        メッセージをバッファに追加
  *     .pending           バッファにあるメッセージの配列（length で件数確認可）
  *     .flush()           バッファにあるメッセージをまとめて表示し、バッファを空にする
- *     .addComboAttack(skillName?)
- *                        連撃を予約する（registerAfterAttack のみ有効）
+ *   addComboAttack(skillName?) : 連撃を予約する（registerAfterAttack のみ有効）
  *                        スキル名を指定するとそのスキルを強制使用、省略時は AI に委ねる
  *                        コールバック内で comboCount をチェックすることで連撃回数を制限できる
  */
@@ -165,27 +164,25 @@
    * @param {function} fn
    * @param {{skill: object, subject: Game_Enemy, targets: Game_Battler[], target: Game_Battler|null, comboCount: number}} ctx
    * @param {Window_BattleLog} logWindow
-   * @param {boolean} [allowCombo=false] true のとき messages.addComboAttack が有効になる
+   * @param {boolean} [allowCombo=false] true のとき addComboAttack がコールバック引数に渡される
    */
   function buildAndQueueMessages(fn, ctx, logWindow, allowCombo = false) {
     const { pending, messages } = createMessagesBuilder(ctx.subject);
     const targets = sortByPartyOrder(ctx.targets);
 
     let _comboRequest = null;
-    if (allowCombo) {
-      messages.addComboAttack = function(skillId = null) {
-        _comboRequest = { skillId: skillId ?? null };
-      };
-    }
+    const addComboAttack = allowCombo
+      ? function(skillName = null) { _comboRequest = { skillName: skillName ?? null }; }
+      : undefined;
 
-    fn({ ...ctx, targets, target: targets[0] ?? null, messages });
+    fn({ ...ctx, targets, target: targets[0] ?? null, messages, addComboAttack });
 
     for (const m of pending) {
       logWindow.push('showMonsterMessage', m.text, m.name, m.face[0], m.face[1], m.background, m.position);
     }
 
     if (_comboRequest != null) {
-      logWindow.push('setupComboAttack', ctx.subject, _comboRequest.skillId);
+      logWindow.push('setupComboAttack', ctx.subject, _comboRequest.skillName);
     }
   }
 

@@ -63,7 +63,7 @@ HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, target, mes
 });
 
 // 攻撃後のセリフ
-HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, target, messages, comboCount }) => {
+HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, target, messages, comboCount, addComboAttack }) => {
   const rand = Math.random();
 
   // 眠り続けているとき、往復ビンタを低い確率で開始
@@ -72,13 +72,13 @@ HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, target, mess
       messages.push('かわいらしい寝顔ですが、\nそろそろ起こしてあげたほうがいいかしら？');
       messages.flush();
 
-      messages.addComboAttack('往復ビンタ');
+      addComboAttack('往復ビンタ');
       return;
     } else if (skill.name === '往復ビンタ' && comboCount > 0 && comboCount < 5) {
       messages.push('まだ眠ってるんですか？\nお寝坊さんですね〜\nもう１回しちゃいますよ？');
       messages.flush();
 
-      messages.addComboAttack('往復ビンタ');
+      addComboAttack('往復ビンタ');
       return;
     }
   }
