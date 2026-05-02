@@ -8,14 +8,28 @@
 
 'use strict';
 
-// ルールは先頭から評価され、最初に一致したものが使われる
-HTN_MonsterMessage.register(1, [
-  // スキルID:5 かつ 対象がステートID:4 を持つとき
-  { skill: 5, state: 4, name: 'スライム', message: '弱ったところを狙うぞ！' },
-  // スキルID:5 を使うとき
-  { skill: 5,           name: 'スライム', message: '炎を食らえ！' },
-  // 対象がステートID:4 を持つとき（スキル問わず）
-  { state: 4,           name: 'スライム', message: '弱ったな……' },
-  // それ以外すべて（デフォルト）
-  {                     name: 'スライム', message: 'いくぞ！' },
-]);
+HTN_MonsterMessage.register(1, ({ skillId, subject, _targets, actor, messages }) => {
+  messages.name = subject.name();
+
+  if (skillId === 16) {
+    messages.push('混乱しましょうね〜');
+
+    if (actor?.isStateAffected(32)) {
+      messages.push('あら、もう混乱してる？');
+    }
+  }
+
+  if (skillId === 17) {
+    messages.push('あなたは何も考えられない');
+  }
+
+  if (skillId === 18) {
+    messages.push('ゆっくりお眠りになって');
+  }
+
+  if (messages.pending.length === 0) {
+    messages.push('いきますわ！');
+  }
+
+  messages.flush();
+});
