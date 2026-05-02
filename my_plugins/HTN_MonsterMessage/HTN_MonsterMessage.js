@@ -35,21 +35,26 @@
  *
  * --- コールバック引数 ---
  *
- *   fn({ skill, subject, targets, target, messages })
- *   ※ registerEncountering の fn は skill を持たない
+ *   fn({ skill, subject, targets, target, comboCount, messages })
+ *   ※ registerEncountering の fn は skill / comboCount を持たない
  *
- *   skill    : 使用スキル ($dataSkills の要素。skill.id や skill.name で参照)
- *   subject  : 行動エネミー (Game_Enemy)
- *   targets  : 対象バトラーの配列
- *   target   : targets[0]（単体攻撃向けショートハンド。対象なしの場合 null）
- *   messages : メッセージビルダー
- *     .name         話者名（デフォルト: モンスター名）。空文字にすると話者名なしになる
- *     .face         顔グラ [faceName, faceIndex] 。デフォルトは ['', 0] （顔グラなし）。例えば妖精は ['Nature', 5]
- *     .background   背景種別（0: 通常, 1: 暗く, 2: 透明）。デフォルトは 1
- *     .position     表示位置（0: 上, 1: 中, 2: 下）。デフォルトは 2
- *     .push(text)   メッセージをバッファに追加
- *     .pending      バッファにあるメッセージの配列（length で件数確認可）
- *     .flush()      バッファにあるメッセージをまとめて表示し、バッファを空にする
+ *   skill      : 使用スキル ($dataSkills の要素。skill.id や skill.name で参照)
+ *   subject    : 行動エネミー (Game_Enemy)
+ *   targets    : 対象バトラーの配列（パーティー並び順）
+ *   target     : targets[0]（単体攻撃向けショートハンド。対象なしの場合 null）
+ *   comboCount : 連撃回数（0 = 初撃、1 = 1 回目の連撃、2 = 2 回目の連撃…）
+ *   messages   : メッセージビルダー
+ *     .name              話者名（デフォルト: モンスター名）。空文字にすると話者名なしになる
+ *     .face              顔グラ [faceName, faceIndex]。デフォルトは ['', 0]（顔グラなし）
+ *     .background        背景種別（0: 通常, 1: 暗く, 2: 透明）。デフォルトは 1
+ *     .position          表示位置（0: 上, 1: 中, 2: 下）。デフォルトは 2
+ *     .push(text)        メッセージをバッファに追加
+ *     .pending           バッファにあるメッセージの配列（length で件数確認可）
+ *     .flush()           バッファにあるメッセージをまとめて表示し、バッファを空にする
+ *     .addComboAttack(skillId?)
+ *                        連撃を予約する（registerAfterAttack のみ有効）
+ *                        skillId を指定するとそのスキルを強制使用、省略時は AI に委ねる
+ *                        コールバック内で comboCount をチェックすることで連撃回数を制限できる
  */
 
 (() => {
@@ -158,17 +163,29 @@
    * コールバックを呼び出し、結果のメッセージをバトルログキューへ積む
    *
    * @param {function} fn
-   * @param {{skill: object, subject: Game_Enemy, targets: Game_Battler[], target: Game_Battler|null}} ctx
+   * @param {{skill: object, subject: Game_Enemy, targets: Game_Battler[], target: Game_Battler|null, comboCount: number}} ctx
    * @param {Window_BattleLog} logWindow
+   * @param {boolean} [allowCombo=false] true のとき messages.addComboAttack が有効になる
    */
-  function buildAndQueueMessages(fn, ctx, logWindow) {
+  function buildAndQueueMessages(fn, ctx, logWindow, allowCombo = false) {
     const { pending, messages } = createMessagesBuilder(ctx.subject);
     const targets = sortByPartyOrder(ctx.targets);
+
+    let _comboRequest = null;
+    if (allowCombo) {
+      messages.addComboAttack = function(skillId = null) {
+        _comboRequest = { skillId: skillId ?? null };
+      };
+    }
 
     fn({ ...ctx, targets, target: targets[0] ?? null, messages });
 
     for (const m of pending) {
       logWindow.push('showMonsterMessage', m.text, m.name, m.face[0], m.face[1], m.background, m.position);
+    }
+
+    if (_comboRequest != null) {
+      logWindow.push('setupComboAttack', ctx.subject, _comboRequest.skillId);
     }
   }
 
@@ -191,6 +208,30 @@
     $gameMessage.setFaceImage(faceName, faceIndex);
     $gameMessage.add(message);
     this.setWaitMode('message');
+  };
+
+  /**
+   * 連撃用の強制アクションを設定して BattleManager.forceAction を呼ぶ
+   *
+   * @param {Game_Enemy} subject
+   * @param {number|null} skillId 指定時はそのスキルを強制使用、null の場合は AI に委ねる
+   */
+  Window_BattleLog.prototype.setupComboAttack = function(subject, skillId) {
+    subject.clearActions();
+
+    if (skillId != null) {
+      const action = new Game_Action(subject, true); // forcing = true で混乱の影響を受けない
+      action.setSkill(skillId);
+      subject._actions = [action];
+    } else {
+      subject.makeActions(); // AI に行動を選択させる
+    }
+
+    if (subject.numActions() > 0) {
+      BattleManager._HTN_MonsterMessage_ComboCount = (BattleManager._HTN_MonsterMessage_ComboCount ?? 0) + 1;
+      BattleManager._HTN_MonsterMessage_IsComboAction = true;
+      BattleManager.forceAction(subject);
+    }
   };
 
   /**
@@ -264,16 +305,23 @@
 
   /**
    * 行動開始時に行動前セリフを表示し、action と targets を保存する
+   * 連撃でない場合は comboCount をリセットする
    */
   const _Window_BattleLog_startAction = Window_BattleLog.prototype.startAction;
   Window_BattleLog.prototype.startAction = function(subject, action, targets) {
     if (subject.isEnemy()) {
+      if (BattleManager._HTN_MonsterMessage_IsComboAction !== true) {
+        BattleManager._HTN_MonsterMessage_ComboCount = 0;
+      }
+      BattleManager._HTN_MonsterMessage_IsComboAction = false;
+
       this._HTN_MonstarMessage_LastAction  = action;
       this._HTN_MonstarMessage_LastTargets = [...targets]; // BattleManager が shift() で同配列を空にするためコピーを保持
 
       const fn = _beforeRegistry[subject.enemyId()];
       if (fn != null) {
-        buildAndQueueMessages(fn, { skill: action.item(), subject, targets, target: targets[0] ?? null }, this);
+        const comboCount = BattleManager._HTN_MonsterMessage_ComboCount ?? 0;
+        buildAndQueueMessages(fn, { skill: action.item(), subject, targets, target: targets[0] ?? null, comboCount }, this, false);
       }
     }
 
@@ -291,9 +339,11 @@
       const fn = _afterRegistry[subject.enemyId()];
 
       if (fn != null) {
-        const action  = this._HTN_MonstarMessage_LastAction;
-        const targets = this._HTN_MonstarMessage_LastTargets;
-        buildAndQueueMessages(fn, { skill: action.item(), subject, targets, target: targets[0] ?? null }, this);
+        const action     = this._HTN_MonstarMessage_LastAction;
+        const targets    = this._HTN_MonstarMessage_LastTargets;
+        const comboCount = BattleManager._HTN_MonsterMessage_ComboCount ?? 0;
+
+        buildAndQueueMessages(fn, { skill: action.item(), subject, targets, target: targets[0] ?? null, comboCount }, this, true);
       }
     }
   };

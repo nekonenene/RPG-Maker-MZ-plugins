@@ -29,9 +29,9 @@ HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, target, mes
     if (rand < 0.3) {
       messages.push('頭の中をカラッポにいたしましょう？');
     } else if (rand < 0.6) {
-      messages.push('ラララ〜♪\nだんだんと考えられなくなってきましたね？');
+      messages.push('嫌なことも全部忘れる歌ですわ♥');
     } else {
-      messages.push('混乱しましょうね〜');
+      messages.push('混乱に身を委ねましょう');
     }
 
     if (target?.isStateAffected(S.CONFUSION)) {
@@ -51,12 +51,11 @@ HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, target, mes
     if (target?.isStateAffected(S.SLEEP)) {
       messages.push('ふふふ、かわいらしい寝顔ですね♥\nこのままずっと眠っていてもいいのですよ？');
     } else {
-      messages.push('だんだん眠くなってくるでしょう？');
+      messages.push('お疲れを癒して差し上げますわ♥');
     }
   }
 
-  // デフォルトメッセージ
-  if (messages.pending.length === 0) {
+  if (skill.name === '攻撃') {
     messages.push('いきますわ！');
   }
 
@@ -64,10 +63,34 @@ HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, target, mes
 });
 
 // 攻撃後のセリフ
-HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, target, messages }) => {
+HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, target, messages, comboCount }) => {
+  const rand = Math.random();
+
+  // 眠り続けているとき、往復ビンタを低い確率で開始
+  if (targetBeforeAttackStateIds.includes(S.SLEEP) && target?.isStateAffected(S.SLEEP)) {
+    if (comboCount === 0 && rand < 0.5) {
+      messages.push('かわいらしい寝顔ですが、\nそろそろ起こしてあげたほうがいいかしら？');
+      messages.flush();
+
+      messages.addComboAttack(20);
+      return;
+    } else if (skill.name === '往復ビンタ' && comboCount > 0 && comboCount < 5) {
+      messages.push('まだ眠ってるんですか？\nお寝坊さんですね〜\nもう１回しちゃいますよ？');
+      messages.flush();
+
+      messages.addComboAttack(20);
+      return;
+    }
+  }
+
+  if (skill.name === '往復ビンタ' && !target?.isStateAffected(S.SLEEP)) {
+    messages.push('おはようございます♥\n寝起きの顔もかわいらしいですね♥');
+    messages.flush();
+  }
+
   if (skill.name === '混乱の歌') {
     if (targetBeforeAttackStateIds.includes(S.CONFUSION) && !target?.isStateAffected(S.CHARM)) {
-      messages.push('あら〜？\n混乱が深くなったら目がトロンとしてきちゃいましたね〜');
+      messages.push('混乱が深くなったら目がトロンとしてきちゃいましたね〜');
       messages.flush();
 
       messages.name = '';
