@@ -193,8 +193,16 @@
     const dir  = path.join(process.cwd(), 'js', 'plugins', 'HTN_MonsterMessage', 'data');
 
     if (fs.existsSync(dir)) {
-      fs.readdirSync(dir)
-        .filter(f => f.endsWith('.js'))
+      const files = fs.readdirSync(dir).filter(f => f.endsWith('.js'));
+      const constantsFile = 'constants.js';
+
+      // 他のファイルが依存しているため constants.js は最初に読み込む
+      if (files.includes(constantsFile)) {
+        require(path.join(dir, constantsFile));
+      }
+
+      files
+        .filter(f => f !== constantsFile)
         .sort()
         .forEach(f => require(path.join(dir, f)));
     }

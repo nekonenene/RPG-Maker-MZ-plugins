@@ -1,6 +1,7 @@
 'use strict';
 
 const ENEMY_ID = 1;
+const S = HTN_MonsterMessage.STATE;
 let targetBeforeAttackStateIds = [];
 
 // 攻撃前のセリフ
@@ -17,13 +18,13 @@ HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, _targets, t
       messages.push('混乱しましょうね〜');
     }
 
-    if (target?.isStateAffected(32)) {
+    if (target?.isStateAffected(S.CONFUSION)) {
       messages.push('あら、もう混乱してる？');
     }
   }
 
   if (skill.name === '誘惑の歌') {
-    if (target?.isStateAffected(33)) {
+    if (target?.isStateAffected(S.CHARM)) {
       messages.push('もっとわたくしに夢中になって♥');
     } else {
       messages.push('あなたはわたくしの虜になるのです♥');
@@ -31,7 +32,7 @@ HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, _targets, t
   }
 
   if (skill.name === '子守唄') {
-    if (target?.isStateAffected(34)) {
+    if (target?.isStateAffected(S.SLEEP)) {
       messages.push('ふふふ、かわいらしい寝顔ですね♥\nこのままずっと眠っていてもいいのですよ？');
     } else {
       messages.push('だんだん眠くなってくるでしょう？');
@@ -49,7 +50,7 @@ HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, _targets, t
 // 攻撃後のセリフ
 HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, _targets, target, messages }) => {
   if (skill.name === '混乱の歌') {
-    if (targetBeforeAttackStateIds.includes(32) && !target?.isStateAffected(33)) {
+    if (targetBeforeAttackStateIds.includes(S.CONFUSION) && !target?.isStateAffected(S.CHARM)) {
       messages.push('あら〜？\n混乱が深くなったら誘惑されちゃいました？');
       messages.flush();
 
@@ -57,13 +58,13 @@ HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, _targets, ta
       messages.push(`${target.name()}の混乱は魅了に変化した！`);
       messages.flush();
 
-      target.addState(33);
-      target.removeState(32);
+      target.addState(S.CHARM);
+      target.removeState(S.CONFUSION);
     }
   }
 
   if (skill.name === '誘惑の歌') {
-    if (target?.isStateAffected(33)) {
+    if (target?.isStateAffected(S.CHARM)) {
       messages.push('うっとりとした素敵な表情になりましたね♥\nかわいい♥');
     }
   }
