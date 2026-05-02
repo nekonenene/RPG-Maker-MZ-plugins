@@ -67,7 +67,7 @@ HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, target, mes
 HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, target, messages }) => {
   if (skill.name === '混乱の歌') {
     if (targetBeforeAttackStateIds.includes(S.CONFUSION) && !target?.isStateAffected(S.CHARM)) {
-      messages.push('あら〜？\n混乱が深くなったら誘惑されちゃいました？');
+      messages.push('あら〜？\n混乱が深くなったら目がトロンとしてきちゃいましたね〜');
       messages.flush();
 
       messages.name = '';
