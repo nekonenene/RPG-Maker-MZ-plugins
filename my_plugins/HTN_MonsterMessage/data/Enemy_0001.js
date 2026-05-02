@@ -51,7 +51,7 @@ HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, target, mes
     if (target?.isStateAffected(S.SLEEP)) {
       messages.push('ふふふ、かわいらしい寝顔ですね♥\nこのままずっと眠っていてもいいのですよ？');
     } else {
-      messages.push('お疲れを癒して差し上げますわ♥');
+      messages.push('お疲れを癒やして差し上げますわ♥');
     }
   }
 
@@ -66,9 +66,56 @@ HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, target, mes
 HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, target, messages, comboCount, addComboAttack }) => {
   const rand = Math.random();
 
+  if (target.hp <= 0) {
+    messages.push('お疲れですか？\nでは、ゆっくりお休みください……');
+    messages.flush();
+
+    messages.name = '';
+    messages.push(`${subject.name()}はにこやかと\n${target.name()}を見つめている`);
+    messages.flush();
+    return;
+  }
+
+  if (skill.name === '混乱の歌') {
+    if (target.result().isStateAdded(S.CONFUSION)) {
+      if (targetBeforeAttackStateIds.includes(S.CONFUSION) && !target?.isStateAffected(S.CHARM)) {
+        messages.push('混乱が深くなったら目がトロンとしてきちゃいましたね〜');
+        messages.flush();
+
+        messages.name = '';
+        messages.push(`${target.name()}の混乱は魅了に変化した！`);
+        messages.flush();
+
+        target.addState(S.CHARM);
+        target.removeState(S.CONFUSION);
+      }
+    }
+  }
+
+  if (skill.name === '誘惑の歌') {
+    // スキルに成功したか
+    // MEMO: 失敗時でも target.result().isHit() は true, target.result().missed は false になることを確認済み
+    if (target.result().success) {
+      if (!targetBeforeAttackStateIds.includes(S.CHARM) && target?.isStateAffected(S.CHARM)) {
+        messages.push('うっとりとした素敵な表情になりましたね♥\nかわいい♥');
+      }
+    } else {
+      if (!target?.isStateAffected(S.CHARM)) {
+        messages.push('そんな……我慢なさらなくとも……');
+      }
+    }
+  }
+
+  if (skill.name === '往復ビンタ') {
+    if (targetBeforeAttackStateIds.includes(S.SLEEP) && !target?.isStateAffected(S.SLEEP)) {
+      messages.push('おはようございます♥\n寝起きの顔もかわいらしいですね♥');
+      messages.flush();
+    }
+  }
+
   // 眠り続けているとき、往復ビンタを低い確率で開始
   if (targetBeforeAttackStateIds.includes(S.SLEEP) && target?.isStateAffected(S.SLEEP)) {
-    if (comboCount === 0 && rand < 0.5) {
+    if (comboCount === 0 && rand < 0.4) {
       messages.push('かわいらしい寝顔ですが、\nそろそろ起こしてあげたほうがいいかしら？');
       messages.flush();
 
@@ -80,31 +127,6 @@ HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, target, mess
 
       addComboAttack('往復ビンタ');
       return;
-    }
-  }
-
-  if (skill.name === '往復ビンタ' && !target?.isStateAffected(S.SLEEP)) {
-    messages.push('おはようございます♥\n寝起きの顔もかわいらしいですね♥');
-    messages.flush();
-  }
-
-  if (skill.name === '混乱の歌') {
-    if (targetBeforeAttackStateIds.includes(S.CONFUSION) && !target?.isStateAffected(S.CHARM)) {
-      messages.push('混乱が深くなったら目がトロンとしてきちゃいましたね〜');
-      messages.flush();
-
-      messages.name = '';
-      messages.push(`${target.name()}の混乱は魅了に変化した！`);
-      messages.flush();
-
-      target.addState(S.CHARM);
-      target.removeState(S.CONFUSION);
-    }
-  }
-
-  if (skill.name === '誘惑の歌') {
-    if (target?.isStateAffected(S.CHARM)) {
-      messages.push('うっとりとした素敵な表情になりましたね♥\nかわいい♥');
     }
   }
 
