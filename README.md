@@ -77,3 +77,13 @@ TPの回復ができなくなるステート（状態異常）を作成できる
 ### 詳しい使い方はこちら：
 
 **https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_TPNoRegenState**
+
+
+## 🧟 HTN_ZombieState
+
+HP回復をHPダメージに反転させる、いわゆる「ゾンビ」のステート（状態異常）を作成できるようになるプラグインです。  
+MP回復やTP回復の反転にも対応しています。
+
+### 詳しい使い方はこちら：
+
+**https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_ZombieState**
