@@ -50,7 +50,7 @@ HTN_MonsterMessage.registerAfterAttack(エネミーID, fn)
 ### コールバック引数
 
 ```javascript
-fn({ skill, subject, targets, target, messages, overwriteNextAction, addComboAttack, comboCount })
+fn({ skill, subject, targets, target, messages, callCommonEvent, overwriteNextAction, addComboAttack, comboCount })
 ```
 
 | 引数 | 型 | 説明 |
@@ -60,6 +60,7 @@ fn({ skill, subject, targets, target, messages, overwriteNextAction, addComboAtt
 | `targets` | Game_Battler[] | 対象バトラーの配列（パーティー並び順） |
 | `target` | Game_Battler or null | `targets[0]` のショートハンド。対象なしの場合 null |
 | `messages` | object | メッセージビルダー（後述） |
+| `callCommonEvent` | function | メッセージ後にコモンイベントを呼び出す（後述） |
 | `overwriteNextAction` | function or undefined | 発動スキル上書き関数（`registerBeforeAttack` のみ有効。後述） |
 | `addComboAttack` | function or undefined | 連撃予約関数（`registerAfterAttack` のみ有効。後述） |
 | `comboCount` | number | 連撃回数（0 = 初撃、1 = 1回目の連撃…）。`registerEncountering` では渡されない |
@@ -74,6 +75,25 @@ fn({ skill, subject, targets, target, messages, overwriteNextAction, addComboAtt
 | `.position` | 表示位置（0: 上、1: 中、2: 下）。デフォルト 2 |
 | `.push(text)` | メッセージをバッファに追加。`\n` で改行 |
 | `.pending` | バッファ内のメッセージ配列（`.length` で件数確認可） |
+
+### callCommonEvent
+
+```javascript
+callCommonEvent(commonEventId)
+```
+
+指定IDのコモンイベントを呼び出します。  
+内部では `$gameTemp.reserveCommonEvent(commonEventId)` を呼んでいます。
+
+いずれの場合も、`messages` で積んだセリフが表示され尽くしてから実行されます。
+
+実装は少し複雑なことになっていて、コモンイベントの内容によってはバグります。
+
+| 呼び出し元 | コモンイベントの開始タイミング | 備考 |
+|---|---|---|
+| `registerEncountering` | セリフ完了後 | `$gameTroop._interpreter` で実行（`$gameTemp.reserveCommonEvent` 経由） |
+| `registerBeforeAttack` | セリフ完了後・アクション実行直前 | ログウィンドウ内の独立したインタープリタで実行 |
+| `registerAfterAttack` | セリフ完了後 | 同上 |
 
 ### overwriteNextAction
 
@@ -138,19 +158,19 @@ const GV = HTN_MonsterMessage.GAME_VARIABLES;
 let targetBeforeAttackStateIds = [];
 
 // 遭遇時のセリフ
-HTN_MonsterMessage.registerEncountering(ENEMY_ID, ({ subject, targets, target, messages }) => {
+HTN_MonsterMessage.registerEncountering(ENEMY_ID, ({ subject, targets, target, messages, callCommonEvent }) => {
   messages.push('遭遇時のセリフのテスト');
 });
 
 // 攻撃前のセリフ
-HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, targets, target, messages, comboCount }) => {
+HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, targets, target, messages, callCommonEvent, comboCount }) => {
   targetBeforeAttackStateIds = target ? target.states().map(state => state.id) : [];
 
   messages.push('攻撃前のセリフのテスト');
 });
 
 // 攻撃後のセリフ
-HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, targets, target, messages, comboCount, addComboAttack }) => {
+HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, targets, target, messages, callCommonEvent, comboCount, addComboAttack }) => {
   // 敵すべてに攻撃が当たった後のセリフ
   if (targets.every(t => t.result().success)) {
     messages.push('攻撃成功時のセリフ');

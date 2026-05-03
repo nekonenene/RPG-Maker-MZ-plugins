@@ -6,7 +6,7 @@ const GV = HTN_MonsterMessage.GAME_VARIABLES;
 let targetBeforeAttackStateIds = [];
 
 // 遭遇時のセリフ
-HTN_MonsterMessage.registerEncountering(ENEMY_ID, ({ subject, target, messages }) => {
+HTN_MonsterMessage.registerEncountering(ENEMY_ID, ({ subject, target, messages, callCommonEvent }) => {
   const metCount = $gameVariables.value(GV.MET_ENEMY_0001);
 
   if (metCount === 0) {
@@ -19,7 +19,7 @@ HTN_MonsterMessage.registerEncountering(ENEMY_ID, ({ subject, target, messages }
 });
 
 // 攻撃前のセリフ
-HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, target, messages, overwriteNextAction }) => {
+HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, target, messages, callCommonEvent, overwriteNextAction }) => {
   const rand = Math.random();
   targetBeforeAttackStateIds = target ? target.states().map(state => state.id) : [];
 
@@ -64,7 +64,7 @@ HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, target, mes
 });
 
 // 攻撃後のセリフ
-HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, target, messages, comboCount, addComboAttack }) => {
+HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, target, messages, callCommonEvent, comboCount, addComboAttack }) => {
   const rand = Math.random();
 
   if (target.hp <= 0) {

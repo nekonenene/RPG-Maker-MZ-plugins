@@ -35,7 +35,7 @@
  *
  * --- コールバック引数 ---
  *
- *   fn({ skill, subject, targets, target, messages, overwriteNextAction, addComboAttack, comboCount })
+ *   fn({ skill, subject, targets, target, messages, callCommonEvent, overwriteNextAction, addComboAttack, comboCount })
  *   ※ registerEncountering の fn は skill / comboCount / overwriteNextAction / addComboAttack を持たない
  *   ※ overwriteNextAction は registerBeforeAttack のみ有効
  *   ※ addComboAttack は registerAfterAttack のみ有効
@@ -51,6 +51,7 @@
  *     .position          表示位置（0: 上, 1: 中, 2: 下）。デフォルトは 2
  *     .push(text)        メッセージをバッファに追加
  *     .pending           バッファにあるメッセージの配列（length で件数確認可）
+ *   callCommonEvent(commonEventId) : メッセージ後にコモンイベントを呼び出す
  *   comboCount : 連撃回数（0 = 初撃、1 = 1 回目の連撃、2 = 2 回目の連撃…）
  *   overwriteNextAction(skillIdOrName) : 発動スキルを上書きする（registerBeforeAttack のみ有効）
  *                        number を渡すとスキルIDで、string を渡すとスキル名で検索して強制使用
@@ -209,10 +210,17 @@
       ? function(skillIdOrName = null) { _comboRequest = { skillIdOrName: skillIdOrName ?? null }; }
       : undefined;
 
-    fn({ ...ctx, targets, target: targets[0] ?? null, messages, addComboAttack });
+    const _commonEventRequests = [];
+    const callCommonEvent = (commonEventId) => { _commonEventRequests.push(commonEventId); };
+
+    fn({ ...ctx, targets, target: targets[0] ?? null, messages, addComboAttack, callCommonEvent });
 
     for (const m of pending) {
       logWindow.push('showMonsterMessage', m.text, m.name, m.face[0], m.face[1], m.background, m.position);
+    }
+
+    for (const id of _commonEventRequests) {
+      logWindow.push('runCommonEvent', id);
     }
 
     if (_comboRequest != null) {
@@ -238,7 +246,22 @@
     $gameMessage.setSpeakerName(name);
     $gameMessage.setFaceImage(faceName, faceIndex);
     $gameMessage.add(message);
-    this.setWaitMode('message');
+    this.setWaitMode('HTN_MonsterMessage_MessageWait');
+  };
+
+  /**
+   * コモンイベントを専用インタープリタで実行し、完了するまでキューを停止する
+   * BattleManager.updateEvent に依存しないため、action フェーズ中でも動作する
+   *
+   * @param {number} commonEventId
+   */
+  Window_BattleLog.prototype.runCommonEvent = function(commonEventId) {
+    const commonEvent = $dataCommonEvents[commonEventId];
+    if (commonEvent != null) {
+      this._HTN_MonsterMessage_CommonEventInterpreter = new Game_Interpreter();
+      this._HTN_MonsterMessage_CommonEventInterpreter.setup(commonEvent.list);
+      this.setWaitMode('HTN_MonsterMessage_CommonEventWait');
+    }
   };
 
   /**
@@ -258,15 +281,30 @@
   };
 
   /**
-   * "message" waitMode を追加: $gameMessage が表示中の間キューを停止する
+   * waitMode を追加
+   * "HTN_MonsterMessage_CommonEventWait": 専用インタープリタでコモンイベントを実行し、完了するまでキューを停止する
    */
   const _Window_BattleLog_updateWaitMode = Window_BattleLog.prototype.updateWaitMode;
   Window_BattleLog.prototype.updateWaitMode = function() {
-    if (this._waitMode === 'message') {
+    if (this._waitMode === 'HTN_MonsterMessage_MessageWait') {
       if ($gameMessage.isBusy()) {
         return true;
       }
 
+      this._waitMode = '';
+
+      return false;
+    }
+
+    if (this._waitMode === 'HTN_MonsterMessage_CommonEventWait') {
+      const interpreter = this._HTN_MonsterMessage_CommonEventInterpreter;
+
+      if (interpreter != null && interpreter.isRunning()) {
+        interpreter.update();
+        return true;
+      }
+
+      this._HTN_MonsterMessage_CommonEventInterpreter = null;
       this._waitMode = '';
 
       return false;
@@ -283,7 +321,8 @@
   BattleManager.displayStartMessages = function() {
     _BattleManager_displayStartMessages.call(this);
 
-    this._HTN_MonsterMessage_EncounterQueue = [];
+    this._HTN_MonsterMessage_EncounterQueue        = [];
+    this._HTN_MonsterMessage_EncounterCommonEvents = [];
 
     const seenIds = new Set();
 
@@ -297,8 +336,12 @@
         const targets = $gameParty.battleMembers();
         // 遭遇時のメッセージウィンドウは通常のものを使うのが違和感ないので、第２引数は 0 を指定
         const { pending, messages } = createMessagesBuilder(enemy, 0);
+        // ここで $gameTemp.reserveCommonEvent を呼ぶと遭遇メッセージより先にコモンイベントが実行されてしまう。
+        // なぜなら updateEventMain は isBusy() = false のとき（＝メッセージ表示中でないとき）にすぐ呼ばれるため。
+        // そのため ID をここでは保持しておき、updateStart でメッセージキューが尽きたときにコモンイベントが走るようにする。
+        const callCommonEvent = (commonEventId) => { this._HTN_MonsterMessage_EncounterCommonEvents.push(commonEventId); };
 
-        fn({ subject: enemy, targets, target: targets[0] ?? null, messages });
+        fn({ subject: enemy, targets, target: targets[0] ?? null, messages, callCommonEvent });
 
         this._HTN_MonsterMessage_EncounterQueue.push(...pending);
       }
@@ -306,13 +349,15 @@
   };
 
   /**
-   * "start" フェーズ更新時、遭遇時セリフキューが残っていれば 1 件ずつ表示してフェーズを止める
-   * キューが空になったら元の処理（フェーズ遷移）へ進む
+   * "start" フェーズ更新時、遭遇時メッセージのキューが残っていれば 1 件ずつ表示してフェーズを止める
+   *
+   * メッセージキューが空になったとき、コモンイベントがあるなら $gameTemp に予約し次フレームの updateEventMain で処理させる。
+   * どちらも空になったら元の処理（フェーズ遷移）へ進む
    */
   const _BattleManager_updateStart = BattleManager.updateStart;
   BattleManager.updateStart = function() {
+    // 遭遇時のメッセージ
     const queue = this._HTN_MonsterMessage_EncounterQueue;
-
     if (queue != null && queue.length > 0) {
       const m = queue.shift();
       $gameMessage.setBackground(m.background);
@@ -321,6 +366,16 @@
       $gameMessage.setFaceImage(m.face[0], m.face[1]);
       $gameMessage.add(m.text);
       return;
+    }
+
+    // コモンイベント
+    const encounterCommonEvents = this._HTN_MonsterMessage_EncounterCommonEvents;
+    if (encounterCommonEvents != null && encounterCommonEvents.length > 0) {
+      for (const id of encounterCommonEvents.splice(0)) {
+        $gameTemp.reserveCommonEvent(id);
+      }
+
+      return; // 次フレームで updateEventMain が予約済みイベントを拾う
     }
 
     _BattleManager_updateStart.call(this);
@@ -354,11 +409,17 @@
             _overwriteRequest = skillIdOrName;
           }
         };
+        const _commonEventRequests = [];
+        const callCommonEvent = (commonEventId) => { _commonEventRequests.push(commonEventId); };
 
-        fn({ skill: action.item(), subject, targets, target: targets[0] ?? null, messages, comboCount, overwriteNextAction });
+        fn({ skill: action.item(), subject, targets, target: targets[0] ?? null, messages, comboCount, overwriteNextAction, callCommonEvent });
 
         for (const m of pending) {
           this._logWindow.push('showMonsterMessage', m.text, m.name, m.face[0], m.face[1], m.background, m.position);
+        }
+
+        for (const id of _commonEventRequests) {
+          this._logWindow.push('runCommonEvent', id);
         }
 
         if (_overwriteRequest !== null) {
