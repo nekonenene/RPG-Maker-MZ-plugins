@@ -36,7 +36,7 @@
  * --- コールバック引数 ---
  *
  *   fn({ skill, subject, targets, target, messages, addComboAttack, comboCount })
- *   ※ registerEncountering の fn は skill / comboCount を持たない
+ *   ※ registerEncountering の fn は skill / comboCount / addComboAttack を持たない
  *
  *   skill      : 使用スキル ($dataSkills の要素。skill.id や skill.name で参照)
  *   subject    : 行動エネミー (Game_Enemy)
@@ -158,6 +158,36 @@
   }
 
   /**
+   * エネミーに強制アクションをセットする
+   * スキル指定がある場合は forcing=true で強制使用、null の場合は AI に行動を委ねる
+   *
+   * @param {Game_Enemy} subject
+   * @param {number|string|null} skillIdOrName number ならスキルID、string ならスキル名で検索
+   */
+  function setupForcedAction(subject, skillIdOrName) {
+    subject.clearActions();
+
+    if (skillIdOrName != null) {
+      let skillId = null;
+
+      if (typeof skillIdOrName === 'number') {
+        skillId = skillIdOrName;
+      } else if (typeof skillIdOrName === 'string') {
+        const skill = $dataSkills.find(s => s != null && s.name === skillIdOrName);
+        skillId = skill != null ? skill.id : null;
+      }
+
+      if (skillId != null) {
+        const action = new Game_Action(subject, true); // forcing = true で混乱の影響を受けない
+        action.setSkill(skillId);
+        subject._actions = [action];
+      }
+    } else {
+      subject.makeActions(); // AI に行動を選択させる
+    }
+  }
+
+  /**
    * コールバックを呼び出し、結果のメッセージをバトルログキューへ積む
    *
    * @param {function} fn
@@ -209,30 +239,11 @@
   /**
    * 連撃用の強制アクションを設定して BattleManager.forceAction を呼ぶ
    *
-   * @param {Game_Enemy} subject
+   * @param {Game_Enemy} subject 攻撃をおこなう対象
    * @param {number|string|null} skillIdOrName number ならスキルID、string ならスキル名で検索。null の場合は AI に委ねる
    */
   Window_BattleLog.prototype.setupComboAttack = function(subject, skillIdOrName) {
-    subject.clearActions();
-
-    if (skillIdOrName != null) {
-      let skillId = null;
-
-      if (typeof skillIdOrName === 'number') {
-        skillId = skillIdOrName;
-      } else if (typeof skillIdOrName === 'string') {
-        const skill = $dataSkills.find(s => s != null && s.name === skillIdOrName);
-        skillId = skill != null ? skill.id : null;
-      }
-
-      if (skillId != null) {
-        const action = new Game_Action(subject, true); // forcing = true で混乱の影響を受けない
-        action.setSkill(skillId);
-        subject._actions = [action];
-      }
-    } else {
-      subject.makeActions(); // AI に行動を選択させる
-    }
+    setupForcedAction(subject, skillIdOrName);
 
     if (subject.numActions() > 0) {
       BattleManager._HTN_MonsterMessage_ComboCount = (BattleManager._HTN_MonsterMessage_ComboCount ?? 0) + 1;
