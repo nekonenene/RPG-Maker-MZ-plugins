@@ -75,7 +75,7 @@ fn({ skill, subject, targets, target, messages, overwriteNextAction, addComboAtt
 | `.push(text)` | メッセージをバッファに追加。`\n` で改行 |
 | `.pending` | バッファ内のメッセージ配列（`.length` で件数確認可） |
 
-### overwriteNextAction （非推奨）
+### overwriteNextAction
 
 ```javascript
 overwriteNextAction(skillIdOrName)
@@ -84,11 +84,8 @@ overwriteNextAction(skillIdOrName)
 `registerBeforeAttack` のコールバック内でのみ有効です。  
 `number` を渡すとスキルIDで、`string` を渡すとスキル名で検索し、指定したスキルを使用するようアクションを変更します。
 
-すでに BattleManager.startAction が呼ばれているため、  
-消費MPや消費TPは元スキルの `useItem` によって減少処理がされています。  
-実際の使用スキルと消費リソースの整合性が保証されないことに注意してください。
-
-他の問題もありそうなため、積極的には使わないほうがいいです。
+ただし、このアクションは `forcing = true`（強制行動）として実行されるため、  
+MPやTPが必要量より不足していても発動し、 paySkillCost の実装を見る限りではマイナスになりえます。
 
 ### addComboAttack
 

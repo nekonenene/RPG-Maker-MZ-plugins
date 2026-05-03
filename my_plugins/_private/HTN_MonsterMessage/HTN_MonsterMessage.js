@@ -327,24 +327,25 @@
   };
 
   /**
-   * 行動開始時に行動前セリフを表示し、action と targets を保存する
+   * 行動開始時に行動前セリフを表示
+   * overwriteNextAction が指定された場合はアクションを差し替える
    * 連撃でない場合は comboCount をリセットする
    */
-  const _Window_BattleLog_startAction = Window_BattleLog.prototype.startAction;
-  Window_BattleLog.prototype.startAction = function(subject, action, targets) {
-    let effectiveAction  = action;
-    let effectiveTargets = targets;
+  const _BattleManager_startAction = BattleManager.startAction;
+  BattleManager.startAction = function() {
+    const subject = this._subject;
 
     if (subject.isEnemy()) {
-      if (BattleManager._HTN_MonsterMessage_IsComboAction !== true) {
-        BattleManager._HTN_MonsterMessage_ComboCount = 0;
+      if (this._HTN_MonsterMessage_IsComboAction !== true) {
+        this._HTN_MonsterMessage_ComboCount = 0;
       }
-      BattleManager._HTN_MonsterMessage_IsComboAction = false;
+      this._HTN_MonsterMessage_IsComboAction = false;
 
       const fn = _beforeRegistry[subject.enemyId()];
       if (fn != null) {
-        const comboCount = BattleManager._HTN_MonsterMessage_ComboCount ?? 0;
-        const sortedTargets = sortByPartyOrder(targets);
+        const action = subject.currentAction();
+        const comboCount = this._HTN_MonsterMessage_ComboCount ?? 0;
+        const targets = sortByPartyOrder(action.makeTargets());
         const { pending, messages } = createMessagesBuilder(subject);
 
         let _overwriteRequest = null;
@@ -354,32 +355,32 @@
           }
         };
 
-        fn({ skill: action.item(), subject, targets: sortedTargets, target: sortedTargets[0] ?? null, messages, comboCount, overwriteNextAction });
+        fn({ skill: action.item(), subject, targets, target: targets[0] ?? null, messages, comboCount, overwriteNextAction });
 
         for (const m of pending) {
-          this.push('showMonsterMessage', m.text, m.name, m.face[0], m.face[1], m.background, m.position);
+          this._logWindow.push('showMonsterMessage', m.text, m.name, m.face[0], m.face[1], m.background, m.position);
         }
 
         if (_overwriteRequest !== null) {
+          const originalActions = [...subject._actions];
           setupForcedAction(subject, _overwriteRequest);
 
-          const newAction = subject.currentAction();
-          if (newAction != null) {
-            effectiveAction  = newAction;
-            effectiveTargets = sortByPartyOrder(newAction.makeTargets());
-            BattleManager._action  = newAction;
-            BattleManager._targets = effectiveTargets;
+          // スキルが見つからなかった場合は元のアクションに戻す
+          if (subject.currentAction() == null) {
+            subject._actions = originalActions;
           }
         }
       }
-
-      // registerAfterAttack で使用できるよう、スキルとターゲットを保存
-      // BattleManager が shift() で targets を空にするため shallow copy をおこなう
-      this._HTN_MonstarMessage_LastAction  = effectiveAction;
-      this._HTN_MonstarMessage_LastTargets = [...effectiveTargets];
     }
 
-    _Window_BattleLog_startAction.call(this, subject, effectiveAction, effectiveTargets);
+    _BattleManager_startAction.call(this);
+
+    // registerAfterAttack で使用できるよう、スキルとターゲットを保存
+    // _targets は updateAction の shift() で空になるため shallow copy をおこなう
+    if (subject.isEnemy()) {
+      this._HTN_MonsterMessage_LastAction  = this._action;
+      this._HTN_MonsterMessage_LastTargets = [...this._targets];
+    }
   };
 
   /**
@@ -393,8 +394,8 @@
       const fn = _afterRegistry[subject.enemyId()];
 
       if (fn != null) {
-        const action     = this._HTN_MonstarMessage_LastAction;
-        const targets    = this._HTN_MonstarMessage_LastTargets;
+        const action     = BattleManager._HTN_MonsterMessage_LastAction;
+        const targets    = BattleManager._HTN_MonsterMessage_LastTargets;
         const comboCount = BattleManager._HTN_MonsterMessage_ComboCount ?? 0;
 
         buildAndQueueMessages(fn, { skill: action.item(), subject, targets, target: targets[0] ?? null, comboCount }, this, true);
