@@ -68,10 +68,10 @@ HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, target, mess
   const rand = Math.random();
 
   if (target.hp <= 0) {
-    messages.push('お疲れですか？\nでは、ゆっくりお休みください……');
+    messages.push('お疲れですか？\nでは、ゆっくりお休みください……♥');
 
     messages.name = '';
-    messages.push(`${subject.name()}はにこやかと\n${target.name()}を見つめている`);
+    messages.push(`${subject.name()}は${target.name()}に顔を近付け、\nにこやかと見つめている`);
     messages.name = subject.name();
     return;
   }
@@ -116,9 +116,13 @@ HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, target, mess
     if (comboCount === 0 && rand < 0.4) {
       messages.push('かわいらしい寝顔ですが、\nそろそろ起こしてあげたほうがいいかしら？');
       addComboAttack('往復ビンタ');
-    } else if (skill.name === '往復ビンタ' && comboCount > 0 && comboCount < 5) {
-      messages.push('まだ眠ってるんですか？\nお寝坊さんですね〜\nもう１回しちゃいますよ？');
-      addComboAttack('往復ビンタ');
+    } else if (skill.name === '往復ビンタ' && comboCount > 0) {
+      if (comboCount < 5) { // 最大5回まで
+        messages.push('まだ眠ってるんですか？\nお寝坊さんですね〜\nもう１回しちゃいますよ？');
+        addComboAttack('往復ビンタ');
+      } else {
+        messages.push('もう！\nこんなに起きないなんて、もう知りませんからね！');
+      }
     }
   }
 });
