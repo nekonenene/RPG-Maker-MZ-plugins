@@ -73,9 +73,6 @@ fn({ skill, subject, targets, target, messages, addComboAttack, comboCount })
 | `.position` | 表示位置（0: 上、1: 中、2: 下）。デフォルト 2 |
 | `.push(text)` | メッセージをバッファに追加。`\n` で改行 |
 | `.pending` | バッファ内のメッセージ配列（`.length` で件数確認可） |
-| `.flush()` | バッファのメッセージをまとめて表示し、バッファを空にする |
-
-`flush()` を呼ばなくても、関数を抜けるときにバッファ内のメッセージは表示されます。
 
 ### addComboAttack
 
@@ -131,7 +128,6 @@ let targetBeforeAttackStateIds = [];
 // 遭遇時のセリフ
 HTN_MonsterMessage.registerEncountering(ENEMY_ID, ({ subject, targets, target, messages }) => {
   messages.push('遭遇時のセリフのテスト');
-  messages.flush();
 });
 
 // 攻撃前のセリフ
@@ -139,7 +135,6 @@ HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, targets, ta
   targetBeforeAttackStateIds = target ? target.states().map(state => state.id) : [];
 
   messages.push('攻撃前のセリフのテスト');
-  messages.flush();
 });
 
 // 攻撃後のセリフ
@@ -153,7 +148,5 @@ HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, targets, tar
   if (messages.pending.length === 0) {
     messages.push('攻撃後のセリフのテスト');
   }
-
-  messages.flush();
 });
 ```

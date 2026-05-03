@@ -8,7 +8,6 @@ let targetBeforeAttackStateIds = [];
 // 遭遇時のセリフ
 HTN_MonsterMessage.registerEncountering(ENEMY_ID, ({ subject, targets, target, messages }) => {
   messages.push('遭遇時のセリフのテスト');
-  messages.flush();
 });
 
 // 攻撃前のセリフ
@@ -16,7 +15,6 @@ HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, targets, ta
   targetBeforeAttackStateIds = target ? target.states().map(state => state.id) : [];
 
   messages.push('攻撃前のセリフのテスト');
-  messages.flush();
 });
 
 // 攻撃後のセリフ
@@ -30,6 +28,4 @@ HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, targets, tar
   if (messages.pending.length === 0) {
     messages.push('攻撃後のセリフのテスト');
   }
-
-  messages.flush();
 });

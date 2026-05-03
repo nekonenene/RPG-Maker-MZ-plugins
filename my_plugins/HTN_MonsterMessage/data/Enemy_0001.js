@@ -16,8 +16,6 @@ HTN_MonsterMessage.registerEncountering(ENEMY_ID, ({ subject, target, messages }
   }
 
   $gameVariables.setValue(GV.MET_ENEMY_0001, metCount + 1);
-
-  messages.flush();
 });
 
 // 攻撃前のセリフ
@@ -58,8 +56,6 @@ HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, target, mes
   if (skill.name === '攻撃') {
     messages.push('いきますわ！');
   }
-
-  messages.flush();
 });
 
 // 攻撃後のセリフ
@@ -68,11 +64,10 @@ HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, target, mess
 
   if (target.hp <= 0) {
     messages.push('お疲れですか？\nでは、ゆっくりお休みください……');
-    messages.flush();
 
     messages.name = '';
     messages.push(`${subject.name()}はにこやかと\n${target.name()}を見つめている`);
-    messages.flush();
+    messages.name = subject.name();
     return;
   }
 
@@ -80,11 +75,10 @@ HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, target, mess
     if (target.result().isStateAdded(S.CONFUSION)) {
       if (targetBeforeAttackStateIds.includes(S.CONFUSION) && !target?.isStateAffected(S.CHARM)) {
         messages.push('混乱が深くなったら目がトロンとしてきちゃいましたね〜');
-        messages.flush();
 
         messages.name = '';
         messages.push(`${target.name()}の混乱は魅了に変化した！`);
-        messages.flush();
+        messages.name = subject.name();
 
         target.addState(S.CHARM);
         target.removeState(S.CONFUSION);
@@ -109,7 +103,6 @@ HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, target, mess
   if (skill.name === '往復ビンタ') {
     if (targetBeforeAttackStateIds.includes(S.SLEEP) && !target?.isStateAffected(S.SLEEP)) {
       messages.push('おはようございます♥\n寝起きの顔もかわいらしいですね♥');
-      messages.flush();
     }
   }
 
@@ -117,18 +110,10 @@ HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, target, mess
   if (targetBeforeAttackStateIds.includes(S.SLEEP) && target?.isStateAffected(S.SLEEP)) {
     if (comboCount === 0 && rand < 0.4) {
       messages.push('かわいらしい寝顔ですが、\nそろそろ起こしてあげたほうがいいかしら？');
-      messages.flush();
-
       addComboAttack('往復ビンタ');
-      return;
     } else if (skill.name === '往復ビンタ' && comboCount > 0 && comboCount < 5) {
       messages.push('まだ眠ってるんですか？\nお寝坊さんですね〜\nもう１回しちゃいますよ？');
-      messages.flush();
-
       addComboAttack('往復ビンタ');
-      return;
     }
   }
-
-  messages.flush();
 });

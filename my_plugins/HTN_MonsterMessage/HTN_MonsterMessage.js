@@ -49,7 +49,6 @@
  *     .position          表示位置（0: 上, 1: 中, 2: 下）。デフォルトは 2
  *     .push(text)        メッセージをバッファに追加
  *     .pending           バッファにあるメッセージの配列（length で件数確認可）
- *     .flush()           バッファにあるメッセージをまとめて表示し、バッファを空にする
  *   addComboAttack(skillName?) : 連撃を予約する（registerAfterAttack のみ有効）
  *                        スキル名を指定するとそのスキルを強制使用、省略時は AI に委ねる
  *                        コールバック内で comboCount をチェックすることで連撃回数を制限できる
@@ -142,7 +141,7 @@
       face:       ['', 0],           // 顔グラ。例えば妖精は ['Nature', 5]
       background: defaultBackground, // 0: 通常, 1: 暗く, 2: 透明
       position:   2,                 // 0: 上, 1: 中, 2: 下
-      pending,                       // 内部で保持するメッセージのバッファ。flush() でまとめて表示され空に戻る
+      pending,                       // 内部で保持するメッセージのバッファ
       push(text) {
         pending.push({
           text,
@@ -152,7 +151,6 @@
           position:   this.position,
         });
       },
-      flush() {},
     };
 
     return { pending, messages };
