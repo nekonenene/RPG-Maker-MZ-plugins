@@ -44,7 +44,7 @@ jobs:
             --jq '.body')
           notes=$(printf '%s\n\n%s' "$tag_message" "$generated")
 
-          files=$(find my_plugins -name '*.js' | sort)
+          files=$(find my_plugins -name '*.js' -not -path '*/_private/*' | sort)
 
           gh release create "$tag" \
             --title "Release $tag" \
