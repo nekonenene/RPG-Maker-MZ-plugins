@@ -347,6 +347,29 @@
   };
 
   /**
+   * コールバックを呼び出し、メッセージとコモンイベントをログウィンドウのキューへ積む
+   *
+   * @param {function} fn
+   * @param {{skill: object, subject: Game_Enemy, targets: Game_Battler[], comboCount: number}} ctx
+   * @param {Window_BattleLog} logWindow
+   * @param {object} [extraArgs={}] fn に追加で渡す引数（overwriteNextAction / addComboAttack など）
+   */
+  function invokeCallbackAndQueue(fn, ctx, logWindow, extraArgs = {}) {
+    const { pending, messages } = createMessagesBuilder(ctx.subject);
+    const _commonEventRequests = [];
+    const callCommonEvent = (commonEventId) => { _commonEventRequests.push(commonEventId); };
+
+    fn({ ...ctx, target: ctx.targets[0] ?? null, messages, callCommonEvent, ...extraArgs });
+
+    for (const m of pending) {
+      logWindow.push('showMonsterMessage', m.text, m.name, m.face[0], m.face[1], m.background, m.position);
+    }
+    for (const id of _commonEventRequests) {
+      logWindow.push('runCommonEvent', id);
+    }
+  }
+
+  /**
    * 行動開始時に行動前セリフを表示
    * overwriteNextAction が指定された場合はアクションを差し替える
    * 連撃でない場合は comboCount をリセットする
@@ -366,7 +389,6 @@
         const action = subject.currentAction();
         const comboCount = this._HTN_MonsterMessage_ComboCount ?? 0;
         const targets = sortByPartyOrder(action.makeTargets());
-        const { pending, messages } = createMessagesBuilder(subject);
 
         let _overwriteRequest = null;
         const overwriteNextAction = function(skillIdOrName) {
@@ -374,18 +396,8 @@
             _overwriteRequest = skillIdOrName;
           }
         };
-        const _commonEventRequests = [];
-        const callCommonEvent = (commonEventId) => { _commonEventRequests.push(commonEventId); };
 
-        fn({ skill: action.item(), subject, targets, target: targets[0] ?? null, messages, comboCount, overwriteNextAction, callCommonEvent });
-
-        for (const m of pending) {
-          this._logWindow.push('showMonsterMessage', m.text, m.name, m.face[0], m.face[1], m.background, m.position);
-        }
-
-        for (const id of _commonEventRequests) {
-          this._logWindow.push('runCommonEvent', id);
-        }
+        invokeCallbackAndQueue(fn, { skill: action.item(), subject, targets, comboCount }, this._logWindow, { overwriteNextAction });
 
         if (_overwriteRequest !== null) {
           const originalActions = [...subject._actions];
@@ -412,38 +424,28 @@
   /**
    * 行動終了時（モンスターが元の位置に戻ったあと）に行動後セリフを表示する
    */
-  const _Window_BattleLog_endAction = Window_BattleLog.prototype.endAction;
-  Window_BattleLog.prototype.endAction = function(subject) {
-    _Window_BattleLog_endAction.call(this, subject);
+  const _BattleManager_endAction = BattleManager.endAction;
+  BattleManager.endAction = function() {
+    const subject = this._subject;
+
+    _BattleManager_endAction.call(this);
 
     if (subject.isEnemy()) {
       const fn = _afterRegistry[subject.enemyId()];
-
       if (fn != null) {
-        const action     = BattleManager._HTN_MonsterMessage_LastAction;
-        const comboCount = BattleManager._HTN_MonsterMessage_ComboCount ?? 0;
-        const targets    = sortByPartyOrder(BattleManager._HTN_MonsterMessage_LastTargets);
-        const { pending, messages } = createMessagesBuilder(subject);
+        const action = this._HTN_MonsterMessage_LastAction;
+        const comboCount = this._HTN_MonsterMessage_ComboCount ?? 0;
+        const targets = sortByPartyOrder(this._HTN_MonsterMessage_LastTargets);
 
         let _comboRequest = null;
         const addComboAttack = function(skillIdOrName = null) {
           _comboRequest = { skillIdOrName: skillIdOrName ?? null };
         };
-        const _commonEventRequests = [];
-        const callCommonEvent = (commonEventId) => { _commonEventRequests.push(commonEventId); };
 
-        fn({ skill: action.item(), subject, targets, target: targets[0] ?? null, messages, comboCount, addComboAttack, callCommonEvent });
-
-        for (const m of pending) {
-          this.push('showMonsterMessage', m.text, m.name, m.face[0], m.face[1], m.background, m.position);
-        }
-
-        for (const id of _commonEventRequests) {
-          this.push('runCommonEvent', id);
-        }
+        invokeCallbackAndQueue(fn, { skill: action.item(), subject, targets, comboCount }, this._logWindow, { addComboAttack });
 
         if (_comboRequest != null) {
-          this.push('setupComboAttack', subject, _comboRequest.skillIdOrName);
+          this._logWindow.push('setupComboAttack', subject, _comboRequest.skillIdOrName);
         }
       }
     }
