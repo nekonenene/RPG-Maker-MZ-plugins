@@ -146,6 +146,11 @@ HTN_MonsterMessage.STATE = {
 HTN_MonsterMessage.GAME_VARIABLE = {
   MET_ENEMY_0001: 1,
 };
+
+// コモンイベントID
+HTN_MonsterMessage.COMMON_EVENT = {
+  SENTAKUSHI_TEST: 1,
+};
 ```
 
 ### Enemy_xxxx.js
@@ -159,6 +164,7 @@ HTN_MonsterMessage.GAME_VARIABLE = {
 const ENEMY_ID = 2;
 const S = HTN_MonsterMessage.STATE;
 const GV = HTN_MonsterMessage.GAME_VARIABLE;
+const CE = HTN_MonsterMessage.COMMON_EVENT;
 let targetBeforeAttackStateIds = [];
 
 // 遭遇時のセリフ

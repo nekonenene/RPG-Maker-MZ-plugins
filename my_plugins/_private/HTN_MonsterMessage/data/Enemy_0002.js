@@ -3,6 +3,7 @@
 const ENEMY_ID = 2;
 const S = HTN_MonsterMessage.STATE;
 const GV = HTN_MonsterMessage.GAME_VARIABLE;
+const CE = HTN_MonsterMessage.COMMON_EVENT;
 let targetBeforeAttackStateIds = [];
 
 // 遭遇時のセリフ
