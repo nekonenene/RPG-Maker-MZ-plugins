@@ -16,5 +16,5 @@ Mac は fswatch で変更を監視するとさらに楽。
 ```bash
 brew install fswatch
 
-fswatch -o ./my_plugins/_private/HTN_MonsterMessage | xargs -n1 -I{} rsync -a ./my_plugins/_private/HTN_MonsterMessage ~/Documents/RPGMakerMZ/SampleProject/js/plugins
+fswatch -o ./my_plugins/_private/HTN_MonsterMessage | xargs -n1 -I{} rsync -av ./my_plugins/_private/HTN_MonsterMessage ~/Documents/RPGMakerMZ/SampleProject/js/plugins
 ```
