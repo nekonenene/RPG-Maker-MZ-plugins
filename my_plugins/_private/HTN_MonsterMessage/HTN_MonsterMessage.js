@@ -463,8 +463,61 @@
     }
   };
 
-  // NW.js 環境では js/plugins/HTN_MonsterMessage/data/ 以下の JS ファイルを自動ロードする
-  if (typeof require !== 'undefined') {
+  //// ---- 以下、 NW.js（デスクトップ）とブラウザ両対応の、データ読み込み処理 ----
+
+  // データファイルの読み込み完了を示すフラグ
+  _api._finishedDataLoading = false;
+
+  // 逐次ロードキュー。data/index.js 経由で各ファイルが積まれる
+  const _dataFileQueue = [];
+
+  /**
+   * ブラウザ環境向けデータファイルローダー
+   *
+   * data/index.js 内で HTN_MonsterMessage.loadDataScript の形式で呼び出す。
+   * キューに積まれ、前ファイルの実行完了後に順次処理される
+   *
+   * @param {string} filename - 'HTN_MonsterMessage/data/constants' のような拡張子のないパス
+   */
+  _api.loadDataScript = function(filename) {
+    _dataFileQueue.push(filename);
+  };
+
+  /**
+   * キューの先頭ファイルを XHR で取得し new Function() で実行する。
+   * 完了後に次のキューを処理し、すべて終わったら _finishedDataLoading を立てる
+   */
+  function _processNextDataFile() {
+    if (_dataFileQueue.length === 0) {
+      _api._finishedDataLoading = true;
+      return;
+    }
+
+    const filename = _dataFileQueue.shift();
+    const url = 'js/plugins/' + filename + '.js';
+    const xhr = new XMLHttpRequest();
+
+    xhr.open('GET', url);
+
+    xhr.onload = function() {
+      if (xhr.status === 200 || xhr.status === 0) {
+        // new Function でラップし独立スコープで実行することで
+        // ファイル間の const/let 変数名の衝突を防ぐ
+        (new Function(xhr.responseText))();
+      }
+      _processNextDataFile();
+    };
+
+    xhr.onerror = function() {
+      _processNextDataFile();
+    };
+
+    xhr.send();
+  }
+
+  // js/plugins/HTN_MonsterMessage/data/ 以下の JS ファイルを読み込む
+  if (Utils.isNwjs()) {
+    // NW.js（デスクトップ）版: require を使い、fs でスキャンして同期
     const fs   = require('fs');
     const path = require('path');
     const dir  = path.join(process.cwd(), 'js', 'plugins', 'HTN_MonsterMessage', 'data');
@@ -483,5 +536,18 @@
         .sort()
         .forEach(f => require(path.join(dir, f)));
     }
+
+    _api._finishedDataLoading = true; // いちおう true にしておく
+  } else {
+    // ブラウザ版: data/index.js に書かれたファイルを XHR + new Function() で逐次ロードしていく
+
+    // 全データファイルが読み込まれるまで DataManager.isDatabaseLoaded を false にする
+    const _DataManager_isDatabaseLoaded = DataManager.isDatabaseLoaded;
+    DataManager.isDatabaseLoaded = function() {
+      return _DataManager_isDatabaseLoaded.call(this) && _api._finishedDataLoading;
+    };
+
+    _api.loadDataScript('HTN_MonsterMessage/data/index');
+    _processNextDataFile();
   }
 })();

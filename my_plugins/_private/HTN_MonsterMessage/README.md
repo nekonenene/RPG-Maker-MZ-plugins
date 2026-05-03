@@ -19,6 +19,7 @@ js/plugins/
 └── HTN_MonsterMessage/
     ├── HTN_MonsterMessage.js   ← プラグイン管理に登録するのはこれだけ
     └── data/
+        ├── index.js            ← ブラウザ版でのみ使用される、dataファイル一覧を記載したもの
         ├── constants.js        ← ステートID・変数IDなどの定数（最初に読み込まれる）
         ├── Enemy_0001.js       ← 敵キャラID 1 のセリフ定義
         └── Enemy_0002.js       ← 敵キャラID 2 のセリフ定義（以降同様）
@@ -26,6 +27,21 @@ js/plugins/
 
 `data/` 以下の JS ファイルは自動で読み込まれます。  
 `constants.js` は他ファイルより先に読み込まれることが保証されています。
+
+**ブラウザ版（Web デプロイ）を使う場合の注意：**  
+デスクトップ版（NW.js）では `data/` フォルダをスキャンして全ファイルを自動読み込みしますが、  
+ブラウザ版ではファイルシステムへのアクセスができないため  
+`data/index.js` に各ファイルのパスを書く必要があります。
+
+ファイルを追加・削除したときは `index.js` も合わせて更新してください。  
+ブラウザ版向けのデプロイをしない場合は `index.js` について気にしなくて大丈夫です。
+
+```javascript
+// data/index.js の例
+HTN_MonsterMessage.loadDataScript('HTN_MonsterMessage/data/constants');
+HTN_MonsterMessage.loadDataScript('HTN_MonsterMessage/data/Enemy_0001');
+HTN_MonsterMessage.loadDataScript('HTN_MonsterMessage/data/Enemy_0002');
+```
 
 ## API
 
