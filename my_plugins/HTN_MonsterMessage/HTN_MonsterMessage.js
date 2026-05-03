@@ -49,10 +49,11 @@
  *     .position          表示位置（0: 上, 1: 中, 2: 下）。デフォルトは 2
  *     .push(text)        メッセージをバッファに追加
  *     .pending           バッファにあるメッセージの配列（length で件数確認可）
- *   addComboAttack(skillName?) : 連撃を予約する（registerAfterAttack のみ有効）
- *                        スキル名を指定するとそのスキルを強制使用、省略時は AI に委ねる
- *                        コールバック内で comboCount をチェックすることで連撃回数を制限できる
  *   comboCount : 連撃回数（0 = 初撃、1 = 1 回目の連撃、2 = 2 回目の連撃…）
+ *   addComboAttack(skillIdOrName?) : 連撃を予約する（registerAfterAttack のみ有効）
+ *                        number を渡すとスキルIDで、string を渡すとスキル名で検索して強制使用
+ *                        省略または null のとき AI に行動を委ねる
+ *                        コールバック内で comboCount をチェックすることで連撃回数を制限できる
  */
 
 (() => {
@@ -170,7 +171,7 @@
 
     let _comboRequest = null;
     const addComboAttack = allowCombo
-      ? function(skillName = null) { _comboRequest = { skillName: skillName ?? null }; }
+      ? function(skillIdOrName = null) { _comboRequest = { skillIdOrName: skillIdOrName ?? null }; }
       : undefined;
 
     fn({ ...ctx, targets, target: targets[0] ?? null, messages, addComboAttack });
@@ -180,7 +181,7 @@
     }
 
     if (_comboRequest != null) {
-      logWindow.push('setupComboAttack', ctx.subject, _comboRequest.skillName);
+      logWindow.push('setupComboAttack', ctx.subject, _comboRequest.skillIdOrName);
     }
   }
 
@@ -209,14 +210,20 @@
    * 連撃用の強制アクションを設定して BattleManager.forceAction を呼ぶ
    *
    * @param {Game_Enemy} subject
-   * @param {string|null} skillName スキル名。指定時はそのスキルを強制使用、null の場合は AI に委ねる
+   * @param {number|string|null} skillIdOrName number ならスキルID、string ならスキル名で検索。null の場合は AI に委ねる
    */
-  Window_BattleLog.prototype.setupComboAttack = function(subject, skillName) {
+  Window_BattleLog.prototype.setupComboAttack = function(subject, skillIdOrName) {
     subject.clearActions();
 
-    if (skillName != null) {
-      const skill = $dataSkills.find(s => s != null && s.name === skillName);
-      const skillId = skill != null ? skill.id : null;
+    if (skillIdOrName != null) {
+      let skillId = null;
+
+      if (typeof skillIdOrName === 'number') {
+        skillId = skillIdOrName;
+      } else if (typeof skillIdOrName === 'string') {
+        const skill = $dataSkills.find(s => s != null && s.name === skillIdOrName);
+        skillId = skill != null ? skill.id : null;
+      }
 
       if (skillId != null) {
         const action = new Game_Action(subject, true); // forcing = true で混乱の影響を受けない

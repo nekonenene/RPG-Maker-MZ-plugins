@@ -77,15 +77,14 @@ fn({ skill, subject, targets, target, messages, addComboAttack, comboCount })
 ### addComboAttack
 
 ```javascript
-addComboAttack(skillName?)
+addComboAttack(skillIdOrName?)
 ```
 
 `registerAfterAttack` のコールバック内でのみ有効です。  
 呼ぶと、現在の行動が終わった後にもう一度モンスターが行動します。
 
-- `skillName` を指定すると、混乱などのステートを加味せずにそのスキルを強制使用する
-- 省略すると AI に行動を委ねる
-- スキル名での指定なので、スキルDBに同名のスキルが複数ある場合、最初に見つかったものが使用されるので注意
+- `number` を渡すとスキルIDで、`string` を渡すとスキル名で検索して強制使用する（混乱などのステートを加味しない）
+- 省略または `null` を渡した場合や、スキル名が見つからない場合は自動で行動が決まる
 
 `comboCount` をチェックすることで連撃回数を制限できます。
 
