@@ -1,10 +1,11 @@
 'use strict';
 
 const ENEMY_ID = 1;
-const S  = HTN_MonsterMessage.STATE;
+const S = HTN_MonsterMessage.STATE;
 const GV = HTN_MonsterMessage.GAME_VARIABLE;
 const CE = HTN_MonsterMessage.COMMON_EVENT;
-let targetBeforeAttackStateIds = [];
+
+let targetBeforeAttackStateIds = []; // 攻撃前の時点で対象に付与されていたステートID一覧
 
 // 遭遇時のセリフ
 HTN_MonsterMessage.registerEncountering(ENEMY_ID, ({ subject, target, messages, callCommonEvent }) => {

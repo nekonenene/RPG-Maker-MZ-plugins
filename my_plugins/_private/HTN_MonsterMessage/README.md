@@ -20,8 +20,8 @@ js/plugins/
     ├── HTN_MonsterMessage.js   ← プラグイン管理に登録するのはこれだけ
     └── data/
         ├── constants.js        ← ステートID・変数IDなどの定数（最初に読み込まれる）
-        ├── Enemy_0001.js       ← エネミーID 1 のセリフ定義
-        └── Enemy_0002.js       ← エネミーID 2 のセリフ定義（以降同様）
+        ├── Enemy_0001.js       ← 敵キャラID 1 のセリフ定義
+        └── Enemy_0002.js       ← 敵キャラID 2 のセリフ定義（以降同様）
 ```
 
 `data/` 以下の JS ファイルは自動で読み込まれます。  
@@ -32,18 +32,18 @@ js/plugins/
 ### 登録メソッド
 
 ```javascript
-HTN_MonsterMessage.registerEncountering(エネミーID, fn)
+HTN_MonsterMessage.registerEncountering(敵キャラID, fn)
 ```
 バトル開始時のセリフを登録します。  
-同一エネミーIDが複数体いるトループでは、1体分のみ表示されます。
+同じIDの敵キャラが複数いる場合、1体分のみ表示されます。
 
 ```javascript
-HTN_MonsterMessage.registerBeforeAttack(エネミーID, fn)
+HTN_MonsterMessage.registerBeforeAttack(敵キャラID, fn)
 ```
 行動前のセリフを登録します。
 
 ```javascript
-HTN_MonsterMessage.registerAfterAttack(エネミーID, fn)
+HTN_MonsterMessage.registerAfterAttack(敵キャラID, fn)
 ```
 行動後のセリフを登録します。
 
@@ -56,7 +56,7 @@ fn({ skill, subject, targets, target, messages, callCommonEvent, overwriteNextAc
 | 引数 | 型 | 説明 |
 |---|---|---|
 | `skill` | object | 使用スキル（`$dataSkills` の要素）。`skill.id` や `skill.name` で参照。`registerEncountering` では渡されない |
-| `subject` | Game_Enemy | 行動エネミー |
+| `subject` | Game_Enemy | 行動中の敵キャラ |
 | `targets` | Game_Battler[] | 対象バトラーの配列（パーティー並び順） |
 | `target` | Game_Battler or null | `targets[0]` のショートハンド。対象なしの場合 null |
 | `messages` | object | メッセージビルダー（後述） |
@@ -155,8 +155,10 @@ HTN_MonsterMessage.COMMON_EVENT = {
 
 ### Enemy_xxxx.js
 
-エネミーごとにファイルを分けます。各ファイルはモジュールスコープで独立しているため、  
+敵キャラごとにファイルを分けます。各ファイルはモジュールスコープで独立しているため、  
 異なるファイルで同じ変数名を使っても衝突しません。
+
+ファイル名はなんでも大丈夫ですので、管理上わかりやすければモンスター名の英名をファイル名にするのもいいと思います。
 
 ```javascript
 'use strict';
@@ -165,7 +167,8 @@ const ENEMY_ID = 2;
 const S = HTN_MonsterMessage.STATE;
 const GV = HTN_MonsterMessage.GAME_VARIABLE;
 const CE = HTN_MonsterMessage.COMMON_EVENT;
-let targetBeforeAttackStateIds = [];
+
+let targetBeforeAttackStateIds = []; // 攻撃前の時点で対象に付与されていたステートID一覧
 
 // 遭遇時のセリフ
 HTN_MonsterMessage.registerEncountering(ENEMY_ID, ({ subject, targets, target, messages, callCommonEvent }) => {

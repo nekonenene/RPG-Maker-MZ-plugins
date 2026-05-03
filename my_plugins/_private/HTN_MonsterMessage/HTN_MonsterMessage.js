@@ -23,14 +23,14 @@
  *
  * --- 登録メソッド ---
  *
- * HTN_MonsterMessage.registerEncountering(エネミーID, fn)
+ * HTN_MonsterMessage.registerEncountering(敵キャラID, fn)
  *   バトル開始時（「○○があらわれた！」の直後）のセリフを登録する
- *   同一エネミーIDが複数体いるトループでは、1体分のみ表示される
+ *   同じIDの敵キャラが複数いる場合、1体分のみ表示される
  *
- * HTN_MonsterMessage.registerBeforeAttack(エネミーID, fn)
+ * HTN_MonsterMessage.registerBeforeAttack(敵キャラID, fn)
  *   行動前（スキル発動前）のセリフを登録する
  *
- * HTN_MonsterMessage.registerAfterAttack(エネミーID, fn)
+ * HTN_MonsterMessage.registerAfterAttack(敵キャラID, fn)
  *   行動後（モンスターが元の位置に戻ったあと）のセリフを登録する
  *
  * --- コールバック引数 ---
@@ -41,7 +41,7 @@
  *   ※ addComboAttack は registerAfterAttack のみ有効
  *
  *   skill      : 使用スキル ($dataSkills の要素。skill.id や skill.name で参照)
- *   subject    : 行動エネミー (Game_Enemy)
+ *   subject    : 行動中の敵キャラ (Game_Enemy)
  *   targets    : 対象バトラーの配列（パーティー並び順）
  *   target     : targets[0]（単体攻撃向けショートハンド。対象なしの場合 null）
  *   messages   : メッセージビルダー
@@ -65,7 +65,7 @@
 (() => {
   'use strict';
 
-  // エネミーIDをキーとするコールバックのレジストリ
+  // 敵キャラIDをキーとするコールバックのレジストリ
   const _encounterRegistry = {};
   const _beforeRegistry    = {};
   const _afterRegistry     = {};
