@@ -194,41 +194,6 @@
   }
 
   /**
-   * コールバックを呼び出し、結果のメッセージをバトルログキューへ積む
-   *
-   * @param {function} fn
-   * @param {{skill: object, subject: Game_Enemy, targets: Game_Battler[], target: Game_Battler|null, comboCount: number}} ctx
-   * @param {Window_BattleLog} logWindow
-   * @param {boolean} [allowCombo=false] true のとき addComboAttack がコールバック引数に渡される
-   */
-  function buildAndQueueMessages(fn, ctx, logWindow, allowCombo = false) {
-    const { pending, messages } = createMessagesBuilder(ctx.subject);
-    const targets = sortByPartyOrder(ctx.targets);
-
-    let _comboRequest = null;
-    const addComboAttack = allowCombo
-      ? function(skillIdOrName = null) { _comboRequest = { skillIdOrName: skillIdOrName ?? null }; }
-      : undefined;
-
-    const _commonEventRequests = [];
-    const callCommonEvent = (commonEventId) => { _commonEventRequests.push(commonEventId); };
-
-    fn({ ...ctx, targets, target: targets[0] ?? null, messages, addComboAttack, callCommonEvent });
-
-    for (const m of pending) {
-      logWindow.push('showMonsterMessage', m.text, m.name, m.face[0], m.face[1], m.background, m.position);
-    }
-
-    for (const id of _commonEventRequests) {
-      logWindow.push('runCommonEvent', id);
-    }
-
-    if (_comboRequest != null) {
-      logWindow.push('setupComboAttack', ctx.subject, _comboRequest.skillIdOrName);
-    }
-  }
-
-  /**
    * $gameMessage にメッセージをセットしてバトルログキューを停止する
    *
    * @param {string} message
@@ -456,10 +421,30 @@
 
       if (fn != null) {
         const action     = BattleManager._HTN_MonsterMessage_LastAction;
-        const targets    = BattleManager._HTN_MonsterMessage_LastTargets;
         const comboCount = BattleManager._HTN_MonsterMessage_ComboCount ?? 0;
+        const targets    = sortByPartyOrder(BattleManager._HTN_MonsterMessage_LastTargets);
+        const { pending, messages } = createMessagesBuilder(subject);
 
-        buildAndQueueMessages(fn, { skill: action.item(), subject, targets, target: targets[0] ?? null, comboCount }, this, true);
+        let _comboRequest = null;
+        const addComboAttack = function(skillIdOrName = null) {
+          _comboRequest = { skillIdOrName: skillIdOrName ?? null };
+        };
+        const _commonEventRequests = [];
+        const callCommonEvent = (commonEventId) => { _commonEventRequests.push(commonEventId); };
+
+        fn({ skill: action.item(), subject, targets, target: targets[0] ?? null, messages, comboCount, addComboAttack, callCommonEvent });
+
+        for (const m of pending) {
+          this.push('showMonsterMessage', m.text, m.name, m.face[0], m.face[1], m.background, m.position);
+        }
+
+        for (const id of _commonEventRequests) {
+          this.push('runCommonEvent', id);
+        }
+
+        if (_comboRequest != null) {
+          this.push('setupComboAttack', subject, _comboRequest.skillIdOrName);
+        }
       }
     }
   };
