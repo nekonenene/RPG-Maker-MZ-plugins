@@ -35,14 +35,13 @@
  *
  * --- コールバック引数 ---
  *
- *   fn({ skill, subject, targets, target, comboCount, messages })
+ *   fn({ skill, subject, targets, target, messages, addComboAttack, comboCount })
  *   ※ registerEncountering の fn は skill / comboCount を持たない
  *
  *   skill      : 使用スキル ($dataSkills の要素。skill.id や skill.name で参照)
  *   subject    : 行動エネミー (Game_Enemy)
  *   targets    : 対象バトラーの配列（パーティー並び順）
  *   target     : targets[0]（単体攻撃向けショートハンド。対象なしの場合 null）
- *   comboCount : 連撃回数（0 = 初撃、1 = 1 回目の連撃、2 = 2 回目の連撃…）
  *   messages   : メッセージビルダー
  *     .name              話者名（デフォルト: モンスター名）。空文字にすると話者名なしになる
  *     .face              顔グラ [faceName, faceIndex]。デフォルトは ['', 0]（顔グラなし）
@@ -54,6 +53,7 @@
  *   addComboAttack(skillName?) : 連撃を予約する（registerAfterAttack のみ有効）
  *                        スキル名を指定するとそのスキルを強制使用、省略時は AI に委ねる
  *                        コールバック内で comboCount をチェックすることで連撃回数を制限できる
+ *   comboCount : 連撃回数（0 = 初撃、1 = 1 回目の連撃、2 = 2 回目の連撃…）
  */
 
 (() => {
