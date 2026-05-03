@@ -143,7 +143,7 @@ HTN_MonsterMessage.STATE = {
 
 // 変数ID（$gameVariables.value() で使う変数のID）
 // ツクールのデータベースで定義した変数の数の範囲内でないと setValue が無視されるので注意
-HTN_MonsterMessage.GAME_VARIABLES = {
+HTN_MonsterMessage.GAME_VARIABLE = {
   MET_ENEMY_0001: 1,
 };
 ```
@@ -158,7 +158,7 @@ HTN_MonsterMessage.GAME_VARIABLES = {
 
 const ENEMY_ID = 2;
 const S = HTN_MonsterMessage.STATE;
-const GV = HTN_MonsterMessage.GAME_VARIABLES;
+const GV = HTN_MonsterMessage.GAME_VARIABLE;
 let targetBeforeAttackStateIds = [];
 
 // 遭遇時のセリフ
