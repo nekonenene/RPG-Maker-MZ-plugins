@@ -89,6 +89,10 @@ callCommonEvent(commonEventId)
 
 実装は少し複雑なことになっていて、コモンイベントの内容によってはバグります。
 
+registerBeforeAttack もしくは registerAfterAttack 内で callCommonEvent を呼び出したとき、  
+コモンイベントの「戦闘行動の強制」があると進行不能になるバグがあったため、  
+「戦闘行動の強制」だけ実行し、コモンイベントはそこで終了するような挙動にしています。
+
 | 呼び出し元 | コモンイベントの開始タイミング | 備考 |
 |---|---|---|
 | `registerEncountering` | セリフ完了後 | `$gameTroop._interpreter` で実行（`$gameTemp.reserveCommonEvent` 経由） |

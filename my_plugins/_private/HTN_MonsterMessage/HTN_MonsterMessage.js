@@ -246,8 +246,10 @@
   };
 
   /**
-   * waitMode を追加
-   * "HTN_MonsterMessage_CommonEventWait": 専用インタープリタでコモンイベントを実行し、完了するまでキューを停止する
+   * waitMode を追加し、メッセージ処理やコモンイベント処理が完了するまで BattleManager の進行を止める
+   *
+   * 戦闘中の registerBeforeAttack, registerAfterAttack で使われる処理で、
+   * モンスター遭遇時の registerEncountering で使われる処理待ちは displayStartMessages と updateStart でおこなわれている
    */
   const _Window_BattleLog_updateWaitMode = Window_BattleLog.prototype.updateWaitMode;
   Window_BattleLog.prototype.updateWaitMode = function() {
@@ -266,6 +268,16 @@
 
       if (interpreter != null && interpreter.isRunning()) {
         interpreter.update();
+
+        // コモンイベントの「戦闘行動の強制」 (command339) が実行されると waitMode: "action" waitMode で止まり、
+        // BattleManager.updateEvent() が呼ばれないためデッドロックになり進行しなくなる。
+        // isActionForced() が true ならば即座に解放してデッドロックを回避する。
+        if (BattleManager.isActionForced()) {
+          this._HTN_MonsterMessage_CommonEventInterpreter = null;
+          this._waitMode = '';
+          return false;
+        }
+
         return true;
       }
 
