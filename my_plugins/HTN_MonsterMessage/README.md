@@ -50,7 +50,7 @@ HTN_MonsterMessage.registerAfterAttack(エネミーID, fn)
 ### コールバック引数
 
 ```javascript
-fn({ skill, subject, targets, target, messages, addComboAttack, comboCount })
+fn({ skill, subject, targets, target, messages, overwriteNextAction, addComboAttack, comboCount })
 ```
 
 | 引数 | 型 | 説明 |
@@ -60,6 +60,7 @@ fn({ skill, subject, targets, target, messages, addComboAttack, comboCount })
 | `targets` | Game_Battler[] | 対象バトラーの配列（パーティー並び順） |
 | `target` | Game_Battler or null | `targets[0]` のショートハンド。対象なしの場合 null |
 | `messages` | object | メッセージビルダー（後述） |
+| `overwriteNextAction` | function or undefined | 発動スキル上書き関数（`registerBeforeAttack` のみ有効。後述） |
 | `addComboAttack` | function or undefined | 連撃予約関数（`registerAfterAttack` のみ有効。後述） |
 | `comboCount` | number | 連撃回数（0 = 初撃、1 = 1回目の連撃…）。`registerEncountering` では渡されない |
 
@@ -73,6 +74,21 @@ fn({ skill, subject, targets, target, messages, addComboAttack, comboCount })
 | `.position` | 表示位置（0: 上、1: 中、2: 下）。デフォルト 2 |
 | `.push(text)` | メッセージをバッファに追加。`\n` で改行 |
 | `.pending` | バッファ内のメッセージ配列（`.length` で件数確認可） |
+
+### overwriteNextAction （非推奨）
+
+```javascript
+overwriteNextAction(skillIdOrName)
+```
+
+`registerBeforeAttack` のコールバック内でのみ有効です。  
+`number` を渡すとスキルIDで、`string` を渡すとスキル名で検索し、指定したスキルを使用するようアクションを変更します。
+
+すでに BattleManager.startAction が呼ばれているため、  
+消費MPや消費TPは元スキルの `useItem` によって減少処理がされています。  
+実際の使用スキルと消費リソースの整合性が保証されないことに注意してください。
+
+他の問題もありそうなため、積極的には使わないほうがいいです。
 
 ### addComboAttack
 

@@ -35,8 +35,10 @@
  *
  * --- コールバック引数 ---
  *
- *   fn({ skill, subject, targets, target, messages, addComboAttack, comboCount })
- *   ※ registerEncountering の fn は skill / comboCount / addComboAttack を持たない
+ *   fn({ skill, subject, targets, target, messages, overwriteNextAction, addComboAttack, comboCount })
+ *   ※ registerEncountering の fn は skill / comboCount / overwriteNextAction / addComboAttack を持たない
+ *   ※ overwriteNextAction は registerBeforeAttack のみ有効
+ *   ※ addComboAttack は registerAfterAttack のみ有効
  *
  *   skill      : 使用スキル ($dataSkills の要素。skill.id や skill.name で参照)
  *   subject    : 行動エネミー (Game_Enemy)
@@ -50,6 +52,9 @@
  *     .push(text)        メッセージをバッファに追加
  *     .pending           バッファにあるメッセージの配列（length で件数確認可）
  *   comboCount : 連撃回数（0 = 初撃、1 = 1 回目の連撃、2 = 2 回目の連撃…）
+ *   overwriteNextAction(skillIdOrName) : 発動スキルを上書きする（registerBeforeAttack のみ有効）
+ *                        number を渡すとスキルIDで、string を渡すとスキル名で検索して強制使用
+ *                        null または引数なしの場合は上書き処理をしない
  *   addComboAttack(skillIdOrName?) : 連撃を予約する（registerAfterAttack のみ有効）
  *                        number を渡すとスキルIDで、string を渡すとスキル名で検索して強制使用
  *                        省略または null のとき AI に行動を委ねる
@@ -327,23 +332,54 @@
    */
   const _Window_BattleLog_startAction = Window_BattleLog.prototype.startAction;
   Window_BattleLog.prototype.startAction = function(subject, action, targets) {
+    let effectiveAction  = action;
+    let effectiveTargets = targets;
+
     if (subject.isEnemy()) {
       if (BattleManager._HTN_MonsterMessage_IsComboAction !== true) {
         BattleManager._HTN_MonsterMessage_ComboCount = 0;
       }
       BattleManager._HTN_MonsterMessage_IsComboAction = false;
 
-      this._HTN_MonstarMessage_LastAction  = action;
-      this._HTN_MonstarMessage_LastTargets = [...targets]; // BattleManager が shift() で同配列を空にするためコピーを保持
-
       const fn = _beforeRegistry[subject.enemyId()];
       if (fn != null) {
         const comboCount = BattleManager._HTN_MonsterMessage_ComboCount ?? 0;
-        buildAndQueueMessages(fn, { skill: action.item(), subject, targets, target: targets[0] ?? null, comboCount }, this, false);
+        const sortedTargets = sortByPartyOrder(targets);
+        const { pending, messages } = createMessagesBuilder(subject);
+
+        let _overwriteRequest = null;
+        const overwriteNextAction = function(skillIdOrName) {
+          if (skillIdOrName != null) {
+            _overwriteRequest = skillIdOrName;
+          }
+        };
+
+        fn({ skill: action.item(), subject, targets: sortedTargets, target: sortedTargets[0] ?? null, messages, comboCount, overwriteNextAction });
+
+        for (const m of pending) {
+          this.push('showMonsterMessage', m.text, m.name, m.face[0], m.face[1], m.background, m.position);
+        }
+
+        if (_overwriteRequest !== null) {
+          setupForcedAction(subject, _overwriteRequest);
+
+          const newAction = subject.currentAction();
+          if (newAction != null) {
+            effectiveAction  = newAction;
+            effectiveTargets = sortByPartyOrder(newAction.makeTargets());
+            BattleManager._action  = newAction;
+            BattleManager._targets = effectiveTargets;
+          }
+        }
       }
+
+      // registerAfterAttack で使用できるよう、スキルとターゲットを保存
+      // BattleManager が shift() で targets を空にするため shallow copy をおこなう
+      this._HTN_MonstarMessage_LastAction  = effectiveAction;
+      this._HTN_MonstarMessage_LastTargets = [...effectiveTargets];
     }
 
-    _Window_BattleLog_startAction.call(this, subject, action, targets);
+    _Window_BattleLog_startAction.call(this, subject, effectiveAction, effectiveTargets);
   };
 
   /**

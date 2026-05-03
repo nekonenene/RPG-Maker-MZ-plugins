@@ -19,7 +19,7 @@ HTN_MonsterMessage.registerEncountering(ENEMY_ID, ({ subject, target, messages }
 });
 
 // 攻撃前のセリフ
-HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, target, messages }) => {
+HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, target, messages, overwriteNextAction }) => {
   const rand = Math.random();
   targetBeforeAttackStateIds = target ? target.states().map(state => state.id) : [];
 
@@ -54,7 +54,12 @@ HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, target, mes
   }
 
   if (skill.name === '攻撃') {
-    messages.push('いきますわ！');
+    if (target?.isStateAffected(S.SLEEP) && rand < 0.1) {
+      messages.push('眠っているところに攻撃してはかわいそうね。\n歌って差し上げますわ♥');
+      overwriteNextAction('誘惑の歌');
+    } else {
+      messages.push('いきますわ！');
+    }
   }
 });
 
