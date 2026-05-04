@@ -1,7 +1,29 @@
 # RPGツクールMZ プラグイン開発における注意点・前提知識
 
 プラグイン開発の中で実際に踏んだ落とし穴や、知っておくと実装効率が上がる知識をまとめたドキュメント。
-`mz_scripts/` を grep する前に、まずここを確認すること。
+
+## インデックス
+
+実装を始める前にこの一覧を確認し、作業内容と関連する項目があれば該当セクションを読むこと。
+
+| セクション | 関連キーワード |
+|---|---|
+| [独自プロパティの初期化は `initMembers` ではなく `onBattleStart` で](#独自プロパティの初期化は-initMembers-ではなく-onBattleStart-で) | バトラー, カスタムプロパティ, セーブデータ読み込み |
+| [`removeState` はゲーム開始時にも呼ばれる](#removeState-はゲーム開始時にも呼ばれる) | ステート, removeState, null チェック |
+| [`Game_Action.prototype.apply` はバトル外でも呼ばれる](#Game_Actionprototypeapply-はバトル外でも呼ばれる) | アクション, スキル, アイテム, inBattle |
+| [ターン制バトルでのダメージポップアップは直接呼べない](#ターン制バトルでのダメージポップアップは直接呼べない) | ポップアップ, ダメージ表示, ターン制, TPB |
+| [`Window_BattleLog` のキューパターン](#Window_BattleLog-のキューパターン) | バトルログ, キュー, メッセージ表示 |
+| [`displayAutoAffectedStatus` フックでメッセージを挿入する](#displayAutoAffectedStatus-フックでメッセージを挿入する) | ステート変化メッセージ, バトルログ, 挿入 |
+| [ステートの `meta` はすべて文字列](#ステートの-meta-はすべて文字列) | ステート, メモ欄, meta, タグ, 型変換 |
+| [通常攻撃によるステート付与の検出](#通常攻撃によるステート付与の検出) | ステート付与, 通常攻撃, effects, dataId |
+| [エネミーの識別はインデックスでおこなう](#エネミーの識別はインデックスでおこなう) | エネミー, 識別, インデックス, actorId |
+| [エネミーは `level` を持たない](#エネミーは-level-を持たない) | エネミー, level, ダメージ計算式, NaN |
+| [アクターの並び順は actorId とは異なる](#アクターの並び順は-actorId-とは異なる) | アクター, パーティ, 並び順, findIndex |
+| [死亡後のステート解除メッセージを正しい順序で表示する](#死亡後のステート解除メッセージを正しい順序で表示する) | 死亡, ステート解除, メッセージ順序, displayBattlerStatus |
+| [`displayRegeneration` はダメージ音を鳴らさない](#displayRegeneration-はダメージ音を鳴らさない) | リジェネ, ダメージ音, SE, performDamage |
+| [`gainSilentTp` は result に記録しない](#gainSilentTp-は-result-に記録しない) | TP, gainSilentTp, ポップアップ, リジェネ |
+| [`gainTp` だけフックしても TP 変化を完全には捕捉できない](#gainTp-だけフックしても-TP-変化を完全には捕捉できない) | TP, setTp, gainTp, フック, 他プラグイン対応 |
+| [ダメージ音のカスタマイズは SoundManager フックでおこなう](#ダメージ音のカスタマイズは-SoundManager-フックでおこなう) | ダメージ音, SE, SoundManager, performDamage |
 
 ---
 
