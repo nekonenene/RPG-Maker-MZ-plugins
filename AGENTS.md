@@ -6,9 +6,9 @@ AIエージェントはコードの生成、修正、および提案をおこな
 ## ディレクトリとファイルの役割
 
 - `docs/mz_classes.md` : RPGツクールMZのクラスリストが記載されています。ツクールのクラス構造を理解する際のリファレンスとして使用してください。
-- `docs/mz_plugin_pitfalls.md` : プラグイン開発で踏みがちな落とし穴と前提知識をまとめたドキュメントです。実装を始める前に必ず確認してください。
 - `docs/mz_architecture.md` : クラス間の呼び出し構造・責務や、バトルの流れやメッセージウィンドウの処理順など、クラス間の関係と内部処理をまとめたドキュメントです。
-- `mz_scripts/` : ディレクトリの直下に、RPGツクールMZのコアとなるソースファイル（`rmmz_*.js` など）が配置されています。 `mz_scripts/plugins/` 以下には、参考となるプラグインが格納されています。 `mz_scripts/` 以下のファイルを直接変更することは**絶対に禁止**します。参照のみに使用してください。
+- `docs/mz_plugin_pitfalls.md` : プラグイン開発で踏みがちな落とし穴と前提知識をまとめたドキュメントです。実装を始める前に必ず確認してください。
+- `mz_scripts/` : ディレクトリの直下に、RPGツクールMZのコアとなるソースファイル（`rmmz_*.js` の形式）が配置されています。 `mz_scripts/plugins/` 以下には、参考となるプラグインが格納されています。 `mz_scripts/` 以下のファイルを直接変更することは**絶対に禁止**します。参照のみに使用してください。このディレクトリは gitignore の対象です。１つもコアファイルが置いていなければ、ユーザーに置くよう指示してください。
 - `my_plugins/` : 開発中のオリジナルプラグインを格納するディレクトリです。新しいプラグインを作成する場合は、すべてこのディレクトリ内に配置してください。プラグインは `my_plugins/HTN_xxx/` のように、機能ごとにサブディレクトリを作成して管理してください。
   - サブディレクトリ内には、プラグインのJSファイルと `README.md` を配置します。
   - `README.md` の書き方は `my_plugins/HTN_TPNoRegenState/README.md` や `my_plugins/HTN_SmartCharm/README.md` を参考にしてください。 `README.md` の改行には行末にスペース2つが必要なことを忘れずに。
@@ -48,7 +48,7 @@ AIエージェントはコードの生成、修正、および提案をおこな
 3. **既存メソッドの拡張**
    - ツクールの既存クラス（例: `Window_Base` 等）のメソッドを書き換える場合は、可能な限り「エイリアス」を利用する
    - 以下の例のように、この場合はメソッドコメントを、メソッドのすぐ上ではなく、エイリアスの定義の上に記述すること。
-   - 既存クラスに追加する独自プロパティ名は `_プラグイン機能名 + 説明` の形式にする。他プラグインとの衝突を避けるため、プラグイン固有の接頭辞を必ず付けること
+   - 既存クラスに追加する独自プロパティ名は `_プラグイン名 + 説明` の形式にする。他プラグインとの衝突を避けるため、プラグイン固有の接頭辞を必ず付けること
    - 例: 
      ```javascript
         /**
@@ -58,8 +58,9 @@ AIエージェントはコードの生成、修正、および提案をおこな
          */
         const _Game_Battler_onBattleEnd = Game_Battler.prototype.onBattleEnd;
         Game_Battler.prototype.onBattleEnd = function() {
-            _Game_Battler_onBattleEnd.call(this);
-            this._pluginNameSomePropertyName = false;
+          _Game_Battler_onBattleEnd.call(this);
+
+          this._pluginNameSomePropertyName = false;
         };
      ```
 4. **パラメータの受け取り**
