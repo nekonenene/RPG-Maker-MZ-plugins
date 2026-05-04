@@ -104,7 +104,7 @@
  *
  * To hide all gauges for a specific enemy, add the following tag
  * to the enemy's Note field:
- *   <HTN_DisplayEnemyHpMpTp_Hide>
+ *   <DisplayEnemyHpMpTp_Hide>
  */
 
 /*:ja
@@ -199,7 +199,7 @@
  *
  * 特定の敵キャラのゲージをすべて非表示にしたい場合は、
  * 敵キャラのメモ欄に以下のタグを記述してください。
- *   <HTN_DisplayEnemyHpMpTp_Hide>
+ *   <DisplayEnemyHpMpTp_Hide>
  */
 
 (() => {
@@ -298,7 +298,7 @@
     if (!this._battler) return false;
     if (!this._battler.isAlive()) return false;
     if (!$gameParty.inBattle()) return false;
-    if (this._battler.isEnemy() && this._battler.enemy().meta['HTN_DisplayEnemyHpMpTp_Hide']) {
+    if (this._battler.isEnemy() && this._battler.enemy().meta['DisplayEnemyHpMpTp_Hide']) {
       return false;
     }
     return true;

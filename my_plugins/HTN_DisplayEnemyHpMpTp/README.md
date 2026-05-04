@@ -41,7 +41,7 @@ RPGツクールMZ用のプラグインです。
 
 敵キャラの「メモ」欄に記述できるタグの一覧です。  
 
-- `<HTN_DisplayEnemyHpMpTp_Hide>`  
+- `<DisplayEnemyHpMpTp_Hide>`  
   ゲージをすべて非表示にします  
 
 ## 📝 作者情報
