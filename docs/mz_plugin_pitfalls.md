@@ -20,12 +20,14 @@
 const _Game_Battler_onBattleStart = Game_Battler.prototype.onBattleStart;
 Game_Battler.prototype.onBattleStart = function(advantageous) {
   _Game_Battler_onBattleStart.call(this, advantageous);
+
   this._myCustomData = {}; // ここで初期化
 };
 
 const _Game_Battler_onBattleEnd = Game_Battler.prototype.onBattleEnd;
 Game_Battler.prototype.onBattleEnd = function() {
   _Game_Battler_onBattleEnd.call(this);
+
   this._myCustomData = {};
 };
 ```
@@ -45,6 +47,7 @@ Game_Battler.prototype.onBattleEnd = function() {
 const _Game_Battler_removeState = Game_Battler.prototype.removeState;
 Game_Battler.prototype.removeState = function(stateId) {
   _Game_Battler_removeState.call(this, stateId);
+
   // _myCustomData はゲーム開始時には undefined の可能性があるため null チェック必須
   if (this._myCustomData != null) {
     delete this._myCustomData[stateId];
@@ -66,6 +69,7 @@ Game_Battler.prototype.removeState = function(stateId) {
 const _Game_Action_apply = Game_Action.prototype.apply;
 Game_Action.prototype.apply = function(target) {
   _Game_Action_apply.call(this, target);
+
   if (!$gameParty.inBattle()) return; // バトル外は何もしない
   // バトル専用の処理...
 };
@@ -131,10 +135,13 @@ Window_BattleLog.prototype.displayAutoAffectedStatus = function(subject) {
     for (const msg of subject._myPendingMessages) {
       this.push('addText', msg);
     }
+
     this.push('wait');
     this.push('clear');
+
     subject._myPendingMessages = [];
   }
+
   _displayAutoAffectedStatus.call(this, subject);
 };
 ```
@@ -144,7 +151,7 @@ Window_BattleLog.prototype.displayAutoAffectedStatus = function(subject) {
 ## ステートの `meta` はすべて文字列
 
 RPGツクールMZはメモ欄のタグを自動パースして `state.meta` に格納するが、
-**値はすべて文字列型**で返ってくる。数値・真偽値への変換は自分で行う必要がある。
+**値はすべて文字列型**で返ってくる。数値・真偽値への変換は自分でおこなう必要がある。
 
 ```javascript
 // <MyTag: 50>  →  state.meta.MyTag === '50'  (文字列)
@@ -184,7 +191,7 @@ const hasAddDrainState = this.item().effects.some(
 
 ---
 
-## エネミーの識別はインデックスで行う
+## エネミーの識別はインデックスでおこなう
 
 エネミーはアクターの `actorId` のような永続IDを持たない。
 **`$gameTroop.members()` 内のインデックス**（0始まり）で識別する。
@@ -230,21 +237,7 @@ drainer.level * 10
 表示順などでパーティー順に並べたい場合は `findIndex` を使う。
 
 ```javascript
-// actorId でソートすると、パーティーの並び順とずれる場合がある
-// 正しい並び順ソートは findIndex を使う
 const partyOrder = $gameParty.members().findIndex(m => m.actorId() === info.actorId);
-```
-
----
-
-## `BattleManager.allBattleMembers()` で全バトラーを取得
-
-パーティー全員と敵グループ全員をまとめて取得したい場合は `BattleManager.allBattleMembers()` を使う。
-
-```javascript
-for (const battler of BattleManager.allBattleMembers()) {
-  // Game_Actor / Game_Enemy を問わず全バトラーを処理
-}
 ```
 
 ---
@@ -346,7 +339,9 @@ TP変化を全パターンで捕捉したい場合は `setTp` 自体をフック
 const _Game_Battler_initTp = Game_Battler.prototype.initTp;
 Game_Battler.prototype.initTp = function() {
   this._myIgnoreSetTp = true;
+
   _Game_Battler_initTp.call(this);
+
   this._myIgnoreSetTp = false;
 };
 
@@ -355,6 +350,7 @@ Game_BattlerBase.prototype.setTp = function(tp) {
   if (tp > this._tp && !this._myIgnoreSetTp && /* 条件 */) {
     // TP が増加する呼び出しへの処理
   }
+
   _Game_BattlerBase_setTp.call(this, tp);
 };
 ```
@@ -365,7 +361,7 @@ Game_BattlerBase.prototype.setTp = function(tp) {
 
 ---
 
-## ダメージ音のカスタマイズは SoundManager フックで行う
+## ダメージ音のカスタマイズは SoundManager フックでおこなう
 
 `performDamage` 内で呼ばれる `playActorDamage` / `playEnemyDamage` を差し替えたい場合、
 `performDamage` 自体をオーバーライドすると音以外のアニメーション処理も複製する必要があり保守が難しい。
@@ -379,6 +375,7 @@ let _suppress = false;
 const _SoundManager_playActorDamage = SoundManager.playActorDamage;
 SoundManager.playActorDamage = function() {
   if (_suppress) { _suppress = false; return; }
+
   _SoundManager_playActorDamage.call(this);
 };
 
