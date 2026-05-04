@@ -11,11 +11,11 @@ RPGツクールMZ v1.10.0 のコアスクリプトに含まれる全クラスの
 | ソースファイル | リファレンス | 主なクラス |
 |---|---|---|
 | `rmmz_core.js` | [mz_classes/core.md](mz_classes/core.md) | Utils, Graphics, Bitmap, Sprite, Tilemap, Input, TouchInput, WebAudio |
-| `rmmz_managers.js` | [mz_classes/managers.md](mz_classes/managers.md) | DataManager, SceneManager, BattleManager, PluginManager, AudioManager, SoundManager, ImageManager |
+| `rmmz_managers.js` | [mz_classes/managers.md](mz_classes/managers.md) | DataManager, ImageManager, AudioManager, SoundManager, SceneManager, BattleManager, PluginManager |
 | `rmmz_objects.js` | [mz_classes/objects.md](mz_classes/objects.md) | Game_Battler, Game_Actor, Game_Enemy, Game_Party, Game_Map, Game_Event, Game_Interpreter |
-| `rmmz_scenes.js` | [mz_classes/scenes.md](mz_classes/scenes.md) | Scene_Base, Scene_Map, Scene_Battle, Scene_Menu とその派生クラス群 |
+| `rmmz_scenes.js` | [mz_classes/scenes.md](mz_classes/scenes.md) | Scene_Base, Scene_Map, Scene_Battle, Scene_Menu |
 | `rmmz_sprites.js` | [mz_classes/sprites.md](mz_classes/sprites.md) | Sprite_Character, Sprite_Battler, Sprite_Actor, Sprite_Enemy, Spriteset_Map, Spriteset_Battle |
-| `rmmz_windows.js` | [mz_classes/windows.md](mz_classes/windows.md) | Window_Base, Window_Selectable, Window_Command, Window_BattleLog, Window_Message とその派生クラス群 |
+| `rmmz_windows.js` | [mz_classes/windows.md](mz_classes/windows.md) | Window_Base, Window_Selectable, Window_Command, Window_BattleLog, Window_Message |
 
 ## 用途別ガイド
 
@@ -25,43 +25,50 @@ objects.md のように1000行以上ある重いファイルもあるので、�
 実装に関連しそうなメソッドの詳細をソースファイルで確認する。
 ソースファイルの行数が多そうであれば、リファレンスに戻ってメソッド一覧をまず確認する、という流れが効率的。
 
-| 実装内容 | 読むファイル | まず確認するクラス |
+| 目的 | 読むファイル | まず確認するクラス |
 |---|---|---|
 | プラグインパラメータ・コマンドの仕組みを理解する | managers.md | PluginManager |
 | バトルの処理フローを把握する | managers.md | BattleManager |
 | 音声再生（BGM・SE など）を扱う | managers.md | AudioManager, SoundManager |
-| アクター・エネミーのHP/MP/スキル・ステートを扱う | objects.md | Game_Battler, Game_Actor |
+| アクター・敵キャラのHP/MP/スキル・ステートを扱う | objects.md | Game_Battler, Game_Action |
 | パーティ・所持品・お金を扱う | objects.md | Game_Party |
-| マップイベント・コモンイベント・スクリプトコマンドを扱う | objects.md | Game_Map, Game_Event, Game_Interpreter |
-| 画面遷移・シーン初期化を扱う | scenes.md | Scene_Base（継承先のシーンクラス） |
-| キャラクタースプライト・バトラースプライトの描画を変更する | sprites.md | Sprite_Character, Sprite_Battler |
-| ウィンドウのレイアウト・テキスト描画を変更する | windows.md | Window_Base（継承先のウィンドウクラス） |
+| コモンイベントを扱う | objects.md | Game_Interpreter |
+| メニュー画面・戦闘画面などのレイアウトをカスタマイズする | scenes.md | Scene_Base |
+| 戦闘画面の敵キャラにHPバーを描画する | sprites.md | Sprite_Enemy, Sprite_Gauge |
+| ウィンドウのレイアウト・テキスト描画を変更する | windows.md | Window_Base |
 | 入力・タッチ操作を扱う | core.md | Input, TouchInput |
-| 画像・ビットマップの低レベル描画処理を扱う | core.md | Graphics, Bitmap |
+| ゲームがどんな環境で起動されているか確認する | core.md | Utils |
+
+互いが密接に関わるので一概には言えないが、
+ソフトウェアとしての大枠が core、ゲームとしての管理が managers、
+ゲームの１画面を表現する scenes、画面を構成する windows と sprites、
+細かなロジックが objects に書かれてRPGが構成されている。
+
+困ったらまずは managers.md を読む。
 
 ## グローバル変数
 
 ### データベース変数 (`$data*`)
 
-ゲーム起動時にJSONファイルから読み込まれる読み取り専用のデータベース
+ゲーム起動時にJSONファイルから読み込まれる読み取り専用データ
 
 | 変数名 | ソース | 説明 |
 |---|---|---|
-| `$dataActors` | Actors.json | アクターデータ配列 |
-| `$dataClasses` | Classes.json | 職業データ配列 |
-| `$dataSkills` | Skills.json | スキルデータ配列 |
-| `$dataItems` | Items.json | アイテムデータ配列 |
-| `$dataWeapons` | Weapons.json | 武器データ配列 |
-| `$dataArmors` | Armors.json | 防具データ配列 |
-| `$dataEnemies` | Enemies.json | 敵キャラクターデータ配列 |
-| `$dataTroops` | Troops.json | 敵グループデータ配列 |
-| `$dataStates` | States.json | ステートデータ配列 |
-| `$dataAnimations` | Animations.json | アニメーションデータ配列 |
-| `$dataTilesets` | Tilesets.json | タイルセットデータ配列 |
-| `$dataCommonEvents` | CommonEvents.json | コモンイベントデータ配列 |
-| `$dataSystem` | System.json | システムデータ |
-| `$dataMapInfos` | MapInfos.json | マップ情報データ配列 |
-| `$dataMap` | Map*NNN*.json | 現在のマップデータ |
+| `$dataActors` | Actors.json | アクター |
+| `$dataClasses` | Classes.json | 職業 |
+| `$dataSkills` | Skills.json | スキル |
+| `$dataItems` | Items.json | アイテム |
+| `$dataWeapons` | Weapons.json | 武器 |
+| `$dataArmors` | Armors.json | 防具 |
+| `$dataEnemies` | Enemies.json | 敵キャラ |
+| `$dataTroops` | Troops.json | 敵グループ |
+| `$dataStates` | States.json | ステート |
+| `$dataAnimations` | Animations.json | アニメーション |
+| `$dataTilesets` | Tilesets.json | タイルセット |
+| `$dataCommonEvents` | CommonEvents.json | コモンイベント |
+| `$dataSystem` | System.json | システム1・システム2・タイプ・用語。その他、スイッチ名・変数名など |
+| `$dataMapInfos` | MapInfos.json | マップツリー（すべてのマップ） |
+| `$dataMap` | Map*NNN*.json | 各マップデータ（地形やマップ内のイベントデータ） |
 
 ### ゲームオブジェクト変数 (`$game*`)
 
@@ -81,4 +88,4 @@ objects.md のように1000行以上ある重いファイルもあるので、�
 | `$gameParty` | `Game_Party` | ✓ | パーティ（メンバー、アイテム、所持金） |
 | `$gameTroop` | `Game_Troop` | ✗ | 現在の敵グループ |
 | `$gameMap` | `Game_Map` | ✓ | 現在のマップ |
-| `$gamePlayer` | `Game_Player` | ✓ | プレイヤーキャラクター |
+| `$gamePlayer` | `Game_Player` | ✓ | プレイヤー |
