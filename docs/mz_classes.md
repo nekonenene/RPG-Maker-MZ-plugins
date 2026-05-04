@@ -62,13 +62,13 @@ RPGツクールMZ v1.10.0 のコアスクリプトに含まれる全クラスの
 
 ## Core
 
-RPGツクールMZのコアエンジンを構成する基本クラス群です。 ( `rmmz_core.js` )
+RPGツクールMZのコアエンジンを構成する基本クラス群。
+
+ソースファイル: `rmmz_core.js`
 
 ### Utils
 
 ユーティリティメソッドを定義する静的クラス。
-
-- **ソースファイル**: `rmmz_core.js`
 
 #### 静的プロパティ
 - `RPGMAKER_NAME` — RPGツクールの名前。現在のバージョンでは "MZ"。
@@ -101,8 +101,6 @@ RPGツクールMZのコアエンジンを構成する基本クラス群です。
 
 グラフィック処理を実行する静的クラス。
 
-- **ソースファイル**: `rmmz_core.js`
-
 #### 静的プロパティ
 - `app` — PIXI.Application オブジェクト。
 - `effekseer` — Effekseer のコンテキストオブジェクト。
@@ -132,21 +130,17 @@ RPGツクールMZのコアエンジンを構成する基本クラス群です。
 
 ポイント(座標)クラス。PIXI.Point を継承。
 
-- **ソースファイル**: `rmmz_core.js`
 - **継承**: `PIXI.Point` → **Point**
 
 ### Rectangle
 
 矩形クラス。PIXI.Rectangle を継承。
 
-- **ソースファイル**: `rmmz_core.js`
 - **継承**: `PIXI.Rectangle` → **Rectangle**
 
 ### Bitmap
 
 画像を表す基本オブジェクト。
-
-- **ソースファイル**: `rmmz_core.js`
 
 #### 静的メソッド
 - `load(url)` — 画像ファイルを読み込む。
@@ -188,7 +182,6 @@ RPGツクールMZのコアエンジンを構成する基本クラス群です。
 
 ゲーム画面に描画される基本オブジェクト。
 
-- **ソースファイル**: `rmmz_core.js`
 - **継承**: `PIXI.Sprite` → **Sprite**
 
 #### プロパティ
@@ -216,8 +209,6 @@ RPGツクールMZのコアエンジンを構成する基本クラス群です。
 
 2Dタイルベースのゲームマップを表示するタイルマップ。
 
-- **ソースファイル**: `rmmz_core.js`
-
 #### プロパティ
 - `width` — タイルマップの幅。
 - `height` — タイルマップの高さ。
@@ -235,8 +226,6 @@ RPGツクールMZのコアエンジンを構成する基本クラス群です。
 
 タイリング画像（繰り返し表示）用のスプライトオブジェクト。
 
-- **ソースファイル**: `rmmz_core.js`
-
 #### プロパティ
 - `bitmap` — タイリングスプライトの画像。
 - `opacity` — タイリングスプライトの不透明度 (0〜255)。
@@ -252,8 +241,6 @@ RPGツクールMZのコアエンジンを構成する基本クラス群です。
 
 ゲーム画面全体を覆うスプライト（フラッシュや画面の色調変更用など）。
 
-- **ソースファイル**: `rmmz_core.js`
-
 #### プロパティ
 - `opacity` — スプライトの不透明度 (0〜255)。
 
@@ -267,7 +254,6 @@ RPGツクールMZのコアエンジンを構成する基本クラス群です。
 
 ゲーム内のウィンドウ。
 
-- **ソースファイル**: `rmmz_core.js`
 - **継承**: `PIXI.Container` → **Window**
 
 #### プロパティ
@@ -305,8 +291,6 @@ RPGツクールMZのコアエンジンを構成する基本クラス群です。
 
 ゲームウィンドウを含むレイヤー（重なりなどを制御）。
 
-- **ソースファイル**: `rmmz_core.js`
-
 #### インスタンスメソッド
 - `update()` — 毎フレーム、ウィンドウレイヤーを更新する。
 - `render(renderer)` — WebGLレンダラを使用してオブジェクトを描画する。
@@ -315,8 +299,6 @@ RPGツクールMZのコアエンジンを構成する基本クラス群です。
 
 雨、嵐、雪を表示する天候エフェクト。
 
-- **ソースファイル**: `rmmz_core.js`
-
 #### インスタンスメソッド
 - `destroy()` — 天候エフェクトを破棄する。
 - `update()` — 毎フレーム、天候状態を更新する。
@@ -324,8 +306,6 @@ RPGツクールMZのコアエンジンを構成する基本クラス群です。
 ### ColorFilter
 
 WebGL用のカラーフィルター（色調変更などに使用）。
-
-- **ソースファイル**: `rmmz_core.js`
 
 #### インスタンスメソッド
 - `setHue(hue)` — 色相回転値を設定する。
@@ -337,16 +317,12 @@ WebGL用のカラーフィルター（色調変更などに使用）。
 
 表示ツリーのルートオブジェクト。
 
-- **ソースファイル**: `rmmz_core.js`
-
 #### インスタンスメソッド
 - `destroy()` — ステージを破棄する。
 
 ### WebAudio
 
 Web Audio APIのオーディオオブジェクト。
-
-- **ソースファイル**: `rmmz_core.js`
 
 #### 静的メソッド
 - `initialize()` — オーディオシステムを初期化する。
@@ -377,8 +353,6 @@ Web Audio APIのオーディオオブジェクト。
 
 ビデオの再生を処理する静的クラス。
 
-- **ソースファイル**: `rmmz_core.js`
-
 #### 静的メソッド
 - `initialize(width, height)` — ビデオシステムを初期化する。
 - `resize(width, height)` — ビデオの表示サイズを変更する。
@@ -389,8 +363,6 @@ Web Audio APIのオーディオオブジェクト。
 ### Input
 
 キーボードとゲームパッドからの入力データを処理する静的クラス。
-
-- **ソースファイル**: `rmmz_core.js`
 
 #### 静的プロパティ
 - `keyRepeatWait` — キーリピートが始まるまでの待機時間（フレーム数）。
@@ -413,8 +385,6 @@ Web Audio APIのオーディオオブジェクト。
 ### TouchInput
 
 マウスとタッチスクリーンからの入力データを処理する静的クラス。
-
-- **ソースファイル**: `rmmz_core.js`
 
 #### 静的プロパティ
 - `keyRepeatWait` — 疑似キーリピートが始まるまでの待機時間（フレーム数）。
@@ -444,8 +414,6 @@ Web Audio APIのオーディオオブジェクト。
 
 オブジェクト情報を含む独自拡張JSONを処理する静的クラス (セーブデータのシリアライズ等に使用)。
 
-- **ソースファイル**: `rmmz_core.js`
-
 #### 静的プロパティ
 - `maxDepth` — オブジェクトをパースする最大深度。
 
@@ -458,14 +426,13 @@ Web Audio APIのオーディオオブジェクト。
 
 ## Managers
 
-データ管理・シーン管理・リソース管理を行うマネージャークラス群です。すべて静的クラスです。 ( `rmmz_managers.js` )
+データ管理・シーン管理・リソース管理を行うマネージャークラス群。すべて静的クラス。
+
+ソースファイル: `rmmz_managers.js`
 
 ### DataManager
 
 データベースとゲームオブジェクトを管理する静的クラス。
-
-- **ソースファイル**: `rmmz_managers.js`
-
 
 #### 静的メソッド
 
@@ -519,9 +486,6 @@ Web Audio APIのオーディオオブジェクト。
 
 設定データを管理する静的クラス。
 
-- **ソースファイル**: `rmmz_managers.js`
-
-
 #### 静的プロパティ
 
 - `alwaysDash` — 常時ダッシュが有効かどうか。
@@ -548,9 +512,6 @@ Web Audio APIのオーディオオブジェクト。
 ### StorageManager
 
 セーブデータの保存を管理する静的クラス。
-
-- **ソースファイル**: `rmmz_managers.js`
-
 
 #### 静的メソッド
 
@@ -589,9 +550,6 @@ Web Audio APIのオーディオオブジェクト。
 
 フォントファイルの読み込みを管理する静的クラス。
 
-- **ソースファイル**: `rmmz_managers.js`
-
-
 #### 静的メソッド
 
 - `load(family, filename)` — フォントファイルを読み込む。
@@ -603,9 +561,6 @@ Web Audio APIのオーディオオブジェクト。
 ### ImageManager
 
 画像の読み込み・Bitmapオブジェクトの作成・保持を行う静的クラス。
-
-- **ソースファイル**: `rmmz_managers.js`
-
 
 #### 静的プロパティ
 
@@ -652,9 +607,6 @@ Web Audio APIのオーディオオブジェクト。
 
 Effekseerエフェクトの読み込みを管理する静的クラス。
 
-- **ソースファイル**: `rmmz_managers.js`
-
-
 #### 静的メソッド
 
 - `load(filename)` — Effekseerのエフェクトファイルを読み込む。
@@ -670,9 +622,6 @@ Effekseerエフェクトの読み込みを管理する静的クラス。
 ### AudioManager
 
 BGM・BGS・ME・SEの再生を管理する静的クラス。
-
-- **ソースファイル**: `rmmz_managers.js`
-
 
 #### 静的メソッド
 
@@ -724,9 +673,6 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 
 データベースで定義された効果音を再生する静的クラス。
 
-- **ソースファイル**: `rmmz_managers.js`
-
-
 #### 静的メソッド
 
 - `preloadImportantSounds()` — 重要な効果音を事前に読み込む。
@@ -761,9 +707,6 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 
 用語やメッセージを管理する静的クラス。
 
-- **ソースファイル**: `rmmz_managers.js`
-
-
 #### 静的メソッド
 
 - `basic(basicId)` — 基本用語を取得する（例: レベル、HP、MP等）。
@@ -779,9 +722,6 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 ### ColorManager
 
 ウィンドウカラーを管理する静的クラス。
-
-- **ソースファイル**: `rmmz_managers.js`
-
 
 #### 静的メソッド
 
@@ -819,9 +759,6 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 ### SceneManager
 
 シーン遷移を管理する静的クラス。
-
-- **ソースファイル**: `rmmz_managers.js`
-
 
 #### 静的メソッド
 
@@ -877,9 +814,6 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 ### BattleManager
 
 戦闘進行を管理する静的クラス。
-
-- **ソースファイル**: `rmmz_managers.js`
-
 
 #### 静的メソッド
 
@@ -991,9 +925,6 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 
 プラグインを管理する静的クラス。
 
-- **ソースファイル**: `rmmz_managers.js`
-
-
 #### 静的メソッド
 
 - `setup(plugins)` — プラグインリストを読み込みセットアップする。
@@ -1011,14 +942,13 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 
 ## Objects
 
-ゲームロジックを構成する `Game_*` クラス群です。セーブデータとして保存されるものが多いです。 ( `rmmz_objects.js` )
+ゲームロジックを構成する `Game_*` クラス群。セーブデータとして保存されるものが多い。
+
+ソースファイル: `rmmz_objects.js`
 
 ### Game_Temp
 
 セーブデータに含まれない一時データ用のゲームオブジェクトクラス。
-
-- **ソースファイル**: `rmmz_objects.js`
-
 
 #### インスタンスメソッド
 
@@ -1055,9 +985,6 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 ### Game_System
 
 システムデータ用のゲームオブジェクトクラス。
-
-- **ソースファイル**: `rmmz_objects.js`
-
 
 #### インスタンスメソッド
 
@@ -1119,9 +1046,6 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 
 タイマー用のゲームオブジェクトクラス。
 
-- **ソースファイル**: `rmmz_objects.js`
-
-
 #### インスタンスメソッド
 
 - `initialize()` — 初期化する。
@@ -1136,9 +1060,6 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 ### Game_Message
 
 テキストや選択肢などを表示するメッセージウィンドウの状態を管理するクラス。
-
-- **ソースファイル**: `rmmz_objects.js`
-
 
 #### インスタンスメソッド
 
@@ -1187,9 +1108,6 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 
 スイッチ用のゲームオブジェクトクラス。
 
-- **ソースファイル**: `rmmz_objects.js`
-
-
 #### インスタンスメソッド
 
 - `initialize()` — 初期化する。
@@ -1201,9 +1119,6 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 ### Game_Variables
 
 変数用のゲームオブジェクトクラス。
-
-- **ソースファイル**: `rmmz_objects.js`
-
 
 #### インスタンスメソッド
 
@@ -1217,9 +1132,6 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 
 セルフスイッチ用のゲームオブジェクトクラス。
 
-- **ソースファイル**: `rmmz_objects.js`
-
-
 #### インスタンスメソッド
 
 - `initialize()` — 初期化する。
@@ -1231,9 +1143,6 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 ### Game_Screen
 
 色調変更やフラッシュなどの画面エフェクトデータ用のクラス。
-
-- **ソースファイル**: `rmmz_objects.js`
-
 
 #### インスタンスメソッド
 
@@ -1286,9 +1195,6 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 
 ピクチャ用のゲームオブジェクトクラス。
 
-- **ソースファイル**: `rmmz_objects.js`
-
-
 #### インスタンスメソッド
 
 - `initialize()` — 初期化する。
@@ -1324,9 +1230,6 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 
 スキル・アイテム・武器・防具を扱うゲームオブジェクトクラス。
 
-- **ソースファイル**: `rmmz_objects.js`
-
-
 #### インスタンスメソッド
 
 - `initialize(item)` — 初期化する。itemが指定されていればそのアイテムをセットする。
@@ -1345,9 +1248,6 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 ### Game_Action
 
 戦闘行動用のゲームオブジェクトクラス。
-
-- **ソースファイル**: `rmmz_objects.js`
-
 
 #### 静的プロパティ
 
@@ -1482,9 +1382,6 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 
 戦闘行動の結果用のゲームオブジェクトクラス。
 
-- **ソースファイル**: `rmmz_objects.js`
-
-
 #### インスタンスメソッド
 
 - `initialize()` — 初期化する。
@@ -1507,9 +1404,6 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 ### Game_BattlerBase
 
 Game_Battlerのスーパークラス。主にパラメータ計算を行う。
-
-- **ソースファイル**: `rmmz_objects.js`
-
 
 #### 静的プロパティ
 
@@ -1678,9 +1572,7 @@ Game_Battlerのスーパークラス。主にパラメータ計算を行う。
 
 Game_ActorとGame_Enemyのスーパークラス。スプライトやアクション関連のメソッドを含む。
 
-- **ソースファイル**: `rmmz_objects.js`
 - **継承**: `Game_BattlerBase` → **Game_Battler**
-
 
 #### インスタンスメソッド
 
@@ -1809,9 +1701,7 @@ Game_ActorとGame_Enemyのスーパークラス。スプライトやアクショ
 
 アクター用のゲームオブジェクトクラス。
 
-- **ソースファイル**: `rmmz_objects.js`
 - **継承**: `Game_BattlerBase` → `Game_Battler` → **Game_Actor**
-
 
 #### プロパティ
 
@@ -1954,9 +1844,7 @@ Game_ActorとGame_Enemyのスーパークラス。スプライトやアクショ
 
 敵キャラクター用のゲームオブジェクトクラス。
 
-- **ソースファイル**: `rmmz_objects.js`
 - **継承**: `Game_BattlerBase` → `Game_Battler` → **Game_Enemy**
-
 
 #### インスタンスメソッド
 
@@ -1968,7 +1856,7 @@ Game_ActorとGame_Enemyのスーパークラス。スプライトやアクショ
 - `opponentsUnit()` — 敵ユニット（$gameParty）を返す。
 - `index()` — 敵グループ内のインデックスを返す。
 - `isBattleMember()` — 戦闘メンバーかを確認する（常にtrue）。
-- `enemyId()` — 敵キャラクIDを返す。
+- `enemyId()` — 敵キャラのIDを返す。
 - `enemy()` — データベースの敵オブジェクトを返す。
 - `traitObjects()` — 特徴を持つオブジェクト（敵・ステート）の配列を返す。
 - `paramBase(paramId)` — パラメータ基本値を返す。
@@ -2009,9 +1897,6 @@ Game_ActorとGame_Enemyのスーパークラス。スプライトやアクショ
 
 アクター配列のラッパークラス。
 
-- **ソースファイル**: `rmmz_objects.js`
-
-
 #### インスタンスメソッド
 
 - `initialize()` — 初期化する。
@@ -2020,9 +1905,6 @@ Game_ActorとGame_Enemyのスーパークラス。スプライトやアクショ
 ### Game_Unit
 
 Game_PartyとGame_Troopのスーパークラス。
-
-- **ソースファイル**: `rmmz_objects.js`
-
 
 #### インスタンスメソッド
 
@@ -2054,9 +1936,7 @@ Game_PartyとGame_Troopのスーパークラス。
 
 パーティ用のゲームオブジェクトクラス。所持金やアイテムなどの情報を含む。
 
-- **ソースファイル**: `rmmz_objects.js`
 - **継承**: `Game_Unit` → **Game_Party**
-
 
 #### 静的プロパティ
 
@@ -2147,9 +2027,7 @@ Game_PartyとGame_Troopのスーパークラス。
 
 敵グループおよび戦闘関連データ用のゲームオブジェクトクラス。
 
-- **ソースファイル**: `rmmz_objects.js`
 - **継承**: `Game_Unit` → **Game_Troop**
-
 
 #### インスタンスメソッド
 
@@ -2177,9 +2055,6 @@ Game_PartyとGame_Troopのスーパークラス。
 ### Game_Map
 
 マップ用のゲームオブジェクトクラス。スクロールや通行判定の機能を含む。
-
-- **ソースファイル**: `rmmz_objects.js`
-
 
 #### インスタンスメソッド
 
@@ -2298,9 +2173,6 @@ Game_PartyとGame_Troopのスーパークラス。
 
 コモンイベント用のゲームオブジェクトクラス。
 
-- **ソースファイル**: `rmmz_objects.js`
-
-
 #### インスタンスメソッド
 
 - `initialize(commonEventId)` — 初期化する。
@@ -2313,9 +2185,6 @@ Game_PartyとGame_Troopのスーパークラス。
 ### Game_CharacterBase
 
 Game_Characterのスーパークラス。座標や画像などの基本情報を扱う。
-
-- **ソースファイル**: `rmmz_objects.js`
-
 
 #### インスタンスメソッド
 
@@ -2417,9 +2286,7 @@ Game_Characterのスーパークラス。座標や画像などの基本情報を
 
 Game_Player・Game_Follower・Game_Vehicle・Game_Eventのスーパークラス。
 
-- **ソースファイル**: `rmmz_objects.js`
 - **継承**: `Game_CharacterBase` → **Game_Character**
-
 
 #### 静的プロパティ
 
@@ -2510,9 +2377,7 @@ Game_Player・Game_Follower・Game_Vehicle・Game_Eventのスーパークラス�
 
 プレイヤーキャラクター用のゲームオブジェクトクラス。
 
-- **ソースファイル**: `rmmz_objects.js`
 - **継承**: `Game_CharacterBase` → `Game_Character` → **Game_Player**
-
 
 #### インスタンスメソッド
 
@@ -2592,9 +2457,7 @@ Game_Player・Game_Follower・Game_Vehicle・Game_Eventのスーパークラス�
 
 隊列歩行のフォロワー用のゲームオブジェクトクラス。
 
-- **ソースファイル**: `rmmz_objects.js`
 - **継承**: `Game_CharacterBase` → `Game_Character` → **Game_Follower**
-
 
 #### インスタンスメソッド
 
@@ -2609,9 +2472,6 @@ Game_Player・Game_Follower・Game_Vehicle・Game_Eventのスーパークラス�
 ### Game_Followers
 
 フォロワー配列のラッパークラス。
-
-- **ソースファイル**: `rmmz_objects.js`
-
 
 #### インスタンスメソッド
 
@@ -2639,9 +2499,7 @@ Game_Player・Game_Follower・Game_Vehicle・Game_Eventのスーパークラス�
 
 乗り物用のゲームオブジェクトクラス。
 
-- **ソースファイル**: `rmmz_objects.js`
 - **継承**: `Game_CharacterBase` → `Game_Character` → **Game_Vehicle**
-
 
 #### インスタンスメソッド
 
@@ -2681,9 +2539,7 @@ Game_Player・Game_Follower・Game_Vehicle・Game_Eventのスーパークラス�
 
 イベント用のゲームオブジェクトクラス。イベントページの切り替え機能を含む。
 
-- **ソースファイル**: `rmmz_objects.js`
 - **継承**: `Game_CharacterBase` → `Game_Character` → **Game_Event**
-
 
 #### インスタンスメソッド
 
@@ -2728,9 +2584,6 @@ Game_Player・Game_Follower・Game_Vehicle・Game_Eventのスーパークラス�
 ### Game_Interpreter
 
 イベントコマンドを実行するインタプリタ。
-
-- **ソースファイル**: `rmmz_objects.js`
-
 
 #### インスタンスメソッド
 
@@ -2892,15 +2745,15 @@ Game_Player・Game_Follower・Game_Vehicle・Game_Eventのスーパークラス�
 
 ## Scenes
 
-画面遷移を管理する `Scene_*` クラス群です。各画面が1つのシーンクラスに対応します。 ( `rmmz_scenes.js` )
+画面遷移を管理する `Scene_*` クラス群。各画面が1つのシーンクラスに対応。
+
+ソースファイル: `rmmz_scenes.js`
 
 ### Scene_Base
 
 ゲーム内の全シーンのスーパークラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → **Scene_Base**
-
 
 #### インスタンスメソッド
 
@@ -2949,9 +2802,7 @@ Game_Player・Game_Follower・Game_Vehicle・Game_Eventのスーパークラス�
 
 ゲーム全体の初期化を行うシーンクラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → **Scene_Boot**
-
 
 #### インスタンスメソッド
 
@@ -2977,9 +2828,7 @@ Game_Player・Game_Follower・Game_Vehicle・Game_Eventのスーパークラス�
 
 スプラッシュ画面のシーンクラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → **Scene_Splash**
-
 
 #### インスタンスメソッド
 
@@ -3000,9 +2849,7 @@ Game_Player・Game_Follower・Game_Vehicle・Game_Eventのスーパークラス�
 
 タイトル画面のシーンクラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → **Scene_Title**
-
 
 #### インスタンスメソッド
 
@@ -3027,9 +2874,7 @@ Game_Player・Game_Follower・Game_Vehicle・Game_Eventのスーパークラス�
 
 Scene_MapとScene_Battleのスーパークラス。共通するメッセージウィンドウ群を管理する。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → **Scene_Message**
-
 
 #### インスタンスメソッド
 
@@ -3054,9 +2899,7 @@ Scene_MapとScene_Battleのスーパークラス。共通するメッセージ�
 
 マップ画面のシーンクラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → `Scene_Message` → **Scene_Map**
-
 
 #### インスタンスメソッド
 
@@ -3118,9 +2961,7 @@ Scene_MapとScene_Battleのスーパークラス。共通するメッセージ�
 
 すべてのメニュー系シーン（メニュー、アイテム、スキル、装備、セーブ等）のスーパークラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → **Scene_MenuBase**
-
 
 #### インスタンスメソッド
 
@@ -3156,9 +2997,7 @@ Scene_MapとScene_Battleのスーパークラス。共通するメッセージ�
 
 メニュー画面のシーンクラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → `Scene_MenuBase` → **Scene_Menu**
-
 
 #### インスタンスメソッド
 
@@ -3187,9 +3026,7 @@ Scene_MapとScene_Battleのスーパークラス。共通するメッセージ�
 
 Scene_ItemとScene_Skillのスーパークラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → `Scene_MenuBase` → **Scene_ItemBase**
-
 
 #### インスタンスメソッド
 
@@ -3218,9 +3055,7 @@ Scene_ItemとScene_Skillのスーパークラス。
 
 アイテム画面のシーンクラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → `Scene_MenuBase` → `Scene_ItemBase` → **Scene_Item**
-
 
 #### インスタンスメソッド
 
@@ -3241,9 +3076,7 @@ Scene_ItemとScene_Skillのスーパークラス。
 
 スキル画面のシーンクラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → `Scene_MenuBase` → `Scene_ItemBase` → **Scene_Skill**
-
 
 #### インスタンスメソッド
 
@@ -3271,9 +3104,7 @@ Scene_ItemとScene_Skillのスーパークラス。
 
 装備画面のシーンクラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → `Scene_MenuBase` → **Scene_Equip**
-
 
 #### インスタンスメソッド
 
@@ -3306,9 +3137,7 @@ Scene_ItemとScene_Skillのスーパークラス。
 
 ステータス画面のシーンクラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → `Scene_MenuBase` → **Scene_Status**
-
 
 #### インスタンスメソッド
 
@@ -3335,9 +3164,7 @@ Scene_ItemとScene_Skillのスーパークラス。
 
 オプション画面のシーンクラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → `Scene_MenuBase` → **Scene_Options**
-
 
 #### インスタンスメソッド
 
@@ -3353,9 +3180,7 @@ Scene_ItemとScene_Skillのスーパークラス。
 
 Scene_SaveとScene_Loadのスーパークラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → `Scene_MenuBase` → **Scene_File**
-
 
 #### インスタンスメソッド
 
@@ -3380,9 +3205,7 @@ Scene_SaveとScene_Loadのスーパークラス。
 
 セーブ画面のシーンクラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → `Scene_MenuBase` → `Scene_File` → **Scene_Save**
-
 
 #### インスタンスメソッド
 
@@ -3399,9 +3222,7 @@ Scene_SaveとScene_Loadのスーパークラス。
 
 ロード画面のシーンクラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → `Scene_MenuBase` → `Scene_File` → **Scene_Load**
-
 
 #### インスタンスメソッド
 
@@ -3420,9 +3241,7 @@ Scene_SaveとScene_Loadのスーパークラス。
 
 ゲーム終了画面のシーンクラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → `Scene_MenuBase` → **Scene_GameEnd**
-
 
 #### インスタンスメソッド
 
@@ -3438,9 +3257,7 @@ Scene_SaveとScene_Loadのスーパークラス。
 
 ショップ画面のシーンクラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → `Scene_MenuBase` → **Scene_Shop**
-
 
 #### インスタンスメソッド
 
@@ -3490,9 +3307,7 @@ Scene_SaveとScene_Loadのスーパークラス。
 
 名前入力画面のシーンクラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → `Scene_MenuBase` → **Scene_Name**
-
 
 #### インスタンスメソッド
 
@@ -3510,9 +3325,7 @@ Scene_SaveとScene_Loadのスーパークラス。
 
 デバッグ画面のシーンクラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → `Scene_MenuBase` → **Scene_Debug**
-
 
 #### インスタンスメソッド
 
@@ -3534,9 +3347,7 @@ Scene_SaveとScene_Loadのスーパークラス。
 
 戦闘画面のシーンクラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → `Scene_Message` → **Scene_Battle**
-
 
 #### インスタンスメソッド
 
@@ -3619,9 +3430,7 @@ Scene_SaveとScene_Loadのスーパークラス。
 
 ゲームオーバー画面のシーンクラス。
 
-- **ソースファイル**: `rmmz_scenes.js`
 - **継承**: `Stage` → `Scene_Base` → **Scene_Gameover**
-
 
 #### インスタンスメソッド
 
@@ -3641,15 +3450,15 @@ Scene_SaveとScene_Loadのスーパークラス。
 
 ## Sprites
 
-ゲーム画面に描画されるスプライトの `Sprite_*` / `Spriteset_*` クラス群です。 ( `rmmz_sprites.js` )
+ゲーム画面に描画されるスプライトの `Sprite_*` / `Spriteset_*` クラス群。
+
+ソースファイル: `rmmz_sprites.js`
 
 ### Sprite_Clickable
 
 クリック処理機能を持つスプライトクラス。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → **Sprite_Clickable**
-
 
 #### インスタンスメソッド
 
@@ -3669,9 +3478,7 @@ Scene_SaveとScene_Loadのスーパークラス。
 
 ボタン表示用のスプライトクラス。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → `Sprite_Clickable` → **Sprite_Button**
-
 
 #### インスタンスメソッド
 
@@ -3694,9 +3501,7 @@ Scene_SaveとScene_Loadのスーパークラス。
 
 キャラクター表示用のスプライトクラス。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → **Sprite_Character**
-
 
 #### インスタンスメソッド
 
@@ -3732,9 +3537,7 @@ Scene_SaveとScene_Loadのスーパークラス。
 
 Sprite_ActorとSprite_Enemyのスーパークラス。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → `Sprite_Clickable` → **Sprite_Battler**
-
 
 #### インスタンスメソッド
 
@@ -3771,9 +3574,7 @@ Sprite_ActorとSprite_Enemyのスーパークラス。
 
 アクター表示用のスプライトクラス。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → `Sprite_Clickable` → `Sprite_Battler` → **Sprite_Actor**
-
 
 #### インスタンスメソッド
 
@@ -3814,9 +3615,7 @@ Sprite_ActorとSprite_Enemyのスーパークラス。
 
 敵キャラクター表示用のスプライトクラス。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → `Sprite_Clickable` → `Sprite_Battler` → **Sprite_Enemy**
-
 
 #### インスタンスメソッド
 
@@ -3858,9 +3657,7 @@ Sprite_ActorとSprite_Enemyのスーパークラス。
 
 アニメーション表示用のスプライトクラス。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → **Sprite_Animation**
-
 
 #### インスタンスメソッド
 
@@ -3891,9 +3688,7 @@ Sprite_ActorとSprite_Enemyのスーパークラス。
 
 旧フォーマット(MV形式)のアニメーション表示用のスプライトクラス。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → **Sprite_AnimationMV**
-
 
 #### インスタンスメソッド
 
@@ -3928,9 +3723,7 @@ Sprite_ActorとSprite_Enemyのスーパークラス。
 
 戦闘背景画像表示用のスプライトクラス。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `TilingSprite` → **Sprite_Battleback**
-
 
 #### インスタンスメソッド
 
@@ -3956,9 +3749,7 @@ Sprite_ActorとSprite_Enemyのスーパークラス。
 
 ダメージポップアップ表示用のスプライトクラス。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → **Sprite_Damage**
-
 
 #### インスタンスメソッド
 
@@ -3985,9 +3776,7 @@ Sprite_ActorとSprite_Enemyのスーパークラス。
 
 ステータスゲージ表示用のスプライトクラス。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → **Sprite_Gauge**
-
 
 #### インスタンスメソッド
 
@@ -4042,9 +3831,7 @@ Sprite_ActorとSprite_Enemyのスーパークラス。
 
 名前表示用のスプライトクラス。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → **Sprite_Name**
-
 
 #### インスタンスメソッド
 
@@ -4070,9 +3857,7 @@ Sprite_ActorとSprite_Enemyのスーパークラス。
 
 ステートアイコン表示用のスプライトクラス。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → **Sprite_StateIcon**
-
 
 #### インスタンスメソッド
 
@@ -4090,9 +3875,7 @@ Sprite_ActorとSprite_Enemyのスーパークラス。
 
 ステートのオーバーレイ画像表示用のスプライトクラス。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → **Sprite_StateOverlay**
-
 
 #### インスタンスメソッド
 
@@ -4109,9 +3892,7 @@ Sprite_ActorとSprite_Enemyのスーパークラス。
 
 攻撃時の武器画像表示用のスプライトクラス。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → **Sprite_Weapon**
-
 
 #### インスタンスメソッド
 
@@ -4129,9 +3910,7 @@ Sprite_ActorとSprite_Enemyのスーパークラス。
 
 フキダシアイコン表示用のスプライトクラス。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → **Sprite_Balloon**
-
 
 #### インスタンスメソッド
 
@@ -4151,9 +3930,7 @@ Sprite_ActorとSprite_Enemyのスーパークラス。
 
 ピクチャ表示用のスプライトクラス。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → `Sprite_Clickable` → **Sprite_Picture**
-
 
 #### インスタンスメソッド
 
@@ -4172,9 +3949,7 @@ Sprite_ActorとSprite_Enemyのスーパークラス。
 
 タイマー表示用のスプライトクラス。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → **Sprite_Timer**
-
 
 #### インスタンスメソッド
 
@@ -4194,9 +3969,7 @@ Sprite_ActorとSprite_Enemyのスーパークラス。
 
 タッチ入力の目的地表示用のスプライトクラス。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → **Sprite_Destination**
-
 
 #### インスタンスメソッド
 
@@ -4211,9 +3984,7 @@ Sprite_ActorとSprite_Enemyのスーパークラス。
 
 Spriteset_MapとSpriteset_Battleのスーパークラス。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → **Spriteset_Base**
-
 
 #### インスタンスメソッド
 
@@ -4251,9 +4022,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 マップ画面のスプライトセット。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → `Spriteset_Base` → **Spriteset_Map**
-
 
 #### インスタンスメソッド
 
@@ -4287,9 +4056,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 戦闘画面のスプライトセット。
 
-- **ソースファイル**: `rmmz_sprites.js`
 - **継承**: `Sprite` → `Spriteset_Base` → **Spriteset_Battle**
-
 
 #### インスタンスメソッド
 
@@ -4316,15 +4083,15 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 ## Windows
 
-ゲーム内UI用の `Window_*` クラス群です。 ( `rmmz_windows.js` )
+ゲーム内UI用の `Window_*` クラス群。
+
+ソースファイル: `rmmz_windows.js`
 
 ### Window_Base
 
 ゲーム内の全ウィンドウのスーパークラス。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → **Window_Base**
-
 
 #### インスタンスメソッド
 
@@ -4404,9 +4171,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 スクロール機能を持つウィンドウクラス。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → **Window_Scrollable**
-
 
 #### インスタンスメソッド
 
@@ -4450,9 +4215,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 項目選択機能を持つウィンドウクラス。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → **Window_Selectable**
-
 
 #### インスタンスメソッド
 
@@ -4548,9 +4311,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 コマンド選択ウィンドウの基底クラス。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → **Window_Command**
-
 
 #### インスタンスメソッド
 
@@ -4579,9 +4340,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 横並びコマンド選択ウィンドウの基底クラス。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_Command` → **Window_HorzCommand**
-
 
 #### インスタンスメソッド
 
@@ -4593,9 +4352,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 ヘルプテキスト表示用のウィンドウクラス。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → **Window_Help**
-
 
 #### インスタンスメソッド
 
@@ -4609,9 +4366,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 所持金表示用のウィンドウクラス。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → **Window_Gold**
-
 
 #### インスタンスメソッド
 
@@ -4626,9 +4381,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 アクターステータス表示ウィンドウのスーパークラス。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → **Window_StatusBase**
-
 
 #### インスタンスメソッド
 
@@ -4656,7 +4409,6 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 メニュー画面のコマンド選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_Command` → **Window_MenuCommand**
 
 
@@ -4687,9 +4439,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 メニュー画面のパーティメンバーステータス表示ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_StatusBase` → **Window_MenuStatus**
-
 
 #### インスタンスメソッド
 
@@ -4714,9 +4464,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 アイテム・スキル画面の対象アクター選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_StatusBase` → `Window_MenuStatus` → **Window_MenuActor**
-
 
 #### インスタンスメソッド
 
@@ -4729,9 +4477,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 アイテム・ショップ画面のアイテムカテゴリ選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_Command` → `Window_HorzCommand` → **Window_ItemCategory**
-
 
 #### インスタンスメソッド
 
@@ -4747,9 +4493,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 アイテム画面のアイテム選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → **Window_ItemList**
-
 
 #### インスタンスメソッド
 
@@ -4776,9 +4520,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 スキル画面のスキルタイプ選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_Command` → **Window_SkillType**
-
 
 #### インスタンスメソッド
 
@@ -4793,9 +4535,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 スキル画面のスキル使用者ステータス表示ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_StatusBase` → **Window_SkillStatus**
-
 
 #### インスタンスメソッド
 
@@ -4807,9 +4547,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 スキル画面のスキル選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → **Window_SkillList**
-
 
 #### インスタンスメソッド
 
@@ -4836,9 +4574,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 装備画面のパラメータ変化表示ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_StatusBase` → **Window_EquipStatus**
-
 
 #### インスタンスメソッド
 
@@ -4862,9 +4598,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 装備画面のコマンド選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_Command` → `Window_HorzCommand` → **Window_EquipCommand**
-
 
 #### インスタンスメソッド
 
@@ -4876,9 +4610,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 装備画面の装備スロット選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_StatusBase` → **Window_EquipSlot**
-
 
 #### インスタンスメソッド
 
@@ -4900,9 +4632,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 装備画面の装備品選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_ItemList` → **Window_EquipItem**
-
 
 #### インスタンスメソッド
 
@@ -4923,9 +4653,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 ステータス画面の詳細ステータス表示ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_StatusBase` → **Window_Status**
-
 
 #### インスタンスメソッド
 
@@ -4945,9 +4673,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 ステータス画面のパラメータ表示ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_StatusBase` → **Window_StatusParams**
-
 
 #### インスタンスメソッド
 
@@ -4962,9 +4688,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 ステータス画面の装備品表示ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_StatusBase` → **Window_StatusEquip**
-
 
 #### インスタンスメソッド
 
@@ -4979,9 +4703,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 オプション画面の設定変更ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_Command` → **Window_Options**
-
 
 #### インスタンスメソッド
 
@@ -5008,9 +4730,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 セーブ・ロード画面のセーブファイル選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → **Window_SavefileList**
-
 
 #### インスタンスメソッド
 
@@ -5035,9 +4755,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 ショップ画面の売買選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_Command` → `Window_HorzCommand` → **Window_ShopCommand**
-
 
 #### インスタンスメソッド
 
@@ -5050,9 +4768,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 ショップ画面の購入アイテム選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → **Window_ShopBuy**
-
 
 #### インスタンスメソッド
 
@@ -5077,9 +4793,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 ショップ画面の売却アイテム選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_ItemList` → **Window_ShopSell**
-
 
 #### インスタンスメソッド
 
@@ -5090,9 +4804,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 ショップ画面の売買個数入力ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → **Window_ShopNumber**
-
 
 #### インスタンスメソッド
 
@@ -5135,9 +4847,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 ショップ画面の所持数・アクター装備状況表示ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_StatusBase` → **Window_ShopStatus**
-
 
 #### インスタンスメソッド
 
@@ -5163,9 +4873,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 名前入力画面のアクター名編集ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_StatusBase` → **Window_NameEdit**
-
 
 #### インスタンスメソッド
 
@@ -5189,9 +4897,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 名前入力画面の文字選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → **Window_NameInput**
-
 
 #### インスタンスメソッド
 
@@ -5229,9 +4935,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 メッセージウィンドウ上部の話者名表示ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → **Window_NameBox**
-
 
 #### インスタンスメソッド
 
@@ -5250,9 +4954,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 イベントコマンド「選択肢の表示」用のウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_Command` → **Window_ChoiceList**
-
 
 #### インスタンスメソッド
 
@@ -5284,9 +4986,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 イベントコマンド「数値入力の処理」用のウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → **Window_NumberInput**
-
 
 #### インスタンスメソッド
 
@@ -5323,9 +5023,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 イベントコマンド「アイテム選択の処理」用のウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_ItemList` → **Window_EventItem**
-
 
 #### インスタンスメソッド
 
@@ -5347,9 +5045,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 テキストメッセージ表示用のウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → **Window_Message**
-
 
 #### インスタンスメソッド
 
@@ -5402,9 +5098,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 スクロールテキスト表示用のウィンドウ。枠なし。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → **Window_ScrollText**
-
 
 #### インスタンスメソッド
 
@@ -5424,9 +5118,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 マップ画面のマップ名表示ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → **Window_MapName**
-
 
 #### インスタンスメソッド
 
@@ -5443,9 +5135,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 戦闘経過表示用のウィンドウ。枠なしだがWindow_Baseを継承。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → **Window_BattleLog**
-
 
 #### インスタンスメソッド
 
@@ -5526,9 +5216,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 戦闘画面の「戦う/逃げる」選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_Command` → **Window_PartyCommand**
-
 
 #### インスタンスメソッド
 
@@ -5540,9 +5228,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 戦闘画面のアクターコマンド選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_Command` → **Window_ActorCommand**
-
 
 #### インスタンスメソッド
 
@@ -5561,9 +5247,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 戦闘画面のパーティメンバーステータス表示ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_StatusBase` → **Window_BattleStatus**
-
 
 #### インスタンスメソッド
 
@@ -5594,9 +5278,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 戦闘画面の対象アクター選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_StatusBase` → `Window_BattleStatus` → **Window_BattleActor**
-
 
 #### インスタンスメソッド
 
@@ -5610,9 +5292,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 戦闘画面の対象敵キャラクター選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → **Window_BattleEnemy**
-
 
 #### インスタンスメソッド
 
@@ -5632,9 +5312,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 戦闘画面のスキル選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_SkillList` → **Window_BattleSkill**
-
 
 #### インスタンスメソッド
 
@@ -5646,9 +5324,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 戦闘画面のアイテム選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_ItemList` → **Window_BattleItem**
-
 
 #### インスタンスメソッド
 
@@ -5661,7 +5337,6 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 タイトル画面の「ニューゲーム/コンティニュー」選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_Command` → **Window_TitleCommand**
 
 
@@ -5681,9 +5356,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 ゲーム終了画面の「タイトルへ」選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → `Window_Command` → **Window_GameEnd**
-
 
 #### インスタンスメソッド
 
@@ -5694,7 +5367,6 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 デバッグ画面のスイッチ/変数ブロック選択ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → **Window_DebugRange**
 
 
@@ -5720,9 +5392,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 デバッグ画面のスイッチ/変数表示ウィンドウ。
 
-- **ソースファイル**: `rmmz_windows.js`
 - **継承**: `Window` → `Window_Base` → `Window_Scrollable` → `Window_Selectable` → **Window_DebugEdit**
-
 
 #### インスタンスメソッド
 
