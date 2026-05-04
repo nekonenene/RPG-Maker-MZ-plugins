@@ -1,8 +1,7 @@
 # RPGツクールMZ クラス一覧
 
-> このドキュメントは、RPGツクールMZ v1.10.0 のコアスクリプトに含まれる全クラスの
-> リファレンスです。プラグイン開発時に参照することを目的としています。
-> ⭐ マークはプラグイン開発で特に重要なクラスを示します。
+RPGツクールMZ v1.10.0 のコアスクリプトに含まれる全クラスのリファレンス。
+プラグイン開発時に参照することを目的としている。
 
 ## ファイル構成
 
@@ -10,10 +9,10 @@
 |---|---|---|
 | `rmmz_core.js` | 描画・入力・音声の基盤 | 15 |
 | `rmmz_managers.js` | データ管理・シーン管理 | 13 |
-| `rmmz_objects.js` | ゲームロジック (Game_\*) | 31 |
-| `rmmz_scenes.js` | 画面遷移 (Scene_\*) | 21 |
-| `rmmz_sprites.js` | スプライト表示 (Sprite_\*) | 22 |
-| `rmmz_windows.js` | ウィンドウUI (Window_\*) | 41 |
+| `rmmz_objects.js` | ゲームロジック (Game_*) | 31 |
+| `rmmz_scenes.js` | 画面遷移 (Scene_*) | 21 |
+| `rmmz_sprites.js` | スプライト表示 (Sprite_*) | 22 |
+| `rmmz_windows.js` | ウィンドウUI (Window_*) | 41 |
 
 ## グローバル変数
 
@@ -58,56 +57,6 @@
 | `$gameTroop` | `Game_Troop` | ✗ | 現在の敵グループ |
 | `$gameMap` | `Game_Map` | ✓ | 現在のマップ |
 | `$gamePlayer` | `Game_Player` | ✓ | プレイヤーキャラクター |
-
-## プラグイン開発パターン
-
-### メソッドのオーバーライド（エイリアス方式）
-
-MZプラグインでは、既存メソッドを拡張する際に以下のパターンを使用する：
-
-```js
-const _OriginalClass_methodName = OriginalClass.prototype.methodName;
-OriginalClass.prototype.methodName = function() {
-    _OriginalClass_methodName.call(this);
-    // 追加処理
-};
-```
-
-引数がある場合：
-
-```js
-const _Game_Actor_setup = Game_Actor.prototype.setup;
-Game_Actor.prototype.setup = function(actorId) {
-    _Game_Actor_setup.call(this, actorId);
-    this._customProperty = 0;
-};
-```
-
-### プラグインパラメータの取得
-
-```js
-const pluginName = "MyPlugin";
-const parameters = PluginManager.parameters(pluginName);
-const myParam = Number(parameters["paramName"] || 0);
-```
-
-### プラグインコマンドの登録 (MZ固有)
-
-```js
-PluginManager.registerCommand(pluginName, "commandName", args => {
-    const value = Number(args.value);
-    // 処理
-});
-```
-
-### メモ欄(Note)の利用
-
-データベースのメモ欄に記載されたメタデータは `meta` プロパティでアクセスできる：
-
-```js
-// メモ欄に <CustomTag:100> と書いた場合
-const value = $dataActors[actorId].meta.CustomTag; // "100" (文字列)
-```
 
 ---
 
@@ -511,7 +460,7 @@ Web Audio APIのオーディオオブジェクト。
 
 データ管理・シーン管理・リソース管理を行うマネージャークラス群です。すべて静的クラスです。 ( `rmmz_managers.js` )
 
-### DataManager ⭐
+### DataManager
 
 データベースとゲームオブジェクトを管理する静的クラス。
 
@@ -566,7 +515,7 @@ Web Audio APIのオーディオオブジェクト。
 - `extractSaveContents(contents)` — セーブデータの内容からゲームオブジェクトを復元する。
 - `correctDataErrors()` — セーブデータのデータエラーを修正する。
 
-### ConfigManager ⭐
+### ConfigManager
 
 設定データを管理する静的クラス。
 
@@ -651,7 +600,7 @@ Web Audio APIのオーディオオブジェクト。
 - `throwLoadError(family)` — フォント読み込みエラーを投げる。
 - `makeUrl(filename)` — フォントファイルのURLを生成する。
 
-### ImageManager ⭐
+### ImageManager
 
 画像の読み込み・Bitmapオブジェクトの作成・保持を行う静的クラス。
 
@@ -718,7 +667,7 @@ Effekseerエフェクトの読み込みを管理する静的クラス。
 - `throwLoadError(url)` — エフェクト読み込みエラーを投げる。
 - `isReady()` — 全てのエフェクトの読み込みが完了したかを確認する。
 
-### AudioManager ⭐
+### AudioManager
 
 BGM・BGS・ME・SEの再生を管理する静的クラス。
 
@@ -808,7 +757,7 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 - `playUseItem()` — アイテム使用音を再生する。
 - `playUseSkill()` — スキル使用音を再生する。
 
-### TextManager ⭐
+### TextManager
 
 用語やメッセージを管理する静的クラス。
 
@@ -827,7 +776,7 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 
 - `currencyUnit` — 通貨単位の文字列（$dataSystem.currencyUnit を返す）。
 
-### ColorManager ⭐
+### ColorManager
 
 ウィンドウカラーを管理する静的クラス。
 
@@ -867,7 +816,7 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 - `itemBackColor1()` — アイテム背景の色1を返す。
 - `itemBackColor2()` — アイテム背景の色2を返す。
 
-### SceneManager ⭐
+### SceneManager
 
 シーン遷移を管理する静的クラス。
 
@@ -925,7 +874,7 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 - `backgroundBitmap()` — 背景用のスナップショットビットマップを返す。
 - `resume()` — シーンの更新を再開する。
 
-### BattleManager ⭐
+### BattleManager
 
 戦闘進行を管理する静的クラス。
 
@@ -1038,7 +987,7 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 - `gainGold()` — パーティにゴールドを付与する。
 - `gainDropItems()` — ドロップアイテムをパーティのインベントリに追加する。
 
-### PluginManager ⭐
+### PluginManager
 
 プラグインを管理する静的クラス。
 
@@ -1064,7 +1013,7 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 
 ゲームロジックを構成する `Game_*` クラス群です。セーブデータとして保存されるものが多いです。 ( `rmmz_objects.js` )
 
-### Game_Temp ⭐
+### Game_Temp
 
 セーブデータに含まれない一時データ用のゲームオブジェクトクラス。
 
@@ -1103,7 +1052,7 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 - `setLastTargetActorId(actorID)` — 最後の対象アクターIDを設定する。
 - `setLastTargetEnemyIndex(enemyIndex)` — 最後の対象敵インデックスを設定する。
 
-### Game_System ⭐
+### Game_System
 
 システムデータ用のゲームオブジェクトクラス。
 
@@ -1184,7 +1133,7 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 - `frames()` — 残りフレーム数を返す。
 - `onExpire()` — タイマー満了時のコールバック（デフォルト: 戦闘中断）。
 
-### Game_Message ⭐
+### Game_Message
 
 テキストや選択肢などを表示するメッセージウィンドウの状態を管理するクラス。
 
@@ -1279,7 +1228,7 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 - `setValue(key, value)` — 指定されたキーのセルフスイッチ値を設定する。
 - `onChange()` — セルフスイッチ変更時のコールバック。
 
-### Game_Screen ⭐
+### Game_Screen
 
 色調変更やフラッシュなどの画面エフェクトデータ用のクラス。
 
@@ -1393,7 +1342,7 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 - `setObject(item)` — データベースオブジェクトからデータクラスとIDをセットする。
 - `setEquip(isWeapon, itemId)` — 装備品として設定する（武器/防具とIDを直接指定）。
 
-### Game_Action ⭐
+### Game_Action
 
 戦闘行動用のゲームオブジェクトクラス。
 
@@ -1555,7 +1504,7 @@ BGM・BGS・ME・SEの再生を管理する静的クラス。
 - `isBuffRemoved(paramId)` — 指定パラメータのバフが解除されたかを確認する。
 - `pushRemovedBuff(paramId)` — 解除バフリストに追加する。`
 
-### Game_BattlerBase ⭐
+### Game_BattlerBase
 
 Game_Battlerのスーパークラス。主にパラメータ計算を行う。
 
@@ -1725,7 +1674,7 @@ Game_Battlerのスーパークラス。主にパラメータ計算を行う。
 - `canAttack()` — 通常攻撃可能かを確認する。
 - `canGuard()` — 防御可能かを確認する。
 
-### Game_Battler ⭐
+### Game_Battler
 
 Game_ActorとGame_Enemyのスーパークラス。スプライトやアクション関連のメソッドを含む。
 
@@ -1856,7 +1805,7 @@ Game_ActorとGame_Enemyのスーパークラス。スプライトやアクショ
 - `performSubstitute(/*target*/)` — 身代わり時の演出を実行する。
 - `performCollapse()` — 戦闘不能時の消滅演出を実行する。
 
-### Game_Actor ⭐
+### Game_Actor
 
 アクター用のゲームオブジェクトクラス。
 
@@ -2001,7 +1950,7 @@ Game_ActorとGame_Enemyのスーパークラス。スプライトやアクショ
 - `meetsUsableItemConditions(item)` — アイテム使用条件を満たすかを確認する。
 - `onEscapeFailure()` — 逃走失敗時のコールバック（TPBペナルティ適用）。
 
-### Game_Enemy ⭐
+### Game_Enemy
 
 敵キャラクター用のゲームオブジェクトクラス。
 
@@ -2101,7 +2050,7 @@ Game_PartyとGame_Troopのスーパークラス。
 - `tpbReferenceTime()` — TPBの参照時間を返す。
 - `updateTpb()` — 全メンバーのTPBを更新する。
 
-### Game_Party ⭐
+### Game_Party
 
 パーティ用のゲームオブジェクトクラス。所持金やアイテムなどの情報を含む。
 
@@ -2194,7 +2143,7 @@ Game_PartyとGame_Troopのスーパークラス。
 - `requestMotionRefresh()` — 全メンバーのモーションリフレッシュを要求する。
 - `onEscapeFailure()` — 逃走失敗時のコールバック。
 
-### Game_Troop ⭐
+### Game_Troop
 
 敵グループおよび戦闘関連データ用のゲームオブジェクトクラス。
 
@@ -2225,7 +2174,7 @@ Game_PartyとGame_Troopのスーパークラス。
 - `makeDropItems()` — 全敵のドロップアイテムをまとめて返す。
 - `isTpbTurnEnd()` — TPBターンが終了したかを確認する。
 
-### Game_Map ⭐
+### Game_Map
 
 マップ用のゲームオブジェクトクラス。スクロールや通行判定の機能を含む。
 
@@ -2361,7 +2310,7 @@ Game_PartyとGame_Troopのスーパークラス。
 - `isActive()` — アクティブ（実行条件を満たす）かを確認する。
 - `update()` — 毎フレーム更新する。
 
-### Game_CharacterBase ⭐
+### Game_CharacterBase
 
 Game_Characterのスーパークラス。座標や画像などの基本情報を扱う。
 
@@ -2464,7 +2413,7 @@ Game_Characterのスーパークラス。座標や画像などの基本情報を
 - `endAnimation()` — アニメーションを終了する。
 - `endBalloon()` — フキダシアイコンを終了する。
 
-### Game_Character ⭐
+### Game_Character
 
 Game_Player・Game_Follower・Game_Vehicle・Game_Eventのスーパークラス。
 
@@ -2557,7 +2506,7 @@ Game_Player・Game_Follower・Game_Vehicle・Game_Eventのスーパークラス�
 - `findDirectionTo(goalX, goalY)` — 目標座標への最短経路の方向を探索する。
 - `searchLimit()` — 経路探索の最大距離を返す。
 
-### Game_Player ⭐
+### Game_Player
 
 プレイヤーキャラクター用のゲームオブジェクトクラス。
 
@@ -2728,7 +2677,7 @@ Game_Player・Game_Follower・Game_Vehicle・Game_Eventのスーパークラス�
 - `isTakeoffOk()` — 離陸可能かを確認する。
 - `isLandOk(x, y, d)` — 着陸可能かを確認する。
 
-### Game_Event ⭐
+### Game_Event
 
 イベント用のゲームオブジェクトクラス。イベントページの切り替え機能を含む。
 
@@ -2776,7 +2725,7 @@ Game_Player・Game_Follower・Game_Vehicle・Game_Eventのスーパークラス�
 - `locate(x, y)` — 指定座標に配置する。
 - `forceMoveRoute(moveRoute)` — 移動ルートを強制実行する。
 
-### Game_Interpreter ⭐
+### Game_Interpreter
 
 イベントコマンドを実行するインタプリタ。
 
@@ -2945,7 +2894,7 @@ Game_Player・Game_Follower・Game_Vehicle・Game_Eventのスーパークラス�
 
 画面遷移を管理する `Scene_*` クラス群です。各画面が1つのシーンクラスに対応します。 ( `rmmz_scenes.js` )
 
-### Scene_Base ⭐
+### Scene_Base
 
 ゲーム内の全シーンのスーパークラス。
 
@@ -2996,7 +2945,7 @@ Game_Player・Game_Follower・Game_Vehicle・Game_Eventのスーパークラス�
 - `onAutosaveSuccess()` — オートセーブ成功時のコールバック。
 - `onAutosaveFailure()` — オートセーブ失敗時のコールバック。
 
-### Scene_Boot ⭐
+### Scene_Boot
 
 ゲーム全体の初期化を行うシーンクラス。
 
@@ -3047,7 +2996,7 @@ Game_Player・Game_Follower・Game_Vehicle・Game_Eventのスーパークラス�
 - `checkSkip()` — タッチやクリックでスキップされたかをチェックする。
 - `gotoTitle()` — タイトル画面に遷移する。
 
-### Scene_Title ⭐
+### Scene_Title
 
 タイトル画面のシーンクラス。
 
@@ -3101,7 +3050,7 @@ Scene_MapとScene_Battleのスーパークラス。共通するメッセージ�
 - `associateWindows()` — 各メッセージウィンドウ群をメッセージウィンドウ本体に関連付ける。
 - `cancelMessageWait()` — メッセージ表示のウェイトをキャンセルする。
 
-### Scene_Map ⭐
+### Scene_Map
 
 マップ画面のシーンクラス。
 
@@ -3165,7 +3114,7 @@ Scene_MapとScene_Battleのスーパークラス。共通するメッセージ�
 - `startFlashForEncounter(duration)` — エンカウント時の画面フラッシュエフェクトを実行する。
 - `encounterEffectSpeed()` — エンカウントエフェクトの速度（60）を返す。
 
-### Scene_MenuBase ⭐
+### Scene_MenuBase
 
 すべてのメニュー系シーン（メニュー、アイテム、スキル、装備、セーブ等）のスーパークラス。
 
@@ -3203,7 +3152,7 @@ Scene_MapとScene_Battleのスーパークラス。共通するメッセージ�
 - `previousActor()`
 - `onActorChange()` — Actor Change時のコールバック。
 
-### Scene_Menu ⭐
+### Scene_Menu
 
 メニュー画面のシーンクラス。
 
@@ -3581,7 +3530,7 @@ Scene_SaveとScene_Loadのスーパークラス。
 - `refreshHelpWindow()` — ヘルプウィンドウのテキストを再描画する。
 - `helpText()` — ヘルプテキスト（操作方法の説明など）を返す。
 
-### Scene_Battle ⭐
+### Scene_Battle
 
 戦闘画面のシーンクラス。
 
@@ -3694,7 +3643,7 @@ Scene_SaveとScene_Loadのスーパークラス。
 
 ゲーム画面に描画されるスプライトの `Sprite_*` / `Spriteset_*` クラス群です。 ( `rmmz_sprites.js` )
 
-### Sprite_Clickable ⭐
+### Sprite_Clickable
 
 クリック処理機能を持つスプライトクラス。
 
@@ -3741,7 +3690,7 @@ Scene_SaveとScene_Loadのスーパークラス。
 - `setClickHandler(method)` — クリックされた時に実行されるコールバック関数を設定する。
 - `onClick()` — クリック時に設定されたハンドラを実行する。
 
-### Sprite_Character ⭐
+### Sprite_Character
 
 キャラクター表示用のスプライトクラス。
 
@@ -3779,7 +3728,7 @@ Scene_SaveとScene_Loadのスーパークラス。
 - `updatePosition()` — 画面座標およびZ座標（重ね合わせ順）を更新する。
 - `updateOther()` — アニメーションやフキダシアイコン、不透明度などを更新する。
 
-### Sprite_Battler ⭐
+### Sprite_Battler
 
 Sprite_ActorとSprite_Enemyのスーパークラス。
 
@@ -3818,7 +3767,7 @@ Sprite_ActorとSprite_Enemyのスーパークラス。
 - `onPress()` — 押し続けられた時のコールバック。
 - `onClick()` — クリック（タップ）された時、ターゲット選択決定を行う。
 
-### Sprite_Actor ⭐
+### Sprite_Actor
 
 アクター表示用のスプライトクラス。
 
@@ -3861,7 +3810,7 @@ Sprite_ActorとSprite_Enemyのスーパークラス。
 - `damageOffsetX()` — アクター側のダメージポップアップXオフセット（-32）。
 - `damageOffsetY()` — アクター側のダメージポップアップYオフセット（0）。
 
-### Sprite_Enemy ⭐
+### Sprite_Enemy
 
 敵キャラクター表示用のスプライトクラス。
 
@@ -4032,7 +3981,7 @@ Sprite_ActorとSprite_Enemyのスーパークラス。
 - `updateOpacity()` — 再生終盤に合わせて不透明度を下げ、フェードアウトさせる。
 - `isPlaying()` — ダメージポップアップが再生中かを確認する。
 
-### Sprite_Gauge ⭐
+### Sprite_Gauge
 
 ステータスゲージ表示用のスプライトクラス。
 
@@ -4258,7 +4207,7 @@ Sprite_ActorとSprite_Enemyのスーパークラス。
 - `updatePosition()` — `$gameTemp` に設定された目的地へ座標を更新する。
 - `updateAnimation()` — 不透明度や拡大アニメーションの進行（フレームによる変化）を更新する。
 
-### Spriteset_Base ⭐
+### Spriteset_Base
 
 Spriteset_MapとSpriteset_Battleのスーパークラス。
 
@@ -4298,7 +4247,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 - `removeAllAnimations()` — 現在再生中のすべてのアニメーションを削除・破棄する。
 - `isAnimationPlaying()` — いずれかのアニメーションが再生中かを確認する。
 
-### Spriteset_Map ⭐
+### Spriteset_Map
 
 マップ画面のスプライトセット。
 
@@ -4334,7 +4283,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 - `findTargetSprite(target)` — 指定された対象（キャラ等）に対応するスプライトを検索する。
 - `animationBaseDelay()` — アニメーション再生開始の基礎的な遅延を返す。
 
-### Spriteset_Battle ⭐
+### Spriteset_Battle
 
 戦闘画面のスプライトセット。
 
@@ -4369,7 +4318,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 
 ゲーム内UI用の `Window_*` クラス群です。 ( `rmmz_windows.js` )
 
-### Window_Base ⭐
+### Window_Base
 
 ゲーム内の全ウィンドウのスーパークラス。
 
@@ -4497,7 +4446,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 - `updateScrollBase(baseX, baseY)` — スクロール変化分を計算してスクロール基点値に加算・更新する。
 - `paint()` — スクロール時の内部要素などの再描画処理のトリガー。
 
-### Window_Selectable ⭐
+### Window_Selectable
 
 項目選択機能を持つウィンドウクラス。
 
@@ -4595,7 +4544,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 - `refreshCursor()` — カーソルの表示位置・矩形を更新する。
 - `refreshCursorForAll()` — 全体選択時用にカーソル矩形を全体サイズに更新する。
 
-### Window_Command ⭐
+### Window_Command
 
 コマンド選択ウィンドウの基底クラス。
 
@@ -4673,7 +4622,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 - `currencyUnit()` — 設定された通貨の単位（「G」など）を返す。
 - `open()` — ウィンドウを開き、同時に表示内容を最新の情報にリフレッシュする。
 
-### Window_StatusBase ⭐
+### Window_StatusBase
 
 アクターステータス表示ウィンドウのスーパークラス。
 
@@ -5394,7 +5343,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 - `onOk()` — アイテム決定時に対象のIDをゲーム変数へ保存し、イベントインタプリタに通知する。
 - `onCancel()` — キャンセル時にゲーム変数「0」を保存し、イベントインタプリタに通知する。
 
-### Window_Message ⭐
+### Window_Message
 
 テキストメッセージ表示用のウィンドウ。
 
@@ -5490,7 +5439,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 - `refresh()` — マップ名を取得して背景とテキストを描画する。
 - `drawBackground(x, y, width, height)` — マップ名表示用の半透明な黒背景を描画する。
 
-### Window_BattleLog ⭐
+### Window_BattleLog
 
 戦闘経過表示用のウィンドウ。枠なしだがWindow_Baseを継承。
 
@@ -5608,7 +5557,7 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 - `processOk()` — 対象アクターの直前のコマンド選択記録を残しつつ、決定ハンドラを呼ぶ。
 - `selectLast()` — 対象アクターが前回選択したコマンド（インデックス）を再選択し、カーソルを合わせる。
 
-### Window_BattleStatus ⭐
+### Window_BattleStatus
 
 戦闘画面のパーティメンバーステータス表示ウィンドウ。
 
@@ -5789,6 +5738,3 @@ Spriteset_MapとSpriteset_Battleのスーパークラス。
 - `updateSwitch()` — 決定ボタンによるスイッチのON/OFF切り替えの入力を処理する。
 - `updateVariable()` — 左右ボタンやLRボタンによる変数の数値の増減入力を処理する。
 - `deltaForVariable()` — LRボタンまたは左右ボタンの入力に応じて、変数を増減させるための変動量（1、10等）を計算する。
-
----
-
