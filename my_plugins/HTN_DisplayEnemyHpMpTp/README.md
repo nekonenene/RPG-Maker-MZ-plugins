@@ -5,6 +5,8 @@ RPGツクールMZ用のプラグインです。
 戦闘中に敵キャラのHP・MP・TPをゲージ（バー）で表示できるようになります。  
 戦闘のデバッグ時に便利です。
 
+![Screenshot1.png](./images/Screenshot1.png)
+
 ## 🛠️ 導入方法
 
 **[【ここを右クリックして「名前を付けてリンク先を保存」みたいな項目を選んでダウンロード】](https://raw.githubusercontent.com/nekonenene/RPG-Maker-MZ-plugins/main/my_plugins/HTN_DisplayEnemyHpMpTp/HTN_DisplayEnemyHpMpTp.js)**
