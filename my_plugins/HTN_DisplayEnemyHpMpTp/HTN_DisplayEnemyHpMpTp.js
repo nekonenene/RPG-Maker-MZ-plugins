@@ -88,7 +88,7 @@
  * @text Gauge Margin
  * @desc Vertical spacing between gauges in pixels.
  * @type number
- * @default 2
+ * @default 0
  * @min 0
  *
  * @param GaugeOffsetX
@@ -207,7 +207,7 @@
  * @text ゲージ間の余白
  * @desc ゲージ同士の縦方向の余白 (px)
  * @type number
- * @default 2
+ * @default 0
  * @min 0
  *
  * @param GaugeOffsetX
@@ -261,7 +261,7 @@
   const gaugePositionDefault = String(parameters.GaugePosition) || 'bottom';
   const gaugeWidthDefault = Number(parameters.GaugeWidth) || 128;
   const gaugeHeight = Number(parameters.GaugeHeight) || 12;
-  const gaugeMargin = Number(parameters.GaugeMargin) || 2;
+  const gaugeMargin = Number(parameters.GaugeMargin) || 0;
   const gaugeOffsetXDefault = Number(parameters.GaugeOffsetX) || 0;
   const gaugeOffsetYDefault = Number(parameters.GaugeOffsetY) || -60;
 
