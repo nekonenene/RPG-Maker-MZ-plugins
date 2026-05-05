@@ -38,7 +38,7 @@
  * @text Show Numeric Values
  * @desc Show the numeric values on gauges.
  * @type boolean
- * @default false
+ * @default true
  *
  * @param ValueFontSize
  * @text Value Font Size
@@ -157,7 +157,7 @@
  * @text 数値を表示
  * @desc ゲージ上にHP・MP・TPの数値を表示するか
  * @type boolean
- * @default false
+ * @default true
  *
  * @param ValueFontSize
  * @text 数値のフォントサイズ
