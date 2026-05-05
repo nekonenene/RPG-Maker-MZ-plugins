@@ -40,11 +40,25 @@
  * @type boolean
  * @default false
  *
+ * @param ValueFontSize
+ * @text Value Font Size
+ * @desc Font size for the numeric values on gauges.
+ * @type number
+ * @default 20
+ * @min 1
+ *
  * @param ShowLabel
  * @text Show Labels
  * @desc Show labels (HP / MP / TP) on gauges. Label text follows the game system settings.
  * @type boolean
  * @default true
+ *
+ * @param LabelFontSize
+ * @text Label Font Size
+ * @desc Font size for the labels on gauges.
+ * @type number
+ * @default 24
+ * @min 1
  *
  * @param GaugePosition
  * @text Gauge Position
@@ -145,11 +159,25 @@
  * @type boolean
  * @default false
  *
+ * @param ValueFontSize
+ * @text 数値のフォントサイズ
+ * @desc ゲージ上の数値のフォントサイズ
+ * @type number
+ * @default 20
+ * @min 1
+ *
  * @param ShowLabel
  * @text ラベルを表示
  * @desc ゲージ上にHP・MP・TP等のラベルを表示するか。ラベル文字列はゲームのシステム設定に従います
  * @type boolean
  * @default true
+ *
+ * @param LabelFontSize
+ * @text ラベルのフォントサイズ
+ * @desc ラベルのフォントサイズ
+ * @type number
+ * @default 24
+ * @min 1
  *
  * @param GaugePosition
  * @text ゲージの表示位置
@@ -227,7 +255,9 @@
   const showMpGauge = String(parameters.ShowMpGauge) === 'true';
   const showTpGauge = String(parameters.ShowTpGauge) === 'true';
   const showValueDefault = String(parameters.ShowValue) === 'true';
+  const valueFontSize = Number(parameters.ValueFontSize) || 20;
   const showLabel = String(parameters.ShowLabel) === 'true';
+  const labelFontSize = Number(parameters.LabelFontSize) || 24;
   const gaugePositionDefault = String(parameters.GaugePosition) || 'bottom';
   const gaugeWidthDefault = Number(parameters.GaugeWidth) || 128;
   const gaugeHeight = Number(parameters.GaugeHeight) || 12;
@@ -318,6 +348,24 @@
   };
 
   /**
+   * ラベルのフォントサイズを返す
+   *
+   * @returns {number}
+   */
+  Sprite_HTN_EnemyHpMpTpGauge.prototype.labelFontSize = function() {
+    return labelFontSize;
+  };
+
+  /**
+   * 数値のフォントサイズを返す
+   *
+   * @returns {number}
+   */
+  Sprite_HTN_EnemyHpMpTpGauge.prototype.valueFontSize = function() {
+    return valueFontSize;
+  };
+
+  /**
    * テキスト領域の高さを返す
    * ラベル・数値を非表示のときはゲージバーの高さと同じにしてビットマップを節約する
    *
@@ -328,7 +376,7 @@
       return gaugeHeight;
     }
 
-    return Math.max(24, gaugeHeight);
+    return Math.max(Math.max(labelFontSize, valueFontSize), gaugeHeight);
   };
 
   /**
@@ -338,10 +386,11 @@
    */
   Sprite_HTN_EnemyHpMpTpGauge.prototype.bitmapHeight = function() {
     if (!showLabel && !this.showValue()) {
-      return gaugeHeight + 4;
+      return gaugeHeight;
     }
 
-    return this.textHeight() + 8;
+    // ラベルの文字が埋もれないよう 4px の余白を設ける
+    return this.textHeight() + 4;
   };
 
   /**
