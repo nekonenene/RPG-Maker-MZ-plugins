@@ -105,6 +105,14 @@
  * To hide all gauges for a specific enemy, add the following tag
  * to the enemy's Note field:
  *   <DisplayEnemyHpMpTp_Hide>
+ *
+ * The following tags can be added to an enemy's Note field to override
+ * the plugin parameters for that enemy:
+ *   <DisplayEnemyHpMpTp_ShowValue: true>
+ *   <DisplayEnemyHpMpTp_GaugePosition: top>
+ *   <DisplayEnemyHpMpTp_GaugeWidth: 200>
+ *   <DisplayEnemyHpMpTp_GaugeOffsetX: 0>
+ *   <DisplayEnemyHpMpTp_GaugeOffsetY: 0>
  */
 
 /*:ja
@@ -200,30 +208,41 @@
  * 特定の敵キャラのゲージをすべて非表示にしたい場合は、
  * 敵キャラのメモ欄に以下のタグを記述してください。
  *   <DisplayEnemyHpMpTp_Hide>
+ *
+ * 敵キャラのメモ欄に以下のタグを記述することで、
+ * その敵キャラだけプラグインパラメータの設定を上書きできます。
+ *   <DisplayEnemyHpMpTp_ShowValue: true>
+ *   <DisplayEnemyHpMpTp_GaugePosition: top>
+ *   <DisplayEnemyHpMpTp_GaugeWidth: 200>
+ *   <DisplayEnemyHpMpTp_GaugeOffsetX: 0>
+ *   <DisplayEnemyHpMpTp_GaugeOffsetY: 0>
  */
 
 (() => {
   'use strict';
 
   const pluginName = "HTN_DisplayEnemyHpMpTp";
-  const params = PluginManager.parameters(pluginName);
-  const SHOW_HP = params.ShowHp !== 'false';
-  const SHOW_MP = params.ShowMp !== 'false';
-  const SHOW_TP = params.ShowTp !== 'false';
-  const SHOW_VALUE = params.ShowValue === 'true';
-  const SHOW_LABEL = params.ShowLabel !== 'false';
-  const GAUGE_POSITION = params.GaugePosition || 'bottom';
-  const GAUGE_WIDTH = Number(params.GaugeWidth || 128);
-  const GAUGE_HEIGHT = Number(params.GaugeHeight || 12);
-  const GAUGE_MARGIN = Number(params.GaugeMargin || 2);
-  const GAUGE_OFFSET_X = Number(params.GaugeOffsetX || 0);
-  const GAUGE_OFFSET_Y = Number(params.GaugeOffsetY || 0);
+  const parameters = PluginManager.parameters(pluginName);
+  const showHp = String(parameters.ShowHp) === 'true';
+  const showMp = String(parameters.ShowMp) === 'true';
+  const showTp = String(parameters.ShowTp) === 'true';
+  const showValueDefault = String(parameters.ShowValue) === 'true';
+  const showLabel = String(parameters.ShowLabel) === 'true';
+  const gaugePositionDefault = String(parameters.GaugePosition) || 'bottom';
+  const gaugeWidthDefault = Number(parameters.GaugeWidth) || 128;
+  const gaugeHeight = Number(parameters.GaugeHeight) || 12;
+  const gaugeMargin = Number(parameters.GaugeMargin) || 2;
+  const gaugeOffsetXDefault = Number(parameters.GaugeOffsetX) || 0;
+  const gaugeOffsetYDefault = Number(parameters.GaugeOffsetY) || 0;
 
   // 表示する型のリスト（HP→MP→TP の順）
-  const GAUGE_TYPES = [];
-  if (SHOW_HP) GAUGE_TYPES.push('hp');
-  if (SHOW_MP) GAUGE_TYPES.push('mp');
-  if (SHOW_TP) GAUGE_TYPES.push('tp');
+  const gaugeTypes = [];
+  if (showHp) gaugeTypes.push('hp');
+  if (showMp) gaugeTypes.push('mp');
+  if (showTp) gaugeTypes.push('tp');
+
+  // どのゲージも表示しないなら、以下の処理は不要なのでここで return
+  if (gaugeTypes.length === 0) return;
 
   function Sprite_HTN_EnemyHpMpTpGauge() {
     this.initialize(...arguments);
@@ -233,12 +252,60 @@
   Sprite_HTN_EnemyHpMpTpGauge.prototype.constructor = Sprite_HTN_EnemyHpMpTpGauge;
 
   /**
-   * ゲージビットマップの横幅を返す
+   * エネミーのメタタグを返す。バトラー未設定時は空オブジェクトを返す
+   *
+   * @returns {Object}
+   */
+  Sprite_HTN_EnemyHpMpTpGauge.prototype.enemyMeta = function() {
+    if (this._battler && this._battler.isEnemy()) {
+      return this._battler.enemy().meta;
+    }
+
+    return {};
+  };
+
+  /**
+   * 数値を表示するか。タグで上書きされていればそちらを優先する
+   *
+   * @returns {boolean}
+   */
+  Sprite_HTN_EnemyHpMpTpGauge.prototype.showValue = function() {
+    const meta = this.enemyMeta();
+    if (meta.DisplayEnemyHpMpTp_ShowValue != null) {
+      return String(meta.DisplayEnemyHpMpTp_ShowValue).trim() === 'true';
+    }
+
+    return showValueDefault;
+  };
+
+  /**
+   * バトラー確定後にタグの値でビットマップを再生成してからセットアップする
+   *
+   * @param {Game_Enemy} battler
+   * @param {string} statusType
+   * @returns {void}
+   */
+  Sprite_HTN_EnemyHpMpTpGauge.prototype.setup = function(battler, statusType) {
+    this._battler = battler; // bitmapWidth/Height で参照できるよう先にセット
+
+    this.bitmap.destroy();
+    this.createBitmap();
+
+    Sprite_Gauge.prototype.setup.call(this, battler, statusType);
+  };
+
+  /**
+   * ゲージビットマップの横幅を返す。タグで上書きされていればそちらを優先する
    *
    * @returns {number}
    */
   Sprite_HTN_EnemyHpMpTpGauge.prototype.bitmapWidth = function() {
-    return GAUGE_WIDTH;
+    const meta = this.enemyMeta();
+    if (meta.DisplayEnemyHpMpTp_GaugeWidth != null) {
+      return Number(meta.DisplayEnemyHpMpTp_GaugeWidth);
+    }
+
+    return gaugeWidthDefault;
   };
 
   /**
@@ -247,7 +314,7 @@
    * @returns {number}
    */
   Sprite_HTN_EnemyHpMpTpGauge.prototype.gaugeHeight = function() {
-    return GAUGE_HEIGHT;
+    return gaugeHeight;
   };
 
   /**
@@ -257,11 +324,11 @@
    * @returns {number}
    */
   Sprite_HTN_EnemyHpMpTpGauge.prototype.textHeight = function() {
-    if (!SHOW_LABEL && !SHOW_VALUE) {
-      return GAUGE_HEIGHT;
+    if (!showLabel && !this.showValue()) {
+      return gaugeHeight;
     }
 
-    return Math.max(24, GAUGE_HEIGHT);
+    return Math.max(24, gaugeHeight);
   };
 
   /**
@@ -270,8 +337,8 @@
    * @returns {number}
    */
   Sprite_HTN_EnemyHpMpTpGauge.prototype.bitmapHeight = function() {
-    if (!SHOW_LABEL && !SHOW_VALUE) {
-      return GAUGE_HEIGHT + 4;
+    if (!showLabel && !this.showValue()) {
+      return gaugeHeight + 4;
     }
 
     return this.textHeight() + 8;
@@ -284,13 +351,14 @@
    * @returns {number}
    */
   Sprite_HTN_EnemyHpMpTpGauge.prototype.gaugeX = function() {
-    if (!SHOW_LABEL) return 0;
+    if (!showLabel) return 0;
+
     return Sprite_Gauge.prototype.gaugeX.call(this);
   };
 
   /**
    * ゲージの表示有効性を判定する
-   * 敵が生存中かつバトル中のみ有効。メタタグで非表示指定があれば無効
+   * 敵が生存中かつバトル中のみ有効。エネミーのメモ欄のタグで非表示指定があれば無効
    *
    * @returns {boolean}
    */
@@ -298,38 +366,34 @@
     if (!this._battler) return false;
     if (!this._battler.isAlive()) return false;
     if (!$gameParty.inBattle()) return false;
+
     if (this._battler.isEnemy() && this._battler.enemy().meta['DisplayEnemyHpMpTp_Hide']) {
       return false;
     }
+
     return true;
   };
 
   /**
-   * ラベルを描画する
-   * ShowLabel が false のときはスキップ
-   *
-   * @returns {void}
+   * ラベルを描画する。ShowLabel が false ならスキップ
    */
   Sprite_HTN_EnemyHpMpTpGauge.prototype.drawLabel = function() {
-    if (!SHOW_LABEL) return;
+    if (!showLabel) return;
+
     Sprite_Gauge.prototype.drawLabel.call(this);
   };
 
   /**
-   * 数値を描画する
-   * ShowValue が false のときはスキップ
-   *
-   * @returns {void}
+   * 数値を描画する。ShowValue が false ならスキップ
    */
   Sprite_HTN_EnemyHpMpTpGauge.prototype.drawValue = function() {
-    if (!SHOW_VALUE) return;
+    if (!this.showValue()) return;
+
     Sprite_Gauge.prototype.drawValue.call(this);
   };
 
   //--------------------------------------------------------------------------
   // Sprite_Enemy の拡張
-
-  if (GAUGE_TYPES.length === 0) return;
 
   /**
    * initMembers をフックしてゲージスプライト配列を生成・追加する
@@ -342,7 +406,7 @@
 
     this._htnDisplayEnemyHpMpTp_gaugeSprites = [];
 
-    for (const type of GAUGE_TYPES) {
+    for (const type of gaugeTypes) {
       const sprite = new Sprite_HTN_EnemyHpMpTpGauge();
       sprite.anchor.x = 0.5;
       this.addChild(sprite);
@@ -386,21 +450,33 @@
    */
   Sprite_Enemy.prototype.htnDisplayEnemyHpMpTp_updateGaugePositions = function() {
     const entries = this._htnDisplayEnemyHpMpTp_gaugeSprites;
-    const n = entries.length;
     const bitmapH = entries[0].sprite.bitmapHeight();
-    const step = bitmapH + GAUGE_MARGIN;
+    const step = bitmapH + gaugeMargin;
 
-    for (let i = 0; i < n; i++) {
+    // タグによるエネミーごとの設定値の上書き
+    const meta = this._enemy.enemy().meta;
+    const gaugePosition = meta.DisplayEnemyHpMpTp_GaugePosition != null
+      ? String(meta.DisplayEnemyHpMpTp_GaugePosition).trim()
+      : gaugePositionDefault;
+    const gaugeOffsetX = meta.DisplayEnemyHpMpTp_GaugeOffsetX != null
+      ? Number(meta.DisplayEnemyHpMpTp_GaugeOffsetX)
+      : gaugeOffsetXDefault;
+    const gaugeOffsetY = meta.DisplayEnemyHpMpTp_GaugeOffsetY != null
+      ? Number(meta.DisplayEnemyHpMpTp_GaugeOffsetY)
+      : gaugeOffsetYDefault;
+
+    const entriesLength = entries.length;
+    for (let i = 0; i < entriesLength; i++) {
       const { sprite } = entries[i];
-      sprite.x = GAUGE_OFFSET_X;
+      sprite.x = gaugeOffsetX;
 
-      if (GAUGE_POSITION === 'top') {
+      if (gaugePosition === 'top') {
         if (this.bitmap && this.bitmap.isReady()) {
           // ゲージスタック全体を敵画像の上に積む（HP が最上部、末尾ゲージが敵の直上）
-          sprite.y = -this.bitmap.height - (n - i) * bitmapH - (n - 1 - i) * GAUGE_MARGIN + GAUGE_OFFSET_Y;
+          sprite.y = -this.bitmap.height - (entriesLength - i) * bitmapH - (entriesLength - 1 - i) * gaugeMargin + gaugeOffsetY;
         }
       } else {
-        sprite.y = GAUGE_OFFSET_Y + i * step;
+        sprite.y = gaugeOffsetY + i * step;
       }
 
       sprite.visible = sprite.isValid();

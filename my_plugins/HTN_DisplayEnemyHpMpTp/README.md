@@ -40,9 +40,31 @@ RPGツクールMZ用のプラグインです。
 ### タグ一覧
 
 敵キャラの「メモ」欄に記述できるタグの一覧です。  
+プラグインパラメータの設定を上書きしない場合には記述しなくて大丈夫です。
 
 - `<DisplayEnemyHpMpTp_Hide>`  
-  ゲージをすべて非表示にします  
+  ゲージを非表示にする
+- `<DisplayEnemyHpMpTp_ShowValue: true/false>`  
+  数値の表示・非表示を上書き
+- `<DisplayEnemyHpMpTp_GaugePosition: bottom/top>`  
+  ゲージの表示位置を上書き（`bottom` で敵画像の下、`top` で上）
+- `<DisplayEnemyHpMpTp_GaugeWidth: 数値>`  
+  各ゲージの横幅 (px) を上書き
+- `<DisplayEnemyHpMpTp_GaugeOffsetX: 数値>`  
+  ゲージのX座標を調整（負の値で左、正の値で右へ）
+- `<DisplayEnemyHpMpTp_GaugeOffsetY: 数値>`  
+  ゲージのY座標を調整（負の値で上、正の値で下へ）
+
+#### コピーしやすい用の一覧
+
+```
+<DisplayEnemyHpMpTp_Hide>
+<DisplayEnemyHpMpTp_ShowValue: false>
+<DisplayEnemyHpMpTp_GaugePosition: bottom>
+<DisplayEnemyHpMpTp_GaugeWidth: 128>
+<DisplayEnemyHpMpTp_GaugeOffsetX: 0>
+<DisplayEnemyHpMpTp_GaugeOffsetY: 0>
+```
 
 ## 📝 作者情報
 
