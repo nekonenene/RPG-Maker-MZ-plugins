@@ -16,6 +16,15 @@ HP : [https://hato-neko.x0.com](https://hato-neko.x0.com)
 バグ報告や要望などは [X](https://x.com/nekonenene) にメンションでお寄せください。
 
 
+## 📊 HTN_DisplayEnemyHpMpTp
+
+戦闘中に敵キャラのHP・MP・TPをゲージ（バー）で表示できるようになるプラグインです。
+
+### 詳しい使い方はこちら：
+
+**https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_DisplayEnemyHpMpTp**
+
+
 ## 🦘 HTN_EnemyJumpOnTurn
 
 敵が攻撃ターンで軽くジャンプするように動き、誰の攻撃かをわかりやすくするプラグインです。
