@@ -163,28 +163,28 @@
  *
  * @param GaugeWidth
  * @text ゲージの横幅
- * @desc 各ゲージの横幅（ピクセル）
+ * @desc ゲージの横幅 (px)
  * @type number
  * @default 128
  * @min 32
  *
  * @param GaugeHeight
- * @text ゲージバーの高さ
- * @desc ゲージバーの高さ（ピクセル）
+ * @text ゲージの高さ
+ * @desc ゲージの高さ (px)
  * @type number
  * @default 12
  * @min 1
  *
  * @param GaugeMargin
  * @text ゲージ間の余白
- * @desc ゲージ同士の縦方向の余白（ピクセル）
+ * @desc ゲージ同士の縦方向の余白 (px)
  * @type number
  * @default 2
  * @min 0
  *
  * @param GaugeOffsetX
  * @text X位置調整
- * @desc 敵キャラ中央からの横方向のズレ（ピクセル）。負で左、正で右
+ * @desc 横方向の位置調整 (px)。負の値で左、正の値で右へ
  * @type number
  * @default 0
  * @min -9999
@@ -192,7 +192,7 @@
  *
  * @param GaugeOffsetY
  * @text Y位置調整
- * @desc 縦方向の追加ズレ（ピクセル）。正で下、負で上
+ * @desc 縦方向の位置調整 (px)。負の値で上、正の値で下へ
  * @type number
  * @default 0
  * @min -9999
