@@ -44,7 +44,7 @@
  * @text Value Font Size
  * @desc Font size for the numeric values on gauges.
  * @type number
- * @default 20
+ * @default 12
  * @min 1
  *
  * @param ShowLabel
@@ -57,7 +57,7 @@
  * @text Label Font Size
  * @desc Font size for the labels on gauges.
  * @type number
- * @default 24
+ * @default 16
  * @min 1
  *
  * @param GaugePosition
@@ -103,7 +103,7 @@
  * @text Y Offset
  * @desc Additional vertical offset (px). Positive moves down, negative moves up.
  * @type number
- * @default 0
+ * @default -60
  * @min -9999
  * @max 9999
  *
@@ -163,7 +163,7 @@
  * @text 数値のフォントサイズ
  * @desc ゲージ上の数値のフォントサイズ
  * @type number
- * @default 20
+ * @default 12
  * @min 1
  *
  * @param ShowLabel
@@ -176,7 +176,7 @@
  * @text ラベルのフォントサイズ
  * @desc ラベルのフォントサイズ
  * @type number
- * @default 24
+ * @default 16
  * @min 1
  *
  * @param GaugePosition
@@ -222,7 +222,7 @@
  * @text Y位置調整
  * @desc 縦方向の位置調整 (px)。負の値で上、正の値で下へ
  * @type number
- * @default 0
+ * @default -60
  * @min -9999
  * @max 9999
  *
@@ -255,15 +255,15 @@
   const showMpGauge = String(parameters.ShowMpGauge) === 'true';
   const showTpGauge = String(parameters.ShowTpGauge) === 'true';
   const showValueDefault = String(parameters.ShowValue) === 'true';
-  const valueFontSize = Number(parameters.ValueFontSize) || 20;
+  const valueFontSize = Number(parameters.ValueFontSize) || 12;
   const showLabel = String(parameters.ShowLabel) === 'true';
-  const labelFontSize = Number(parameters.LabelFontSize) || 24;
+  const labelFontSize = Number(parameters.LabelFontSize) || 16;
   const gaugePositionDefault = String(parameters.GaugePosition) || 'bottom';
   const gaugeWidthDefault = Number(parameters.GaugeWidth) || 128;
   const gaugeHeight = Number(parameters.GaugeHeight) || 12;
   const gaugeMargin = Number(parameters.GaugeMargin) || 2;
   const gaugeOffsetXDefault = Number(parameters.GaugeOffsetX) || 0;
-  const gaugeOffsetYDefault = Number(parameters.GaugeOffsetY) || 0;
+  const gaugeOffsetYDefault = Number(parameters.GaugeOffsetY) || -60;
 
   // 表示する型のリスト（HP→MP→TP の順）
   const gaugeTypes = [];
