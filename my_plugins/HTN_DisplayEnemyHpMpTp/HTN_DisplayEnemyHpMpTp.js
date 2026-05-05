@@ -274,6 +274,8 @@
   // どのゲージも表示しないなら、以下の処理は不要なのでここで return
   if (gaugeTypes.length === 0) return;
 
+  //// -v- Sprite_Gauge を継承した Sprite_HTN_EnemyHpMpTpGauge クラスを定義 -v-
+
   function Sprite_HTN_EnemyHpMpTpGauge() {
     this.initialize(...arguments);
   }
@@ -441,8 +443,7 @@
     Sprite_Gauge.prototype.drawValue.call(this);
   };
 
-  //--------------------------------------------------------------------------
-  // Sprite_Enemy の拡張
+  //// -v- Sprite_Enemy の拡張 -v-
 
   /**
    * initMembers をフックしてゲージスプライト配列を生成・追加する
@@ -458,7 +459,6 @@
     for (const type of gaugeTypes) {
       const sprite = new Sprite_HTN_EnemyHpMpTpGauge();
       sprite.anchor.x = 0.5;
-      this.addChild(sprite);
       this._htnDisplayEnemyHpMpTp_gaugeSprites.push({ sprite, type });
     }
   };
@@ -517,18 +517,38 @@
     const entriesLength = entries.length;
     for (let i = 0; i < entriesLength; i++) {
       const { sprite } = entries[i];
-      sprite.x = gaugeOffsetX;
+      sprite.x = this.x + gaugeOffsetX;
 
       if (gaugePosition === 'top') {
         if (this.bitmap && this.bitmap.isReady()) {
           // ゲージスタック全体を敵画像の上に積む（HP が最上部、末尾ゲージが敵の直上）
-          sprite.y = -this.bitmap.height - (entriesLength - i) * bitmapH - (entriesLength - 1 - i) * gaugeMargin + gaugeOffsetY;
+          sprite.y = this.y - this.bitmap.height - (entriesLength - i) * bitmapH - (entriesLength - 1 - i) * gaugeMargin + gaugeOffsetY;
         }
       } else {
-        sprite.y = gaugeOffsetY + i * step;
+        sprite.y = this.y + gaugeOffsetY + i * step;
       }
 
       sprite.visible = sprite.isValid();
+    }
+  };
+
+  //// -v- Spriteset_Battle の拡張 -v-
+
+  /**
+   * createEnemies をフックして、全敵スプライトの上に描画されるゲージ専用コンテナを追加する
+   */
+  const _Spriteset_Battle_createEnemies = Spriteset_Battle.prototype.createEnemies;
+  Spriteset_Battle.prototype.createEnemies = function() {
+    _Spriteset_Battle_createEnemies.call(this);
+
+    // 敵スプライトより後に addChild することで、敵グループよりも前面に描画される
+    const container = new Sprite();
+    this._battleField.addChild(container);
+
+    for (const enemySprite of this._enemySprites) {
+      for (const { sprite } of enemySprite._htnDisplayEnemyHpMpTp_gaugeSprites) {
+        container.addChild(sprite);
+      }
     }
   };
 })();
