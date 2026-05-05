@@ -16,19 +16,19 @@
  * @author hatonekoe - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_DisplayEnemyHpMpTp
  *
- * @param ShowHp
+ * @param ShowHpGauge
  * @text Show HP Gauge
  * @desc Show the enemy HP gauge.
  * @type boolean
  * @default true
  *
- * @param ShowMp
+ * @param ShowMpGauge
  * @text Show MP Gauge
  * @desc Show the enemy MP gauge.
  * @type boolean
  * @default true
  *
- * @param ShowTp
+ * @param ShowTpGauge
  * @text Show TP Gauge
  * @desc Show the enemy TP gauge.
  * @type boolean
@@ -121,19 +121,19 @@
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_DisplayEnemyHpMpTp
  *
- * @param ShowHp
+ * @param ShowHpGauge
  * @text HPゲージを表示
  * @desc 敵キャラのHPゲージを表示するか
  * @type boolean
  * @default true
  *
- * @param ShowMp
+ * @param ShowMpGauge
  * @text MPゲージを表示
  * @desc 敵キャラのMPゲージを表示するか
  * @type boolean
  * @default true
  *
- * @param ShowTp
+ * @param ShowTpGauge
  * @text TPゲージを表示
  * @desc 敵キャラのTPゲージを表示するか
  * @type boolean
@@ -223,9 +223,9 @@
 
   const pluginName = "HTN_DisplayEnemyHpMpTp";
   const parameters = PluginManager.parameters(pluginName);
-  const showHp = String(parameters.ShowHp) === 'true';
-  const showMp = String(parameters.ShowMp) === 'true';
-  const showTp = String(parameters.ShowTp) === 'true';
+  const showHpGauge = String(parameters.ShowHpGauge) === 'true';
+  const showMpGauge = String(parameters.ShowMpGauge) === 'true';
+  const showTpGauge = String(parameters.ShowTpGauge) === 'true';
   const showValueDefault = String(parameters.ShowValue) === 'true';
   const showLabel = String(parameters.ShowLabel) === 'true';
   const gaugePositionDefault = String(parameters.GaugePosition) || 'bottom';
@@ -237,9 +237,9 @@
 
   // 表示する型のリスト（HP→MP→TP の順）
   const gaugeTypes = [];
-  if (showHp) gaugeTypes.push('hp');
-  if (showMp) gaugeTypes.push('mp');
-  if (showTp) gaugeTypes.push('tp');
+  if (showHpGauge) gaugeTypes.push('hp');
+  if (showMpGauge) gaugeTypes.push('mp');
+  if (showTpGauge) gaugeTypes.push('tp');
 
   // どのゲージも表示しないなら、以下の処理は不要なのでここで return
   if (gaugeTypes.length === 0) return;
