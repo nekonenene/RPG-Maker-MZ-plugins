@@ -123,7 +123,7 @@
   };
 
   /**
-   * 結果をクリアする際に continuousStates も初期化する
+   * 結果をクリアする際に stateContinuousMessage_StateIds も初期化する
    *
    * @returns {void}
    */
@@ -131,29 +131,7 @@
   Game_ActionResult.prototype.clear = function() {
     _Game_ActionResult_clear.call(this);
 
-    this.continuousStates = [];
-  };
-
-  /**
-   * 再付与されたステートのIDを記録する
-   *
-   * @param {number} stateId ステートID
-   * @returns {void}
-   */
-  Game_ActionResult.prototype.pushContinuousState = function(stateId) {
-    if (!this.continuousStates.includes(stateId)) {
-      this.continuousStates.push(stateId);
-    }
-  };
-
-  /**
-   * 指定ステートが再付与時のステートかどうかを返す
-   *
-   * @param {number} stateId ステートID
-   * @returns {boolean}
-   */
-  Game_ActionResult.prototype.isStateContinuous = function(stateId) {
-    return this.continuousStates.includes(stateId);
+    this.stateContinuousMessage_StateIds = [];
   };
 
   /**
@@ -170,7 +148,9 @@
     _Game_Battler_addState.call(this, stateId);
 
     if (alreadyAffected && this.isStateAddable(stateId)) {
-      this._result.pushContinuousState(stateId);
+      if (!this._result.stateContinuousMessage_StateIds.includes(stateId)) {
+        this._result.stateContinuousMessage_StateIds.push(stateId);
+      }
     }
   };
 
@@ -181,23 +161,29 @@
    * @param {Game_Battler} target 対象バトラー
    * @returns {void}
    */
+  const _Window_BattleLog_displayAddedStates = Window_BattleLog.prototype.displayAddedStates;
   Window_BattleLog.prototype.displayAddedStates = function(target) {
     const result = target.result();
-    const states = result.addedStateObjects();
+    const continuousStateIds = result.stateContinuousMessage_StateIds;
 
-    for (const state of states) {
-      if (state.id === target.deathStateId()) {
+    // 付与されたステートの中から、継続中のステートは除いた上で本来の処理を実行
+    const allAddedStates = result.addedStates;
+    result.addedStates = allAddedStates.filter(id => !continuousStateIds.includes(id));
+
+    _Window_BattleLog_displayAddedStates.call(this, target);
+
+    result.addedStates = allAddedStates;
+
+    // 継続中のステートはカスタムメッセージを表示
+    for (const stateId of allAddedStates.filter(id => continuousStateIds.includes(id))) {
+      const state = $dataStates[stateId];
+
+      if (stateId === target.deathStateId()) {
         this.push('performCollapse', target);
       }
 
-      let stateText;
-
-      if (result.isStateContinuous(state.id)) {
-        const msg = parseContinuousMessage(state, target.isActor());
-        stateText = msg !== null ? msg : (target.isActor() ? state.message1 : state.message2);
-      } else {
-        stateText = target.isActor() ? state.message1 : state.message2;
-      }
+      const msg = parseContinuousMessage(state, target.isActor());
+      const stateText = msg !== null ? msg : (target.isActor() ? state.message1 : state.message2);
 
       if (stateText) {
         this.push('popBaseLine');
