@@ -157,9 +157,16 @@
     let displayIcons;
 
     if (showAll && iconsCount > maxIconCount) {
+      let elapsedFrames;
+      if (this._allStatesInMenu_OpenFrame === undefined) {
+        this._allStatesInMenu_OpenFrame = 0;
+        elapsedFrames = 0;
+      } else {
+        elapsedFrames = Graphics.frameCount - this._allStatesInMenu_OpenFrame;
+      }
+
       const framesPerSwitch = Math.round(switchIntervalSec * 60);
       const totalPages = Math.ceil(iconsCount / maxIconCount);
-      const elapsedFrames = Graphics.frameCount - (this._allStatesInMenu_OpenFrame ?? 0);
       const currentIndex = Math.floor(elapsedFrames / framesPerSwitch) % totalPages;
       const startIndex = currentIndex * maxIconCount;
 
@@ -197,12 +204,12 @@
   Window_StatusBase.prototype.update = function() {
     _Window_StatusBase_update.call(this);
 
-    if (!this._allStatesInMenu_ShowAll) {
+    if (!this._allStatesInMenu_ShowAll || this._allStatesInMenu_OpenFrame === undefined) {
       return;
     }
 
     const framesPerSwitch = Math.round(switchIntervalSec * 60);
-    const elapsedFrames = Graphics.frameCount - (this._allStatesInMenu_OpenFrame ?? 0);
+    const elapsedFrames = Graphics.frameCount - this._allStatesInMenu_OpenFrame;
     const currentIndex = Math.floor(elapsedFrames / framesPerSwitch);
 
     // Index が切り替わるタイミング（≒切り替え秒数）で drawActorIcons を refresh を介して呼び出す
