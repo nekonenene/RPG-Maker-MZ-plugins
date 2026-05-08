@@ -192,8 +192,6 @@
 
   /**
    * ページ切り替えタイミングを検知してウィンドウを更新する
-   *
-   * @returns {void}
    */
   const _Window_StatusBase_update = Window_StatusBase.prototype.update;
   Window_StatusBase.prototype.update = function() {
