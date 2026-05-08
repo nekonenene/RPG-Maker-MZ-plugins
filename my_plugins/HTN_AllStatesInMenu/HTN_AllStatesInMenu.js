@@ -38,19 +38,15 @@
  * @decimals 1
  *
  * @help
- * By default, Window_StatusBase.prototype.drawActorIcons limits the number of
- * displayed state icons based on window width. This plugin lifts that restriction.
+ * A plugin that shows all state icons in the menu.
  *
- * With "Max icons at once", icons are placed at equal spacing within the
- * available width. If the icon size exceeds the spacing, icons overlap to the right.
- *
- * When "Show all states" is true, icons are grouped by "Max icons at once" and
- * cycle automatically according to "Switch interval".
+ * Note: This plugin overrides Window_StatusBase.prototype.drawActorIcons,
+ * which may conflict with other plugins that customize the menu screen.
  */
 
 /*:ja
  * @target MZ
- * @plugindesc メニュー画面で全てのステートアイコンを表示します (v1.0.0)
+ * @plugindesc メニュー画面に全てのステートアイコンを表示 (v1.0.0)
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_AllStatesInMenu
  *
@@ -68,7 +64,7 @@
  * @type boolean
  *
  * @param SwitchIntervalSec
- * @text 切り替わり秒数
+ * @text 切り替え秒数
  * @desc ページが切り替わるまでの秒数。「すべて表示するか」が true のときに有効
  * @default 1.0
  * @type number
@@ -76,14 +72,11 @@
  * @decimals 1
  *
  * @help
- * ツクールMZのデフォルトでは、drawActorIcons はウィンドウの横幅に応じて
- * 表示できるステートアイコン数が制限されます。このプラグインはその制限を撤廃します。
+ * メニュー画面に全てのステートアイコンを表示するプラグインです。
  *
- * 「一度に表示する最大数」に設定した数を元に、横幅を等分した間隔でアイコンを配置します。
- * 間隔よりアイコンが大きい場合、右側のアイコンは重なって表示されます。
- *
- * 「すべて表示するか」が true のとき、「一度に表示する最大数」単位でページに分け、
- * 「切り替わり秒数」の間隔でページが自動的に切り替わります。
+ * Window_StatusBase.prototype.drawActorIcons を上書きしているため、
+ * メニュー画面をカスタマイズする
+ * 他のプラグインと競合する可能性がある点にご注意ください。
  */
 
 (() => {
