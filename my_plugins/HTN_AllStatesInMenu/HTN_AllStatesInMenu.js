@@ -142,9 +142,11 @@
   Window_StatusBase.prototype.drawActorIcons = function(actor, x, y, width) {
     width = width || 144;
     const delta = ImageManager.standardIconWidth - ImageManager.iconWidth;
+    const iconWidth = ImageManager.standardIconWidth;
     const icons = actor.allIcons();
+    const iconsCount = icons.length;
 
-    if (icons.length === 0) {
+    if (iconsCount === 0) {
       return;
     }
 
@@ -154,9 +156,9 @@
 
     let displayIcons;
 
-    if (showAll && icons.length > maxIconCount) {
+    if (showAll && iconsCount > maxIconCount) {
       const framesPerSwitch = Math.round(switchIntervalSec * 60);
-      const totalPages = Math.ceil(icons.length / maxIconCount);
+      const totalPages = Math.ceil(iconsCount / maxIconCount);
       const elapsedFrames = Graphics.frameCount - (this._allStatesInMenu_OpenFrame ?? 0);
       const currentIndex = Math.floor(elapsedFrames / framesPerSwitch) % totalPages;
       const startIndex = currentIndex * maxIconCount;
@@ -166,7 +168,20 @@
       displayIcons = icons.slice(0, maxIconCount);
     }
 
-    const iconSpacing = width / maxIconCount;
+    let iconSpacing;
+
+    if (iconsCount < maxIconCount) {
+      // アイコンが１ページに収まる場合は、できるだけ重なりが少なくなるよう配置していく
+      if (iconsCount * iconWidth <= width) {
+        iconSpacing = iconWidth;
+      } else {
+        iconSpacing = width / iconsCount;
+      }
+    } else {
+      // アイコンが２ページ以上に続く場合は、２ページ目以降も同じ間隔で配置
+      iconSpacing = width / maxIconCount;
+    }
+
     let iconX = x + delta / 2;
 
     for (const icon of displayIcons) {
