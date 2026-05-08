@@ -192,6 +192,7 @@
     const elapsedFrames = Graphics.frameCount - (this._allStatesInMenu_OpenFrame ?? 0);
     const currentIndex = Math.floor(elapsedFrames / framesPerSwitch);
 
+    // Index が切り替わるタイミング（≒切り替え秒数）で drawActorIcons を refresh を介して呼び出す
     if (this._allStatesInMenu_Index !== currentIndex) {
       this._allStatesInMenu_Index = currentIndex;
       this.refresh();
