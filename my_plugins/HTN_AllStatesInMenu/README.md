@@ -1,0 +1,52 @@
+# HTN_AllStatesInMenu
+
+RPGツクールMZ用のプラグインです。
+
+メニュー画面で全てのステートアイコンを表示できるようになります。
+
+## 🛠️ 導入方法
+
+**[【ここを右クリックして「名前を付けてリンク先を保存」みたいな項目を選んでダウンロード】](https://raw.githubusercontent.com/nekonenene/RPG-Maker-MZ-plugins/main/my_plugins/HTN_AllStatesInMenu/HTN_AllStatesInMenu.js)**
+
+プラグインの導入方法については、[ツクール公式サイトの講座ページ](https://rpgmakerofficial.com/product/mz/plugin/start/dounyu.html)をご参考に！  
+ダウンロードした `HTN_xxx.js` のような名前のファイルを、プロジェクト内の `js/plugins` フォルダーの中に入れてください。
+
+## 🧭 使い方
+
+「プラグイン管理」画面でこのプラグインを追加するだけで機能します。  
+設定変更はプラグインの「パラメータ」欄からおこなえます。
+
+### プラグインパラメータ
+
+#### 一度に表示する最大数
+
+一度に表示するステートアイコンの最大数です。  
+横幅をこの数で割った均等間隔で、アイコンを左から順に配置します。
+
+#### すべて表示するか
+
+`true` にすると、「一度に表示する最大数」を超えたアイコンをページ切り替えで順番に表示します。  
+
+`false` にすると、「一度に表示する最大数」までしか表示されません。  
+メニュー画面で切り替わりがあると画面がうるさいと感じる場合にお使いください。
+
+#### 切り替え秒数
+
+「すべて表示するか」が `true` のときの、ページが切り替わるまでの秒数です。
+
+## ⚠️ 注意点
+
+このプラグインは、コアスクリプトの `Window_StatusBase.prototype.drawActorIcons` の処理を上書きしているため、  
+メニュー画面の表示をカスタマイズするような他のプラグインと競合して、お互いの動作に悪影響を与える可能性があります。
+
+## 📝 作者情報
+
+ハトネコエ  
+**[X : @nekonenene](https://x.com/nekonenene)**  
+HP : [https://hato-neko.x0.com](https://hato-neko.x0.com)
+
+バグ報告や要望などは [X](https://x.com/nekonenene) にメンションでお寄せください。
+
+## 📄 ライセンス
+
+MIT License ( https://opensource.org/license/mit )
