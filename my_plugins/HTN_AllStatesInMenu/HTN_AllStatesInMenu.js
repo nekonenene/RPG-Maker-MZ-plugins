@@ -89,6 +89,46 @@
   const switchIntervalSec = Math.max(0.1, Number(parameters.SwitchIntervalSec) || 1.0);
 
   /**
+   * メニューを開いたとき、ページ切り替えの基準フレームをリセットする
+   */
+  const _Scene_Menu_start = Scene_Menu.prototype.start;
+  Scene_Menu.prototype.start = function() {
+    _Scene_Menu_start.call(this);
+
+    this._statusWindow._allStatesInMenu_OpenFrame = Graphics.frameCount;
+  };
+
+  /**
+   * スキル画面を開いたとき、ページ切り替えの基準フレームをリセットする
+   */
+  const _Scene_Skill_start = Scene_Skill.prototype.start;
+  Scene_Skill.prototype.start = function() {
+    _Scene_Skill_start.call(this);
+
+    this._statusWindow._allStatesInMenu_OpenFrame = Graphics.frameCount;
+  };
+
+  /**
+   * ステータス画面を開いたとき、ページ切り替えの基準フレームをリセットする
+   */
+  const _Scene_Status_start = Scene_Status.prototype.start;
+  Scene_Status.prototype.start = function() {
+    _Scene_Status_start.call(this);
+
+    this._statusWindow._allStatesInMenu_OpenFrame = Graphics.frameCount;
+  };
+
+  /**
+   * アイテムやスキルの使用対象を選ぶウィンドウが開かれるときに、ページ切り替えの基準フレームをリセットする
+   */
+  const _Window_StatusBase_show = Window_StatusBase.prototype.show;
+  Window_StatusBase.prototype.show = function() {
+    _Window_StatusBase_show.call(this);
+
+    this._allStatesInMenu_OpenFrame = Graphics.frameCount;
+  };
+
+  /**
    * ステートアイコンを均等間隔で配置し、全ステートをページ切り替えで表示する
    *
    * コアスクリプトの drawActorIcons を上書きしているので、他のプラグインと競合する可能性に注意
@@ -117,7 +157,8 @@
     if (showAll && icons.length > maxIconCount) {
       const framesPerSwitch = Math.round(switchIntervalSec * 60);
       const totalPages = Math.ceil(icons.length / maxIconCount);
-      const currentIndex = Math.floor(Graphics.frameCount / framesPerSwitch) % totalPages;
+      const elapsedFrames = Graphics.frameCount - (this._allStatesInMenu_OpenFrame ?? 0);
+      const currentIndex = Math.floor(elapsedFrames / framesPerSwitch) % totalPages;
       const startIndex = currentIndex * maxIconCount;
 
       displayIcons = icons.slice(startIndex, startIndex + maxIconCount);
@@ -148,7 +189,8 @@
     }
 
     const framesPerSwitch = Math.round(switchIntervalSec * 60);
-    const currentIndex = Math.floor(Graphics.frameCount / framesPerSwitch);
+    const elapsedFrames = Graphics.frameCount - (this._allStatesInMenu_OpenFrame ?? 0);
+    const currentIndex = Math.floor(elapsedFrames / framesPerSwitch);
 
     if (this._allStatesInMenu_Index !== currentIndex) {
       this._allStatesInMenu_Index = currentIndex;
