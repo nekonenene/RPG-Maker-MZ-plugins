@@ -218,4 +218,17 @@
       this.refresh();
     }
   };
+
+  /**
+   * ウィンドウが閉じられるときに独自プロパティをリセットする
+   * （書かなくても動作するが念のため）
+   */
+  const _Window_StatusBase_close = Window_StatusBase.prototype.close;
+  Window_StatusBase.prototype.close = function() {
+    this._allStatesInMenu_OpenFrame = undefined;
+    this._allStatesInMenu_ShowAll = undefined;
+    this._allStatesInMenu_Index = undefined;
+
+    _Window_StatusBase_close.call(this);
+  };
 })();
