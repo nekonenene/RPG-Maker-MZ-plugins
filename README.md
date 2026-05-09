@@ -79,6 +79,15 @@ HP : [https://hato-neko.x0.com](https://hato-neko.x0.com)
 **https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_SmartCharm**
 
 
+## 🔁 HTN_StateContinuousMessage
+
+すでにかかっているステート（状態異常）が再び付与されたときのメッセージを設定できるようになるプラグインです。
+
+### 詳しい使い方はこちら：
+
+**https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_StateContinuousMessage**
+
+
 ## 🫠 HTN_TPNoRegenState
 
 TPの回復ができなくなるステート（状態異常）を作成できるプラグインです。
