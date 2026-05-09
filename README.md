@@ -16,6 +16,15 @@ HP : [https://hato-neko.x0.com](https://hato-neko.x0.com)
 バグ報告や要望などは [X](https://x.com/nekonenene) にメンションでお寄せください。
 
 
+## 🥗 HTN_AllStatesInMenu
+
+メニュー画面やステータス画面で、ステート（状態異常）のアイコンを数の制限なく表示できるようになるプラグインです。
+
+### 詳しい使い方はこちら：
+
+**https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_AllStatesInMenu**
+
+
 ## 📊 HTN_DisplayEnemyHpMpTp
 
 戦闘中に敵キャラのHP・MP・TPをゲージ（バー）で表示できるようになるプラグインです。
