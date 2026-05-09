@@ -56,7 +56,7 @@
 
 /*:ja
  * @target MZ
- * @plugindesc ステートがすでにかかっている対象に再付与されたときのメッセージを設定できます (v1.0.0)
+ * @plugindesc すでにかかっているステートが再付与されたときのメッセージを設定 (v1.0.0)
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_StateContinuousMessage
  *
@@ -82,8 +82,8 @@
  *   アクター・敵キャラ共通の再付与時メッセージ。
  *   _Actor や _Enemy タグが同時に記述されている場合、そちらが優先されます。
  *
- * タグが記述されていて内容が空（例：<StateContinuousMessage_Common: >）の場合、
- * 再付与時にメッセージが表示されないようになります。
+ * タグが記述されていて内容が空（例：<StateContinuousMessage_Common: >）の場合は、
+ * 再付与時のメッセージが表示されなくなります。
  *
  * === 記述例 ===
  *
