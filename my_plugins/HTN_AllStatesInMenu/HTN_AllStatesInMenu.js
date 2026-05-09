@@ -19,7 +19,7 @@
  * @param MaxIconCount
  * @text Max icons at once
  * @desc Maximum number of state icons displayed at one time.
- * @default 4
+ * @default 6
  * @type number
  * @min 1
  *
@@ -53,7 +53,7 @@
  * @param MaxIconCount
  * @text 一度に表示する最大数
  * @desc 一度に表示するステートアイコンの最大数
- * @default 4
+ * @default 6
  * @type number
  * @min 1
  *
@@ -84,7 +84,7 @@
 
   const pluginName = 'HTN_AllStatesInMenu';
   const parameters = PluginManager.parameters(pluginName);
-  const maxIconCount = Math.max(1, Number(parameters.MaxIconCount) || 4);
+  const maxIconCount = Math.max(1, Number(parameters.MaxIconCount) || 6);
   const showAll = String(parameters.ShowAll) === 'true';
   const switchIntervalSec = Math.max(0.1, Number(parameters.SwitchIntervalSec) || 1.0);
 
