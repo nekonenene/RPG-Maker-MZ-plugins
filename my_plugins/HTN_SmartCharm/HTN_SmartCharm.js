@@ -269,15 +269,17 @@
         // HPの残りパーセンテージが低い順に並び替え
         targetsNeedingHeal.sort((a, b) => (a.hp / a.mhp) - (b.hp / b.mhp));
 
-        // 魅了を付与してきた相手（または同種のモンスター）の条件定義
-        const inflicter = subject._smartCharmInflicter;
-        let isPriorityTarget = (_member) => false;
+        // 魅了を付与してきた相手を取得
+        const inflicterMap = subject._smartCharmInflicterMap;
+        const inflicter = inflicterMap ? inflicterMap.get(charmState.id) : null;
 
+        // 優先対象を探す
+        let isPriorityTarget = (_member) => false;
         if (inflicter) {
-          if (inflicter.isAlive() && targetsNeedingHeal.includes(inflicter)) {
+          if (inflicter.isAlive() && targetsNeedingHeal.includes(inflicter)) { // 付与者が生存中で回復対象の場合
             isPriorityTarget = (member) => member === inflicter;
-          } else if (inflicter.isEnemy()) { // 魅了付与者がモンスターの場合
-            // 本人がいない場合、同種のモンスターを探す条件
+          } else if (inflicter.isEnemy()) { // 付与者がモンスターの場合
+            // 付与者がいない場合は同種のモンスターを探す
             isPriorityTarget = (member) => member.isEnemy() && member.enemyId() === inflicter.enemyId();
           }
         }
@@ -408,22 +410,40 @@
    */
   const _Game_Action_apply = Game_Action.prototype.apply;
   Game_Action.prototype.apply = function(target) {
-    const wasCharmed = target.states().some(s => s.meta.SmartCharm);
+    // アクション適用前に、ターゲットがすでに SmartCharm にかかっているかチェック
+    const beforeSmartCharmStateIds = new Set(
+      target.states().filter(s => s.meta.SmartCharm).map(s => s.id)
+    );
 
     _Game_Action_apply.call(this, target);
 
-    const isCharmedNow = target.states().some(s => s.meta.SmartCharm);
-    if (!wasCharmed && isCharmedNow) { // すでに魅了されてはおらず、新たに魅了された場合
-      const subject = this.subject();
-      let inflicter = subject;
+    const addedSmartCharmStates = target.states().filter(
+      s => s.meta.SmartCharm && !beforeSmartCharmStateIds.has(s.id)
+    );
 
-      // 魅了を付与した者がすでに魅了されている場合、その「元凶」を引き継ぐ
-      // （自陣を攻撃したときに魅了付与が起きた場合を想定）
-      if (subject.states().some(s => s.meta.SmartCharm) && subject._smartCharmInflicter) {
-        inflicter = subject._smartCharmInflicter;
+    // SmartCharm ステートが新しく付与されたときに、その付与者を記録する
+    if (addedSmartCharmStates.length > 0) {
+      if (target._smartCharmInflicterMap == null) {
+        target._smartCharmInflicterMap = new Map();
       }
 
-      target._smartCharmInflicter = inflicter;
+      const subject = this.subject();
+
+      for (const state of addedSmartCharmStates) {
+        let inflicter = subject;
+
+        // 魅了を付与した者がすでに魅了されている場合、その「元凶」を引き継ぐ
+        // （魅了された者が自陣を攻撃したときに、さらなる魅了付与が起きた場合を想定）
+        if (subject._smartCharmInflicterMap != null) {
+          const subjectInflicter = subject._smartCharmInflicterMap.get(state.id);
+
+          if (subjectInflicter != null) {
+            inflicter = subjectInflicter;
+          }
+        }
+
+        target._smartCharmInflicterMap.set(state.id, inflicter);
+      }
     }
   };
 
@@ -452,8 +472,8 @@
 
     _Game_Battler_removeState.call(this, stateId);
 
-    if (!this.states().some(s => s.meta.SmartCharm)) {
-      this._smartCharmInflicter = null;
+    if (this._smartCharmInflicterMap != null) {
+      this._smartCharmInflicterMap.delete(stateId);
     }
 
     // 戦闘中にすべてのSmartCharmステートから解除された場合、CancelActionOnRecoverの設定に従いフラグを立てる
