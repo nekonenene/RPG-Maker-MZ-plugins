@@ -538,7 +538,7 @@
     if (action && subject._smartCharmShouldCancelAction && !subject.states().some(s => s.meta.SmartCharm)) {
       subject._smartCharmShouldCancelAction = false;
       // Actionフェーズへの移行処理だけおこない、ターゲットを空にして実質的にスキップする
-      this._phase = "action";
+      this._phase = 'action';
       this._action = action;
       this._targets = [];
       subject.cancelMotionRefresh();
@@ -548,13 +548,13 @@
     if (action && action._isSmartCharmStunned) {
       const stunMessage = action._smartCharmStunMessage;
       if (stunMessage) {
-        this._logWindow.push("addText", stunMessage.format(subject.name()).trim());
-        this._logWindow.push("wait"); // メッセージを読ませるためのウェイト
-        this._logWindow.push("clear");
+        this._logWindow.push('addText', stunMessage.format(subject.name()).trim());
+        this._logWindow.push('wait'); // メッセージを読ませるためのウェイト
+        this._logWindow.push('clear');
       }
 
       // Actionフェーズへの移行処理だけおこない、ターゲットを空にしてスキップする
-      this._phase = "action";
+      this._phase = 'action';
       this._action = action;
       this._targets = [];
       subject.cancelMotionRefresh();
