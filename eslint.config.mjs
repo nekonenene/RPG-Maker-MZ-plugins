@@ -16,7 +16,7 @@ export default [
       "linebreak-style": ["error", "unix"],
       "no-trailing-spaces": "error",
       "eol-last": ["error", "always"],
-      quotes: ["error", "single", { avoidEscape: true }],
+      quotes: ["warn", "single", { avoidEscape: true }], // コアスクリプトでは double quotes なので warn に留める
     },
   },
 ];
