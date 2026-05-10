@@ -6,13 +6,14 @@
 // This software is released under the MIT License.
 // https://opensource.org/license/mit
 //
+// 2026/05/11 v1.0.1 ドレインメッセージの表示時間を増やした
 // 2026/03/23 v1.0.0 First release
 //
 // --------------------------------------------------------------------------
 
 /*:
  * @target MZ
- * @plugindesc Creates a state that drains MP from the afflicted to the drainer each turn (v1.0.0)
+ * @plugindesc Creates a state that drains MP from the afflicted to the drainer each turn (v1.0.1)
  * @author hatonekoe - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_MPDrainState
  *
@@ -98,7 +99,7 @@
 
 /*:ja
  * @target MZ
- * @plugindesc MPを吸収され続けるステート（状態異常）を作成できます (v1.0.0)
+ * @plugindesc MPを吸収され続けるステート（状態異常）を作成できます (v1.0.1)
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_MPDrainState
  *
@@ -543,10 +544,9 @@
     if (drainMessages != null && drainMessages.length > 0) {
       for (const drainMessage of drainMessages) {
         this.push('addText', drainMessage); // ドレインメッセージをバトルログに表示
+        this.push('wait'); // 読みやすいようメッセージごとに wait
       }
 
-      // MZ の標準的なメッセージ表示パターン（addText → wait → clear）に倣い、
-      // ドレインメッセージを表示し終えたらクリアする
       this.push('wait');
       this.push('clear');
 
