@@ -276,7 +276,7 @@
       amount = Number(amount);
     }
 
-    let result = 0;
+    let result;
 
     switch (amountType) {
       case 'absolute':
@@ -301,7 +301,7 @@
           result = Math.ceil(eval(amount));
         } catch (e) {
           console.error(`HP吸収の計算式の評価中にエラーが発生しました。式「${amount}」エラー内容「${e.message}」`);
-          throw new Error(`Error evaluating HP drain formula: ${amount}. Original error: ${e.message}`);
+          throw new Error(`Error evaluating HP drain formula: ${amount}`, { cause: e });
         }
         break;
       default:

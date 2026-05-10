@@ -257,7 +257,7 @@
       amount = Number(amount);
     }
 
-    let result = 0;
+    let result;
 
     switch (amountType) {
       case 'absolute':
@@ -282,7 +282,7 @@
           result = Math.ceil(eval(amount));
         } catch (e) {
           console.error(`MP吸収の計算式の評価中にエラーが発生しました。式「${amount}」エラー内容「${e.message}」`);
-          throw new Error(`Error evaluating MP drain formula: ${amount}. Original error: ${e.message}`);
+          throw new Error(`Error evaluating MP drain formula: ${amount}`, { cause: e });
         }
         break;
       default:
