@@ -249,7 +249,7 @@
 (() => {
   'use strict';
 
-  const pluginName = 'HTN_DisplayEnemyHpMpTp';
+  const pluginName = "HTN_DisplayEnemyHpMpTp";
   const parameters = PluginManager.parameters(pluginName);
   const showHpGauge = String(parameters.ShowHpGauge) === 'true';
   const showMpGauge = String(parameters.ShowMpGauge) === 'true';

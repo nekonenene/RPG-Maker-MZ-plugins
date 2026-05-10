@@ -117,7 +117,7 @@
 (() => {
   'use strict';
 
-  const pluginName = 'HTN_EscapeRate';
+  const pluginName = "HTN_EscapeRate";
   const parameters = PluginManager.parameters(pluginName);
 
   // デフォルト逃走成功率（0〜100の整数）

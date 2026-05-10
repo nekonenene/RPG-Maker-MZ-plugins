@@ -269,7 +269,7 @@
   const calcDrainAmount = (state, drainTarget, drainer) => {
     const amountType = String(state.meta.HPDrainState_AmountType ?? '').trim() || paramAmountType;
     // タグ内に " や ' を書かれた場合に削除。 &lt; や &gt; は置換して対応
-    let amount = String(state.meta.HPDrainState_Amount ?? paramAmount).trim().replace(/['"]/g, '').replace('&lt;', '<').replace('&gt;', '>');
+    let amount = String(state.meta.HPDrainState_Amount ?? paramAmount).trim().replace(/[\'\"]/g, '').replace("&lt;", "<").replace("&gt;", ">");
     const amountRandomizer = Math.min(80, Math.max(0, Number(state.meta.HPDrainState_AmountRandomizer ?? paramAmountRandomizer)));
 
     if (amountType !== 'formula') {
