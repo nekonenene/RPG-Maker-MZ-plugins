@@ -49,13 +49,13 @@
 
 (function() {
 
-  const pluginName = "HTN_SaveMax";
+  const pluginName = 'HTN_SaveMax';
 
   const parameters = PluginManager.parameters(pluginName);
-  const saveMax = Number(parameters["Max Quantity"]);
+  const saveMax = Number(parameters['Max Quantity']);
 
   DataManager.maxSavefiles = function() {
-    if (Utils.RPGMAKER_NAME === "MZ" && $gameSystem && $gameSystem.isAutosaveEnabled()) {
+    if (Utils.RPGMAKER_NAME === 'MZ' && $gameSystem && $gameSystem.isAutosaveEnabled()) {
       return saveMax + 1;
     }
 

@@ -72,7 +72,7 @@
 (() => {
   'use strict';
 
-  const pluginName = "HTN_EnemyJumpOnTurn";
+  const pluginName = 'HTN_EnemyJumpOnTurn';
   const parameters = PluginManager.parameters(pluginName);
 
   // ジャンプの高さ（ピクセル単位）
