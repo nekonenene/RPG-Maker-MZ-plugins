@@ -6,6 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/license/mit
 //
+// 2026/05/11 v1.0.3 SmartCharm が設定されたステートが複数ある場合に、魅了を付与した相手がより正しく判定されるよう改善
 // 2026/03/23 v1.0.2 魅了から回復したターンの行動キャンセルが機能しない場合があったため修正
 // 2026/03/23 v1.0.1 同じ種類のモンスターを優先して回復する挙動が機能していなかったので修正
 // 2026/03/20 v1.0.0 First release
@@ -14,7 +15,7 @@
 
 /*:
  * @target MZ
- * @plugindesc 魅了の状態異常時に、より適切な（？）行動をとるようにします (v1.0.2)
+ * @plugindesc 魅了の状態異常時に、より適切な（？）行動をとるようにします (v1.0.3)
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_SmartCharm
  *
