@@ -238,14 +238,14 @@
   const paramHpDamageSound = (() => {
     try {
       return JSON.parse(parameters.HPDamageSound || '{}');
-    } catch (e) {
+    } catch (_e) {
       return {};
     }
   })();
   const paramMpDamageSound = (() => {
     try {
       return JSON.parse(parameters.MPDamageSound || '{}');
-    } catch (e) {
+    } catch (_e) {
       return {};
     }
   })();

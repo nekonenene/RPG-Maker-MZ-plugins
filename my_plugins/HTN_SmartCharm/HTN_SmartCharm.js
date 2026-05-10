@@ -272,7 +272,7 @@
 
         // 魅了を付与してきた相手（または同種のモンスター）の条件定義
         const inflicter = subject._smartCharmInflicter;
-        let isPriorityTarget = (member) => false;
+        let isPriorityTarget = (_member) => false;
 
         if (inflicter) {
           if (inflicter.isAlive() && targetsNeedingHeal.includes(inflicter)) {
