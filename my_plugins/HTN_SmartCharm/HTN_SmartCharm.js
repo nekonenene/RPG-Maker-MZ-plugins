@@ -133,7 +133,7 @@
 (() => {
   'use strict';
 
-  const pluginName = "HTN_SmartCharm";
+  const pluginName = 'HTN_SmartCharm';
   const parameters = PluginManager.parameters(pluginName);
   const paramHealThreshold = Number(parameters['HealThreshold'] || 60);
   const paramSelfAttackRate = Number(parameters['SelfAttackRate'] || 0);
