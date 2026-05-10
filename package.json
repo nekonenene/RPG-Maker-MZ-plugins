@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "lint": "eslint my_plugins",
+    "lint:fix": "eslint my_plugins --fix"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.3.0"
+  }
+}

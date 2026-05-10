@@ -1,0 +1,18 @@
+import js from "@eslint/js";
+
+export default [
+  {
+    files: ["my_plugins/**/*.js"],
+    ...js.configs.recommended,
+    rules: {
+      ...js.configs.recommended.rules,
+      "no-undef": "off", // RPGツクールMZで定義されているクラスやグローバル変数などを使うため無効化
+      "no-unused-vars": "warn",
+      indent: ["error", 2, { SwitchCase: 1 }],
+      "linebreak-style": ["error", "unix"],
+      "no-trailing-spaces": "error",
+      "eol-last": ["error", "always"],
+      quotes: ["error", "single", { avoidEscape: true }],
+    },
+  },
+];
