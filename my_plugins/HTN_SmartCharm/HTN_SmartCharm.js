@@ -256,9 +256,8 @@
     let decidedSkill = null;
     let decidedTarget = null;
 
-    // 1. HP回復スキルの判定
+    // HP回復対象・回復スキルの判定
     let targetNeedHeal = null;
-
     if (currentAllowHeal) {
       // 回復が必要なメンバーを抽出
       const healThresholdRatio = currentHealThreshold / 100;
@@ -312,7 +311,7 @@
       }
     }
 
-    // 2. 攻撃対象の決定処理 (自傷確率の考慮)
+    // 攻撃対象の判定
     let decidedTargetForAttack = null;
     if (targetUnitForAttack.length > 0) {
       const otherTargets = targetUnitForAttack.filter(m => m !== subject);
@@ -330,7 +329,7 @@
       }
     }
 
-    // 3. 攻撃・魔法攻撃・必殺技 スキルの判定
+    // 攻撃・魔法攻撃・必殺技 スキルの判定
     if (!decidedSkill && decidedTargetForAttack) {
       // HPダメージスキル (damage.type === 1: HPダメージ) を探す
       const atkSkills = usableSkills.filter(s => s.damage && s.damage.type === 1);
