@@ -274,18 +274,19 @@
         const inflicter = inflicterMap ? inflicterMap.get(charmState.id) : null;
 
         // 優先対象を探す
-        let isPriorityTarget = (_member) => false;
-        if (inflicter) {
-          if (inflicter.isAlive() && targetsNeedingHeal.includes(inflicter)) { // 付与者が生存中で回復対象の場合
-            isPriorityTarget = (member) => member === inflicter;
-          } else if (inflicter.isEnemy()) { // 付与者がモンスターの場合
-            // 付与者がいない場合は同種のモンスターを探す
-            isPriorityTarget = (member) => member.isEnemy() && member.enemyId() === inflicter.enemyId();
+        let priorityTarget = null;
+        if (inflicter != null) {
+          if (inflicter.isAlive() && targetsNeedingHeal.includes(inflicter)) {
+            // 付与者が生存中で回復対象の場合は、付与者を優先
+            priorityTarget = inflicter;
+          } else if (inflicter.isEnemy()) {
+            // 付与者がモンスターで、すでに倒されたか回復対象でない場合は、同種のモンスターを優先
+            priorityTarget = targetsNeedingHeal.find(t => t.isEnemy() && t.enemyId() === inflicter.enemyId()) || null;
           }
         }
 
         // 優先対象がいれば選ぶ、いなければ最もHP割合が低い者を選ぶ
-        targetNeedHeal = targetsNeedingHeal.find(isPriorityTarget) || targetsNeedingHeal[0];
+        targetNeedHeal = priorityTarget || targetsNeedingHeal[0];
       }
 
       if (targetNeedHeal) {
