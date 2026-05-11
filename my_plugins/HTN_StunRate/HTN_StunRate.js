@@ -18,7 +18,7 @@
  *
  * @param StunRate
  * @text Stun Rate (%)
- * @desc Default probability (%) that the battler cannot act when the tagged state is active.
+ * @desc Probability (%) of the battler being unable to act.
  * @default 25
  * @type number
  * @min 0
@@ -32,27 +32,35 @@
  *
  * @param ShowStateMessageBeforeAction
  * @text Show State Message Before Action
- * @desc If true, the state's continuation message (message3) is shown before the battler acts instead of after.
+ * @desc If true, the state's continuation message is shown before the battler acts. If false, shown after.
  * @default true
  * @type boolean
  *
  * @help
- * Add the following note tag to a state to give it a stun probability:
- * <StunRate: 60>
- *
- * The value specifies the probability (%) of the battler being unable to act.
- * Omitting the value uses the plugin parameter default:
+ * [How to Use]
+ * Add the following note tag to any state you want this plugin to apply to:
  * <StunRate>
  *
- * You can override the stun message per state:
- * <StunRate_Message: %1 is paralyzed!>
+ * You can also specify the probability (%) alongside the tag to override
+ * the plugin parameter default per state.
+ * For example, to set a 60% chance of being unable to act:
+ * <StunRate: 60>
  *
- * You can override whether to show the continuation message before action:
- * <StunRate_ShowStateMessageBeforeAction: false>
+ * [Per-State Settings]
+ * You can override plugin parameter settings per state using these tags:
  *
- * If multiple tagged states are active, each state's stun probability is
- * checked independently. The first state to trigger stun determines the message.
- * For ShowStateMessageBeforeAction, each state's setting is applied individually.
+ * Example — override the stun message:
+ *   <StunRate_Message: %1 is paralyzed!>
+ * Example — show the continuation message after action instead of before:
+ *   <StunRate_ShowStateMessageBeforeAction: false>
+ * (Note: RPG Maker MZ only shows one continuation message per turn —
+ *  the one belonging to the highest-priority state — so setting this to
+ *  false does not guarantee the message will appear after the action.)
+ *
+ * [Note on Stun Messages with Multiple States]
+ * If multiple states with the <StunRate> tag are active at the same time,
+ * each state is checked for stun in priority order.
+ * The message from the first state that triggers stun is displayed.
  */
 
 /*:ja
@@ -63,7 +71,7 @@
  *
  * @param StunRate
  * @text 行動不能の確率(%)
- * @desc 行動不能になるデフォルトの確率(%)
+ * @desc 行動不能になる確率(%)
  * @default 25
  * @type number
  * @min 0
@@ -71,13 +79,13 @@
  *
  * @param Message
  * @text 行動不能時のメッセージ
- * @desc 行動不能の際に表示されるメッセージです。%1は行動者の名前に置き換わります。空欄にするとメッセージはスキップされます。
+ * @desc 行動不能の際に表示されるメッセージです。%1は行動者の名前に置き換わります。空欄にするとメッセージはスキップされます
  * @default %1は動けない！
  * @type string
  *
  * @param ShowStateMessageBeforeAction
  * @text 行動前に継続メッセージを表示
- * @desc ステートの継続メッセージを行動の前に表示するか。falseの場合、ツクールMZの本来の挙動と同じく、行動の後に表示されます。
+ * @desc ステートの継続メッセージを行動の前に表示するか。falseの場合、ツクールMZの本来の挙動同様、行動の後に表示されます
  * @default true
  * @type boolean
  *
