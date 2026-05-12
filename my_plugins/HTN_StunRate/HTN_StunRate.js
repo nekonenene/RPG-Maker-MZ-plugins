@@ -172,12 +172,21 @@
  * 他にも、ステートの「メモ」欄に以下のようなタグを記述することで、
  * プラグインパラメータの設定をステートごとに上書きできます。
  *
- * 行動不能時のメッセージを設定する例:
- *   <StunRate_Message: %1はしびれている！>
- * 継続メッセージを行動後に表示したい場合の設定例:
- *   <StunRate_ShowStateMessageBeforeAction: false>
- * 防御では行動不能にならないようにする場合の設定例:
+ * 設定項目一覧：
+ * <StunRate: 25> （※必須。 <StunRate> だけでもOK）
+ * <StunRate_Message: %1はしびれている！> （行動不能時のメッセージ）
+ * <StunRate_ShowStateMessageBeforeAction: true> （継続メッセージを行動前に表示するか）
+ * <StunRate_AllowAttack: false> （通常攻撃を常に許可するか）
+ * <StunRate_AllowGuard: false> （防御を常に許可するか）
+ * <StunRate_AllowItem: false> （アイテム使用を常に許可するか）
+ * <StunRate_AllowMagicSkill: false> （魔法スキルを常に許可するか）
+ * <StunRate_AllowSpecialSkill: false> （必殺技スキルを常に許可するか）
+ *
+ * 防御とアイテム使用は行動失敗せず、他は30%の確率で失敗するステートの設定例：
+ *   <StunRate: 30>
+ *   <StunRate_Message: %1は呪いで動くことができない！>
  *   <StunRate_AllowGuard: true>
+ *   <StunRate_AllowItem: true>
  *
  * 【行動不能時のメッセージの補足】
  * <StunRate> タグを持つステートが複数存在し、それらに同時にかかっている場合、
