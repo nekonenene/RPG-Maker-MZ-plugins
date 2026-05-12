@@ -206,15 +206,15 @@
   };
 
   const pluginName = 'HTN_StunRate';
-  const parameters = PluginManager.parameters(pluginName);
-  const paramStunRate = Number(parameters.StunRate || 25);
-  const paramMessage = String(parameters.Message).trim();
-  const paramShowStateMessageBeforeAction = toBoolean(parameters.ShowStateMessageBeforeAction, true);
-  const paramAllowAttack = toBoolean(parameters.AllowAttack, false);
-  const paramAllowGuard = toBoolean(parameters.AllowGuard, false);
-  const paramAllowItem = toBoolean(parameters.AllowItem, false);
-  const paramAllowMagicSkill = toBoolean(parameters.AllowMagicSkill, false);
-  const paramAllowSpecialSkill = toBoolean(parameters.AllowSpecialSkill, false);
+  const pluginParams = PluginManager.parameters(pluginName);
+  const paramStunRate = Number(pluginParams.StunRate || 25);
+  const paramMessage = String(pluginParams.Message).trim();
+  const paramShowStateMessageBeforeAction = toBoolean(pluginParams.ShowStateMessageBeforeAction, true);
+  const paramAllowAttack = toBoolean(pluginParams.AllowAttack, false);
+  const paramAllowGuard = toBoolean(pluginParams.AllowGuard, false);
+  const paramAllowItem = toBoolean(pluginParams.AllowItem, false);
+  const paramAllowMagicSkill = toBoolean(pluginParams.AllowMagicSkill, false);
+  const paramAllowSpecialSkill = toBoolean(pluginParams.AllowSpecialSkill, false);
 
   /**
    * スタン判定をスルーするアクションかどうか
