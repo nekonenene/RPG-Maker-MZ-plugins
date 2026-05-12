@@ -6,6 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/license/mit
 //
+// 2026/05/13 v1.0.2 計算式内の &lt; と &gt; が１箇所しか置換されなかった問題を修正
 // 2026/05/11 v1.0.1 ドレインメッセージの表示時間を増やした
 // 2026/03/24 v1.0.0 First release
 //
@@ -13,7 +14,7 @@
 
 /*:
  * @target MZ
- * @plugindesc Creates a state that drains HP from the afflicted to the drainer each turn (v1.0.1)
+ * @plugindesc Creates a state that drains HP from the afflicted to the drainer each turn (v1.0.2)
  * @author hatonekoe - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_HPDrainState
  *
@@ -108,7 +109,7 @@
 
 /*:ja
  * @target MZ
- * @plugindesc HPを吸収され続けるステート（状態異常）を作成できます (v1.0.1)
+ * @plugindesc HPを吸収され続けるステート（状態異常）を作成できます (v1.0.2)
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_HPDrainState
  *
@@ -269,7 +270,7 @@
   const calcDrainAmount = (state, drainTarget, drainer) => {
     const amountType = String(state.meta.HPDrainState_AmountType ?? '').trim() || paramAmountType;
     // タグ内に " や ' を書かれた場合に削除。 &lt; や &gt; は置換して対応
-    let amount = String(state.meta.HPDrainState_Amount ?? paramAmount).trim().replace(/['"]/g, '').replace('&lt;', '<').replace('&gt;', '>');
+    let amount = String(state.meta.HPDrainState_Amount ?? paramAmount).trim().replace(/['"]/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
     const amountRandomizer = Math.min(80, Math.max(0, Number(state.meta.HPDrainState_AmountRandomizer ?? paramAmountRandomizer)));
 
     if (amountType !== 'formula') {
