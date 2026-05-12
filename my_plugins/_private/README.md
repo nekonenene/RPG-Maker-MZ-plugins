@@ -19,6 +19,15 @@ brew install fswatch
 fswatch -o ./my_plugins/_private/HTN_MonsterMessage | xargs -n1 -I{} rsync -av ./my_plugins/_private/HTN_MonsterMessage ~/Documents/RPGMakerMZ/SampleProject/js/plugins
 ```
 
+公開済みのプラグインを全部プロジェクトに送りたい場合はこう。
+
+```bash
+find my_plugins -path 'my_plugins/_private' -prune -o -type f -name '*.js' -print | rsync -av --files-from=- --no-relative ./ ~/Documents/RPGMakerMZ/SampleProject/js/plugins/
+
+# fswatch で監視する場合。区切り文字をヌル文字にして、ファイル名にスペースが入っていても大丈夫なようにしている
+fswatch -0 my_plugins | while read -d '' event; do find my_plugins -path 'my_plugins/_private' -prune -o -type f -name '*.js' -print0 | rsync -av --from0 --files-from=- --no-relative ./ ~/Documents/RPGMakerMZ/SampleProject/js/plugins/; done
+```
+
 ## デプロイメント
 
 macOS は [NW.js の差し替えをしないと](https://rpgtkool.hatenablog.com/entry/2024/10/23/140944)デバッグビルドが不安定になる問題があったが、  
