@@ -24,8 +24,10 @@ fswatch -o ./my_plugins/_private/HTN_MonsterMessage | xargs -n1 -I{} rsync -av .
 ```bash
 find my_plugins -path 'my_plugins/_private' -prune -o -type f -name '*.js' -print | rsync -av --files-from=- --no-relative ./ ~/Documents/RPGMakerMZ/SampleProject/js/plugins/
 
-# fswatch で監視する場合。区切り文字をヌル文字にして、ファイル名にスペースが入っていても大丈夫なようにしている
-fswatch -0 my_plugins | while read -d '' event; do find my_plugins -path 'my_plugins/_private' -prune -o -type f -name '*.js' -print0 | rsync -av --from0 --files-from=- --no-relative ./ ~/Documents/RPGMakerMZ/SampleProject/js/plugins/; done
+# 長いので Makefile に書いておいた
+make sync DEST_DIR=~/Documents/RPGMakerMZ/SampleProject/js/plugins/
+# 最初に同期したあと fswatch での変更監視もおこなう
+make watch DEST_DIR=~/Documents/RPGMakerMZ/SampleProject/js/plugins/
 ```
 
 ## デプロイメント
