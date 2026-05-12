@@ -68,6 +68,10 @@
  *
  * @help
  * [How to Use]
+ * First, set the state's Restriction to "None".
+ * If it is set to "Cannot move", the battler cannot select actions and
+ * will always be unable to act.
+ *
  * Add the following note tag to any state you want this plugin to apply to:
  * <StunRate>
  *
