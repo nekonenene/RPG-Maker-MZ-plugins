@@ -82,6 +82,15 @@ RPGツクールMZの仕様では、ステートの継続メッセージに関し
 メモ欄に `<StunRate_ShowStateMessageBeforeAction: false>` と記述することをおこなっても、  
 必ずしも継続メッセージが行動後に表示されるわけではないことにご注意ください。
 
+### NumbState.js とのマニアックな違い
+
+[公式プラグイン](https://rpgmakerofficial.com/product/mz/download/dl_plugin.html)である「NumbState.js」との微妙な挙動の違いとして、  
+NumbState.js では、 processTurn 内で clearActions を呼び出すため、スタン時は全行動をキャンセルしていましたが、  
+このプラグインでは startAction 内でアクションごとにキャンセル処理をおこないます。
+
+そのため、アクターや職業などの特徴で「行動回数追加」を設定していて、１ターンに複数回の行動がおこなわれる場合、  
+このプラグインでは、複数回の行動それぞれでスタン判定がおこなわれることになります。
+
 ## 📝 作者情報
 
 ハトネコエ  

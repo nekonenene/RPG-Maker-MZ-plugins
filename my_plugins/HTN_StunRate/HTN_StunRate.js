@@ -144,6 +144,10 @@
   /**
    * StunRate ステートの継続メッセージ表示とスタン判定をおこなう
    *
+   * NumbStates.js では BattleManager.processTurn 内で clearActions を呼び出すため、スタン時は全行動のキャンセルだが、
+   * BattleManager.startAction 内でアクションごとにキャンセル処理をおこなうことにより、行動ごとにスタン判定がおこなわれる。
+   * アクターや職業などの特徴で「行動回数追加」を設定していて、１ターンに複数回の行動がおこなわれる場合に挙動が異なる。
+   *
    * @returns {void}
    */
   const _BattleManager_startAction = BattleManager.startAction;
