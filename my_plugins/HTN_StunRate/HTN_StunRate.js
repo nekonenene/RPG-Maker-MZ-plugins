@@ -120,38 +120,38 @@
  * @type string
  *
  * @param ShowStateMessageBeforeAction
- * @text 行動前に継続メッセージを表示
- * @desc ステートの継続メッセージを行動の前に表示するか。falseの場合、ツクールMZの本来の挙動同様、行動の後に表示されます
+ * @text 継続メッセージを行動前に表示
+ * @desc ステートの継続メッセージを行動の前に表示するか。falseの場合、ツクールMZの本来の挙動同様、行動後に表示されます
  * @default true
  * @type boolean
  *
  * @param AllowAttack
  * @text 通常攻撃を常に許可
- * @desc true の場合、通常攻撃はスタンせず必ず行動可能です
+ * @desc 通常攻撃をスタンせず必ず行動可能にするか
  * @default false
  * @type boolean
  *
  * @param AllowGuard
  * @text 防御を常に許可
- * @desc true の場合、防御はスタンせず必ず行動可能です
+ * @desc 防御をスタンせず必ず行動可能にするか
  * @default false
  * @type boolean
  *
  * @param AllowItem
  * @text アイテム使用を常に許可
- * @desc true の場合、アイテム使用はスタンせず必ず行動可能です
+ * @desc アイテム使用をスタンせず必ず行動可能にするか
  * @default false
  * @type boolean
  *
  * @param AllowMagicSkill
  * @text 魔法スキルを常に許可
- * @desc true の場合、魔法スキル（スキルタイプ１番）はスタンせず必ず行動可能です
+ * @desc 魔法スキル（スキルタイプ１番）をスタンせず必ず行動可能にするか
  * @default false
  * @type boolean
  *
  * @param AllowSpecialSkill
  * @text 必殺技スキルを常に許可
- * @desc true の場合、必殺技スキル（スキルタイプ２番）はスタンせず必ず行動可能です
+ * @desc 必殺技スキル（スキルタイプ２番）をスタンせず必ず行動可能にするか
  * @default false
  * @type boolean
  *
@@ -178,13 +178,17 @@
  *   <StunRate_ShowStateMessageBeforeAction: false>
  * 防御では行動不能にならないようにする場合の設定例:
  *   <StunRate_AllowGuard: true>
- * （※ツクールMZは、ステートの継続メッセージに関して「優先度」がもっとも高い１つだけを
- *   表示する仕様のため、false に設定しても必ず表示されるわけではありません）
  *
  * 【行動不能時のメッセージの補足】
  * <StunRate> タグを持つステートが複数存在し、それらに同時にかかっている場合、
  * 各ステートで「優先度」の順にスタン判定がおこなわれ、
  * 最初にスタン判定となったステートのメッセージが表示されます。
+ *
+ * 【継続メッセージの表示タイミングについて】
+ * ツクールMZは、ステートの継続メッセージに関して「優先度」が
+ * もっとも高い１つだけを表示します。そのため、
+ * 「継続メッセージを行動前に表示」を false にしても、
+ * 必ずしも行動後に継続メッセージが表示されるわけではありません。
  */
 
 (() => {
