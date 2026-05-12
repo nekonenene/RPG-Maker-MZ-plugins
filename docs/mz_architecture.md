@@ -81,6 +81,36 @@ Game_Battler.onTurnEnd()
 
 ---
 
+## バトル行動開始の処理フロー
+
+通常のターン処理では、`BattleManager.processTurn()` が現在行動を取得し、
+`Game_Action.prepare()` と `Game_Action.isValid()` を通過した場合だけ `BattleManager.startAction()` を呼ぶ。
+
+```
+BattleManager.processTurn()
+  ├── action = subject.currentAction()
+  ├── action.prepare()
+  │     └── 混乱中かつ強制行動でない場合、setConfusion() で通常攻撃へ変更
+  ├── action.isValid()
+  │     └── 強制行動なら item が存在すれば true、通常行動なら subject.canUse(item)
+  ├── BattleManager.startAction()
+  │     ├── targets = action.makeTargets()
+  │     ├── subject.useItem(action.item())
+  │     ├── action.applyGlobal()
+  │     └── logWindow.startAction(subject, action, targets)
+  └── subject.removeCurrentAction()
+```
+
+`new Game_Action(subject, true)` で作成した行動は `_forcing` が true になり、
+`isValid()` で MP不足、封印、スキルタイプ封印などの `canUse` 判定を通らない。
+また、`makeTargets()` では混乱対象の上書きもおこなわれない。
+
+現在行動を別スキルへ差し替えるプラグインは、`BattleManager.startAction()` のエイリアス内で
+`subject.currentAction()` を置き換えると、対象決定、コスト消費、バトルログ表示が差し替え後のスキル基準になる。
+対象も変えたい場合は、`startAction()` 本体が `makeTargets()` を呼ぶ前に差し替える必要がある。
+
+---
+
 ## バトルログの表示フロー
 
 ### スキル・アイテム使用時
