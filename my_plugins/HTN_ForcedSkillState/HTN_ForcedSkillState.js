@@ -1,0 +1,374 @@
+// --------------------------------------------------------------------------
+//
+// HTN_ForcedSkillState.js
+//
+// Copyright (c) 2026 hatonekoe
+// This software is released under the MIT License.
+// https://opensource.org/license/mit
+//
+// 2026/05/13 v0.0.1 開発中
+//
+// --------------------------------------------------------------------------
+
+/*:
+ * @target MZ
+ * @plugindesc States that randomly force the battler to use specified skills (v1.0.0)
+ * @author hatonekoe - https://hato-neko.x0.com
+ * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_ForcedSkillState
+ *
+ * @param Rate
+ * @text Forced Skill Rate (%)
+ * @desc Probability (%) of forcing one of the specified skills.
+ * @default 5
+ * @type number
+ * @min 0
+ * @max 100
+ *
+ * @param ShowStateMessageBeforeAction
+ * @text Show State Message Before Action
+ * @desc If true, the state's continuation message is shown before the battler acts. If false, shown after.
+ * @default true
+ * @type boolean
+ *
+ * @help
+ * [How to Use]
+ * First, set the state's Restriction to "None".
+ * If it is set to "Cannot move", the battler cannot select actions.
+ *
+ * Add the following note tag to any state you want this plugin to apply to:
+ * <ForcedSkillState>
+ *
+ * [Per-State Settings]
+ * You can override plugin parameter settings per state using these tags:
+ *
+ * Setting list:
+ * <ForcedSkillState> (Required)
+ * <ForcedSkillState_Rate: 10> (Forced skill probability)
+ * <ForcedSkillState_SkillIds: 2,2,7,0> (Candidate skill IDs)
+ * <ForcedSkillState_SkillNames: Guard,Defend> (Candidate skill names)
+ * <ForcedSkillState_ShowStateMessageBeforeAction: true> (Show continuation message before action)
+ *
+ * SkillIds takes priority over SkillNames.
+ * Only existing positive skill IDs are used.
+ * Invalid IDs are ignored.
+ *
+ * SkillNames is used only when SkillIds has no valid candidates.
+ * Use &lt; and &gt; when a skill name contains < or >.
+ *
+ * If multiple states with the <ForcedSkillState> tag are active at the same time,
+ * each state is checked in priority order.
+ * The first state that triggers and has valid skill candidates overrides the action.
+ *
+ * Forced skills ignore normal use conditions such as MP cost, seals, and skill type seals.
+ *
+ * [About Continuation Message Timing]
+ * RPG Maker MZ only shows one state continuation message per turn:
+ * the one belonging to the highest-priority state.
+ * Therefore, even if Show State Message Before Action is set to false,
+ * the continuation message is not guaranteed to appear after the action.
+ */
+
+/*:ja
+ * @target MZ
+ * @plugindesc 一定確率で指定スキルを勝手に使ってしまうステート (v1.0.0)
+ * @author ハトネコエ - https://hato-neko.x0.com
+ * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_ForcedSkillState
+ *
+ * @param Rate
+ * @text 強制スキル発動率(%)
+ * @desc 指定スキルを勝手に使ってしまう確率(%)
+ * @default 5
+ * @type number
+ * @min 0
+ * @max 100
+ *
+ * @param ShowStateMessageBeforeAction
+ * @text 継続メッセージを行動前に表示
+ * @desc ステートの継続メッセージを行動の前に表示するか。falseの場合、ツクールMZの本来の挙動同様、行動後に表示されます
+ * @default true
+ * @type boolean
+ *
+ * @help
+ * 【使い方】
+ * ステートの「メモ」の欄に例えば以下のようにタグを記述します。
+ * <ForcedSkillState>
+ * <ForcedSkillState_Rate: 50>
+ * <ForcedSkillState_SkillIds: 2>
+ *
+ * この例の場合、このステートが付与されたキャラクターは、
+ * 50%の確率でスキルID: 2（通常は防御）のスキルを勝手に使います。
+ *
+ * 【ステートごとの個別設定】
+ * ステートの「メモ」に以下のように記述することで、
+ * プラグインパラメータの設定をステートごとに上書きできます。
+ *
+ * 設定項目一覧：
+ * <ForcedSkillState> （※この記述は必須です）
+ * <ForcedSkillState_Rate: 10> （指定スキルを勝手に使う確率）
+ * <ForcedSkillState_SkillIds: 2> （スキルID）
+ * <ForcedSkillState_SkillNames: 防御> （スキル名。 ForcedSkillState_SkillIds が指定されていない場合に使用されます）
+ * <ForcedSkillState_ShowStateMessageBeforeAction: true> （継続メッセージを行動前に表示するか）
+ *
+ * SkillIds は SkillNames より優先されます。SkillNames は SkillIds に有効な候補がない場合だけ参照されます。
+ * スキルIDをあとから変更しそうで心配な方は SkillNames の使用をご検討ください。
+ *
+ * SkillNames の注意事項として、同じスキル名が複数存在する場合は、スキルIDが小さいものが選ばれます。
+ * また、スキル名に < や > が含まれる場合は、 &lt; や &gt; と記述してください。
+ * （例：スキル名が「つよいこうげき(>_<)」の場合、 <ForcedSkillState_SkillNames: つよいこうげき(&gt;_&lt;)> と記述）
+ *
+ * <ForcedSkillState> タグを持つステートが複数存在し、それらに同時にかかっている場合、
+ * 各ステートで「優先度」の順に判定がおこなわれ、
+ * 最初に発動し、有効な候補スキルを持つステートが行動を上書きします。
+ *
+ * 強制スキルは、MP不足、封印、スキルタイプ封印などの使用条件を無視します。
+ *
+ * 【継続メッセージの表示タイミングについて】
+ * ツクールMZは、ステートの継続メッセージに関して「優先度」が
+ * もっとも高い１つだけを表示します。そのため、
+ * 「継続メッセージを行動前に表示」を false にしても、
+ * 必ずしも行動後に継続メッセージが表示されるわけではありません。
+ */
+
+(() => {
+  'use strict';
+
+  /**
+   * 文字列や真偽値の入力を真偽値へ変換
+   *
+   * @param {boolean|string} value 変換対象の値
+   * @param {boolean} defaultValue 変換不能時の既定値
+   * @returns {boolean} 変換後の真偽値を返す
+   */
+  const toBoolean = (value, defaultValue) => {
+    const strValue = String(value).trim().toLowerCase();
+
+    if (strValue === 'true') {
+      return true;
+    } else if (strValue === 'false') {
+      return false;
+    }
+
+    return defaultValue;
+  };
+
+  const pluginName = 'HTN_ForcedSkillState';
+  const pluginParams = PluginManager.parameters(pluginName);
+  const paramRate = Number(pluginParams.Rate || 5);
+  const paramShowStateMessageBeforeAction = toBoolean(pluginParams.ShowStateMessageBeforeAction, true);
+
+  /**
+   * カンマ区切り文字列を要素配列へ変換
+   *
+   * @param {string} value カンマ区切り文字列
+   * @returns {string[]} 空文字を除いた要素配列を返す
+   */
+  const splitCsv = (value) => {
+    return String(value).split(',').map(str => str.trim()).filter(str => str !== '');
+  };
+
+  /**
+   * スキル名タグ用のエスケープを変換
+   *
+   * @param {string} value 変換対象の文字列
+   * @returns {string} 変換後の文字列を返す
+   */
+  const unescapeSkillName = (value) => {
+    return String(value).replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+  };
+
+  /**
+   * ステートに設定された強制スキル発動率を取得
+   *
+   * @param {object} state ステートデータ
+   * @returns {number} 発動率を返す
+   */
+  const forcedSkillRate = (state) => {
+    let rate = paramRate;
+
+    if (state.meta.ForcedSkillState_Rate !== undefined) {
+      rate = Number(state.meta.ForcedSkillState_Rate);
+    }
+
+    return Math.min(Math.max(rate, 0), 100);
+  };
+
+  /**
+   * スキルIDタグから有効な候補スキルを取得
+   *
+   * @param {object} state ステートデータ
+   * @returns {object[]} 候補スキル配列を返す
+   */
+  const skillCandidatesByIds = (state) => {
+    if (state.meta.ForcedSkillState_SkillIds === undefined) {
+      return [];
+    }
+
+    return splitCsv(state.meta.ForcedSkillState_SkillIds)
+      .map(str => Number(str))
+      .filter(skillId => Number.isInteger(skillId) && skillId > 0 && $dataSkills[skillId] !== undefined)
+      .map(skillId => $dataSkills[skillId]);
+  };
+
+  /**
+   * スキル名タグから有効な候補スキルを取得
+   *
+   * @param {object} state ステートデータ
+   * @returns {object[]} 候補スキル配列を返す
+   */
+  const skillCandidatesByNames = (state) => {
+    if (state.meta.ForcedSkillState_SkillNames === undefined) {
+      return [];
+    }
+
+    return splitCsv(state.meta.ForcedSkillState_SkillNames)
+      .map(str => unescapeSkillName(str))
+      .map(skillName => $dataSkills.find(skill => skill !== null && skill !== undefined && skill.name.trim() === skillName.trim()))
+      .filter(skill => skill !== undefined); // find で見つからなかったものを除外
+  };
+
+  /**
+   * ステートに設定された候補スキルを取得
+   *
+   * @param {object} state ステートデータ
+   * @returns {object[]} 候補スキル配列を返す
+   */
+  const skillCandidates = (state) => {
+    const skillsByIds = skillCandidatesByIds(state);
+    if (skillsByIds.length > 0) {
+      return skillsByIds;
+    }
+
+    return skillCandidatesByNames(state);
+  };
+
+  /**
+   * 候補から等確率でスキルを選ぶ
+   *
+   * @param {object[]} skills 候補スキル配列
+   * @returns {object|null} 選ばれたスキルを返す
+   */
+  const selectRandomSkill = (skills) => {
+    if (skills.length === 0) {
+      return null;
+    }
+
+    return skills[Math.randomInt(skills.length)];
+  };
+
+  /**
+   * バトル開始時に独自プロパティを初期化する
+   *
+   * @param {boolean} advantageous
+   * @returns {void}
+   */
+  const _Game_Battler_onBattleStart = Game_Battler.prototype.onBattleStart;
+  Game_Battler.prototype.onBattleStart = function(advantageous) {
+    _Game_Battler_onBattleStart.call(this, advantageous);
+
+    this._forcedSkillState_ShownStateIdsBefore = new Set();
+  };
+
+  /**
+   * バトル終了時に独自プロパティをリセットする
+   *
+   * @returns {void}
+   */
+  const _Game_Battler_onBattleEnd = Game_Battler.prototype.onBattleEnd;
+  Game_Battler.prototype.onBattleEnd = function() {
+    _Game_Battler_onBattleEnd.call(this);
+
+    this._forcedSkillState_ShownStateIdsBefore = new Set();
+  };
+
+  /**
+   * ForcedSkillState ステートの継続メッセージ表示と強制スキル判定をおこなう
+   *
+   * @returns {void}
+   */
+  const _BattleManager_startAction = BattleManager.startAction;
+  BattleManager.startAction = function() {
+    const subject = this._subject;
+    const forcedSkillStates = subject.states().filter(state => state.meta.ForcedSkillState !== undefined);
+
+    if (subject._forcedSkillState_ShownStateIdsBefore === undefined) {
+      subject._forcedSkillState_ShownStateIdsBefore = new Set();
+    }
+
+    // 対象ステートにかかっていないなら通常の startAction を呼び出して終了
+    if (forcedSkillStates.length === 0) {
+      _BattleManager_startAction.call(this);
+      return;
+    }
+
+    // ステート継続メッセージの表示
+    for (const state of forcedSkillStates) {
+      const showStateMessageBeforeAction = toBoolean(
+        state.meta.ForcedSkillState_ShowStateMessageBeforeAction,
+        paramShowStateMessageBeforeAction
+      );
+
+      if (showStateMessageBeforeAction && state.message3 !== '') {
+        this._logWindow.push('addText', state.message3.format(subject.name()));
+        this._logWindow.push('wait');
+        this._logWindow.push('clear');
+
+        subject._forcedSkillState_ShownStateIdsBefore.add(state.id);
+      }
+    }
+
+    // 上書きするスキルを選択し設定
+    for (const state of forcedSkillStates) {
+      if (Math.random() * 100 >= forcedSkillRate(state)) {
+        continue;
+      }
+
+      const skill = selectRandomSkill(skillCandidates(state));
+      if (skill === null) {
+        continue;
+      }
+
+      const action = new Game_Action(subject, true);
+      action.setSkill(skill.id);
+
+      if (action.needsSelection()) {
+        action.decideRandomTarget();
+      }
+
+      if (action.item() === null) {
+        continue;
+      }
+
+      subject.setAction(0, action);
+      break;
+    }
+
+    _BattleManager_startAction.call(this);
+  };
+
+  /**
+   * 行動前に継続メッセージを表示済みの場合、重複表示を避けつつ未表示のステートのメッセージを表示する
+   *
+   * @param {Game_Battler} subject 対象バトラー
+   * @returns {void}
+   */
+  const _Window_BattleLog_displayCurrentState = Window_BattleLog.prototype.displayCurrentState;
+  Window_BattleLog.prototype.displayCurrentState = function(subject) {
+    if (
+      subject._forcedSkillState_ShownStateIdsBefore === undefined ||
+      subject._forcedSkillState_ShownStateIdsBefore.size === 0
+    ) {
+      _Window_BattleLog_displayCurrentState.call(this, subject);
+      return;
+    }
+
+    // 一時的に subject._states から表示済みのステートを除外して、元の displayCurrentState を呼び出す
+    const savedStates = subject._states;
+    subject._states = savedStates.filter(stateId => !subject._forcedSkillState_ShownStateIdsBefore.has(stateId));
+
+    try {
+      _Window_BattleLog_displayCurrentState.call(this, subject);
+    } finally {
+      subject._states = savedStates;
+    }
+  };
+})();
