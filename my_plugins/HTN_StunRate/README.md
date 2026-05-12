@@ -57,6 +57,18 @@ RPGツクールMZ用のプラグインです。
   行動不能になったときの表示メッセージを上書き（文字列内の `%1` は行動者名に置換されます）
 - `<StunRate_ShowStateMessageBeforeAction: true/false>`  
   ステートの継続メッセージを、行動の前に表示するかの設定を上書き
+- `<StunRate_AllowAttack: true/false>`  
+  true の場合、通常攻撃はスタンせず必ず行動可能です
+- `<StunRate_AllowGuard: true/false>`  
+  true の場合、防御はスタンせず必ず行動可能です
+- `<StunRate_AllowItem: true/false>`  
+  true の場合、アイテム使用はスタンせず必ず行動可能です
+- `<StunRate_AllowCertainHit: true/false>`  
+  true の場合、必中アクションはスタンせず必ず行動可能です
+- `<StunRate_AllowPhysicalAttack: true/false>`  
+  true の場合、物理攻撃はスタンせず必ず行動可能です
+- `<StunRate_AllowMagicalAttack: true/false>`  
+  true の場合、魔法攻撃はスタンせず必ず行動可能です
 
 #### コピーしやすい用の一覧
 
@@ -64,6 +76,12 @@ RPGツクールMZ用のプラグインです。
 <StunRate: 25>
 <StunRate_Message: %1は動けない！>
 <StunRate_ShowStateMessageBeforeAction: true>
+<StunRate_AllowAttack: false>
+<StunRate_AllowGuard: false>
+<StunRate_AllowItem: false>
+<StunRate_AllowCertainHit: false>
+<StunRate_AllowPhysicalAttack: false>
+<StunRate_AllowMagicalAttack: false>
 ```
 
 ### 行動不能時のメッセージの補足

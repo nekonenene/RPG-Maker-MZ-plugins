@@ -36,6 +36,42 @@
  * @default true
  * @type boolean
  *
+ * @param AllowAttack
+ * @text Allow Attack
+ * @desc If true, normal attacks are never stunned.
+ * @default false
+ * @type boolean
+ *
+ * @param AllowGuard
+ * @text Allow Guard
+ * @desc If true, guard actions are never stunned.
+ * @default false
+ * @type boolean
+ *
+ * @param AllowItem
+ * @text Allow Item
+ * @desc If true, item actions are never stunned.
+ * @default false
+ * @type boolean
+ *
+ * @param AllowCertainHit
+ * @text Allow Certain Hit
+ * @desc If true, certain hit actions are never stunned.
+ * @default false
+ * @type boolean
+ *
+ * @param AllowPhysicalAttack
+ * @text Allow Physical Attack
+ * @desc If true, physical hit actions are never stunned.
+ * @default false
+ * @type boolean
+ *
+ * @param AllowMagicalAttack
+ * @text Allow Magical Attack
+ * @desc If true, magical hit actions are never stunned.
+ * @default false
+ * @type boolean
+ *
  * @help
  * [How to Use]
  * Add the following note tag to any state you want this plugin to apply to:
@@ -53,6 +89,8 @@
  *   <StunRate_Message: %1 is paralyzed!>
  * Example — show the continuation message after action instead of before:
  *   <StunRate_ShowStateMessageBeforeAction: false>
+ * Example — make normal attacks never stun:
+ *   <StunRate_AllowAttack: true>
  * (Note: RPG Maker MZ only shows one continuation message per turn —
  *  the one belonging to the highest-priority state — so setting this to
  *  false does not guarantee the message will appear after the action.)
@@ -89,6 +127,42 @@
  * @default true
  * @type boolean
  *
+ * @param AllowAttack
+ * @text 通常攻撃を許可
+ * @desc true の場合、通常攻撃はスタンせず必ず行動可能です
+ * @default false
+ * @type boolean
+ *
+ * @param AllowGuard
+ * @text 防御を許可
+ * @desc true の場合、防御はスタンせず必ず行動可能です
+ * @default false
+ * @type boolean
+ *
+ * @param AllowItem
+ * @text アイテムを許可
+ * @desc true の場合、アイテム使用はスタンせず必ず行動可能です
+ * @default false
+ * @type boolean
+ *
+ * @param AllowCertainHit
+ * @text 必中アクションを許可
+ * @desc true の場合、必中アクションはスタンせず必ず行動可能です
+ * @default false
+ * @type boolean
+ *
+ * @param AllowPhysicalAttack
+ * @text 物理攻撃を許可
+ * @desc true の場合、物理攻撃はスタンせず必ず行動可能です
+ * @default false
+ * @type boolean
+ *
+ * @param AllowMagicalAttack
+ * @text 魔法攻撃を許可
+ * @desc true の場合、魔法攻撃はスタンせず必ず行動可能です
+ * @default false
+ * @type boolean
+ *
  * @help
  * 【使い方】
  * まず、ステートの「行動制約」は「なし」に設定してください。
@@ -110,6 +184,8 @@
  *   <StunRate_Message: %1はしびれている！>
  * 継続メッセージを行動後に表示したい場合の設定例:
  *   <StunRate_ShowStateMessageBeforeAction: false>
+ * 通常攻撃では行動不能にならないようにする場合の設定例:
+ *   <StunRate_AllowAttack: true>
  * （※ツクールMZは、ステートの継続メッセージに関して「優先度」がもっとも高い１つだけを
  *   表示する仕様のため、false に設定しても必ず表示されるわけではありません）
  *
@@ -127,6 +203,66 @@
   const paramStunRate = Number(parameters.StunRate || 25);
   const paramMessage = String(parameters.Message);
   const paramShowStateMessageBeforeAction = String(parameters.ShowStateMessageBeforeAction) !== 'false';
+  const paramAllowAttack = String(parameters.AllowAttack) === 'true';
+  const paramAllowGuard = String(parameters.AllowGuard) === 'true';
+  const paramAllowItem = String(parameters.AllowItem) === 'true';
+  const paramAllowCertainHit = String(parameters.AllowCertainHit) === 'true';
+  const paramAllowPhysicalAttack = String(parameters.AllowPhysicalAttack) === 'true';
+  const paramAllowMagicalAttack = String(parameters.AllowMagicalAttack) === 'true';
+
+  /**
+   * 文字列や真偽値の入力を真偽値へ変換
+   *
+   * @param {boolean|string} value 変換対象の値
+   * @param {boolean} defaultValue 変換不能時の既定値
+   * @returns {boolean} 変換後の真偽値を返す
+   */
+  const toBoolean = (value, defaultValue) => {
+    const strValue = String(value).trim().toLowerCase();
+
+    if (strValue === 'true') {
+      return true;
+    } else if (strValue === 'false') {
+      return false;
+    }
+
+    return defaultValue;
+  };
+
+  /**
+   * スタン判定をスルーするアクションかどうか
+   *
+   * @param {Game_Action} action 調査対象のアクション
+   * @param {object} state ステートデータ
+   * @returns {boolean} スタン除外対象の場合は true
+   */
+  const isNotStunAction = (action, state) => {
+    if (action.isAttack() && toBoolean(state.meta.StunRate_AllowAttack, paramAllowAttack)) {
+      return true;
+    }
+
+    if (action.isGuard() && toBoolean(state.meta.StunRate_AllowGuard, paramAllowGuard)) {
+      return true;
+    }
+
+    if (action.isItem() && toBoolean(state.meta.StunRate_AllowItem, paramAllowItem)) {
+      return true;
+    }
+
+    if (action.isCertainHit() && toBoolean(state.meta.StunRate_AllowCertainHit, paramAllowCertainHit)) {
+      return true;
+    }
+
+    if (action.isPhysical() && toBoolean(state.meta.StunRate_AllowPhysicalAttack, paramAllowPhysicalAttack)) {
+      return true;
+    }
+
+    if (action.isMagical() && toBoolean(state.meta.StunRate_AllowMagicalAttack, paramAllowMagicalAttack)) {
+      return true;
+    }
+
+    return false;
+  };
 
   /**
    * バトル開始時に独自プロパティを初期化する
@@ -184,6 +320,11 @@
     let stunMessage = paramMessage;
 
     for (const state of stunStates) {
+      // 特定のアクションであればスタン判定をスキップ
+      if (isNotStunAction(action, state)) {
+        continue;
+      }
+
       const stunRate = state.meta.StunRate !== true ? Number(state.meta.StunRate) : paramStunRate;
 
       if (Math.random() * 100 < stunRate) {
