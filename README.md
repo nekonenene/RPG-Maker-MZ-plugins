@@ -88,6 +88,15 @@ HP : [https://hato-neko.x0.com](https://hato-neko.x0.com)
 **https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_SmartCharm**
 
 
+## 🕸️ HTN_StunRate
+
+一定確率で行動できないステート（状態異常）を作成できるようになるプラグインです。
+
+### 詳しい使い方はこちら：
+
+**https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_StunRate**
+
+
 ## 🔁 HTN_StateContinuousMessage
 
 すでにかかっているステート（状態異常）が再び付与されたときのメッセージを設定できるようになるプラグインです。
