@@ -83,20 +83,33 @@
  * [Per-State Settings]
  * You can override plugin parameter settings per state using these tags:
  *
- * Example — override the stun message:
- *   <StunRate_Message: %1 is paralyzed!>
- * Example — show the continuation message after action instead of before:
- *   <StunRate_ShowStateMessageBeforeAction: false>
- * Example — make guard actions never stun:
+ * Setting list:
+ * <StunRate: 25> (Required. <StunRate> alone is also valid.)
+ * <StunRate_Message: %1 is paralyzed!> (Message shown when unable to act)
+ * <StunRate_ShowStateMessageBeforeAction: true> (Show continuation message before action)
+ * <StunRate_AllowAttack: false> (Always allow normal attacks)
+ * <StunRate_AllowGuard: false> (Always allow guard actions)
+ * <StunRate_AllowItem: false> (Always allow item use)
+ * <StunRate_AllowMagicSkill: false> (Always allow magic skills)
+ * <StunRate_AllowSpecialSkill: false> (Always allow special skills)
+ *
+ * Example state where guard and item use never fail,
+ * while other actions fail at a 30% chance:
+ *   <StunRate: 30>
+ *   <StunRate_Message: %1 is too cursed to move!>
  *   <StunRate_AllowGuard: true>
- * (Note: RPG Maker MZ only shows one continuation message per turn —
- *  the one belonging to the highest-priority state — so setting this to
- *  false does not guarantee the message will appear after the action.)
+ *   <StunRate_AllowItem: true>
  *
  * [Note on Stun Messages with Multiple States]
  * If multiple states with the <StunRate> tag are active at the same time,
  * each state is checked for stun in priority order.
  * The message from the first state that triggers stun is displayed.
+ *
+ * [About Continuation Message Timing]
+ * RPG Maker MZ only shows one state continuation message per turn:
+ * the one belonging to the highest-priority state.
+ * Therefore, even if Show State Message Before Action is set to false,
+ * the continuation message is not guaranteed to appear after the action.
  */
 
 /*:ja
