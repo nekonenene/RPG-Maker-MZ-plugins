@@ -107,10 +107,10 @@
   'use strict';
 
   const pluginName = 'HTN_TPNoRegenState';
-  const parameters = PluginManager.parameters(pluginName);
-  const itemRecoverDefault = String(parameters.ItemRecover) === 'true';
-  const skillRecoverDefault = String(parameters.SkillRecover) === 'true';
-  const recoverBlockedMessageDefault = String(parameters.RecoverBlockedMessage || '%1の%2を回復できない！');
+  const pluginParams = PluginManager.parameters(pluginName);
+  const itemRecoverDefault = String(pluginParams.ItemRecover) === 'true';
+  const skillRecoverDefault = String(pluginParams.SkillRecover) === 'true';
+  const recoverBlockedMessageDefault = String(pluginParams.RecoverBlockedMessage || '%1の%2を回復できない！');
 
   /**
    * 文字列や真偽値の入力を真偽値へ変換
