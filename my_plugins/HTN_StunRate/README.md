@@ -3,7 +3,7 @@
 RPGツクールMZ用のプラグインです。
 
 一定確率で行動できないステート（状態異常）を作成できるようになります。  
-[公式プラグイン](https://rpgmakerofficial.com/product/mz/download/dl_plugin.html)の「NumbState.js」だと、行動不能時のメッセージをステートごとに設定できなかったため作成しました。
+[公式プラグイン](https://rpgmakerofficial.com/product/mz/download/dl_plugin.html)の「NumbState.js」だと、行動不能時のメッセージをステートIDごとに設定できなかったため作成しました。
 
 ## 🛠️ 導入方法
 
