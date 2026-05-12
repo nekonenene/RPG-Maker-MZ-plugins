@@ -171,6 +171,11 @@
     }
   };
 
+  /**
+   * TP増加を打ち消す
+   *
+   * @param {number} tp 設定するTPの値
+   */
   const _Game_BattlerBase_setTp = Game_BattlerBase.prototype.setTp;
   Game_BattlerBase.prototype.setTp = function(tp) {
     const currentTp = this.tp;
@@ -196,6 +201,12 @@
     _Game_BattlerBase_setTp.call(this, tp);
   };
 
+  /**
+   * アイテム・スキルによるTP増加の発生元を記録する
+   *
+   * @param {Game_Battler} target 対象バトラー
+   * @param {object} effect 使用効果
+   */
   const _Game_Action_itemEffectGainTp = Game_Action.prototype.itemEffectGainTp;
   Game_Action.prototype.itemEffectGainTp = function(target, effect) {
     // TP増加の原因を一時フラグで記録し、gainTp 側で許可判定に利用
@@ -215,15 +226,22 @@
     }
   };
 
+  /**
+   * 行動結果を初期化するメソッドで、独自プロパティも初期化
+   */
   const _Game_ActionResult_clear = Game_ActionResult.prototype.clear;
   Game_ActionResult.prototype.clear = function() {
     _Game_ActionResult_clear.call(this);
 
-    // プラグイン独自のフラグを解放
     this.tpNoRegenRecoverBlocked = null;
     this.tpNoRegenRecoverBlockedMessage = null;
   };
 
+  /**
+   * setTp で設定したフラグに基づき、TP回復無効メッセージを表示する
+   *
+   * @param {Game_Battler} target 対象バトラー
+   */
   const _Window_BattleLog_displayTpDamage = Window_BattleLog.prototype.displayTpDamage;
   Window_BattleLog.prototype.displayTpDamage = function(target) {
     _Window_BattleLog_displayTpDamage.call(this, target);
