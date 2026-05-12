@@ -89,8 +89,8 @@
  *   <StunRate_Message: %1 is paralyzed!>
  * Example — show the continuation message after action instead of before:
  *   <StunRate_ShowStateMessageBeforeAction: false>
- * Example — make normal attacks never stun:
- *   <StunRate_AllowAttack: true>
+ * Example — make guard actions never stun:
+ *   <StunRate_AllowGuard: true>
  * (Note: RPG Maker MZ only shows one continuation message per turn —
  *  the one belonging to the highest-priority state — so setting this to
  *  false does not guarantee the message will appear after the action.)
@@ -140,7 +140,7 @@
  * @type boolean
  *
  * @param AllowItem
- * @text アイテムを許可
+ * @text アイテム使用を許可
  * @desc true の場合、アイテム使用はスタンせず必ず行動可能です
  * @default false
  * @type boolean
@@ -184,8 +184,8 @@
  *   <StunRate_Message: %1はしびれている！>
  * 継続メッセージを行動後に表示したい場合の設定例:
  *   <StunRate_ShowStateMessageBeforeAction: false>
- * 通常攻撃では行動不能にならないようにする場合の設定例:
- *   <StunRate_AllowAttack: true>
+ * 防御では行動不能にならないようにする場合の設定例:
+ *   <StunRate_AllowGuard: true>
  * （※ツクールMZは、ステートの継続メッセージに関して「優先度」がもっとも高い１つだけを
  *   表示する仕様のため、false に設定しても必ず表示されるわけではありません）
  *
