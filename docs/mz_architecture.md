@@ -243,8 +243,9 @@ Scene_Battle.update()
               │                 │     └── BattleManager.processDefeat()
               │                 │           └── BattleManager.endBattle(2)
               │                 └── $gameTroop.isAllDead()
-              │                       └── BattleManager.processVictory() : 経験値やアイテム獲得の処理
-              │                             └── BattleManager.endBattle(0)
+              │                        └── BattleManager.processVictory() : 経験値やアイテム獲得の処理
+              │                              └── BattleManager.endBattle(0)
+              │                                    └── _phase = "battleEnd"
               └── updateEvent() が true を返すため、このフレームでは updatePhase() は呼ばれない
 ```
 
