@@ -37,31 +37,31 @@
  * @type boolean
  *
  * @param AllowAttack
- * @text Allow Attack
+ * @text Allow Attack Always
  * @desc If true, normal attacks are never stunned.
  * @default false
  * @type boolean
  *
  * @param AllowGuard
- * @text Allow Guard
+ * @text Allow Guard Always
  * @desc If true, guard actions are never stunned.
  * @default false
  * @type boolean
  *
  * @param AllowItem
- * @text Allow Item
+ * @text Allow Item Always
  * @desc If true, item actions are never stunned.
  * @default false
  * @type boolean
  *
  * @param AllowMagicSkill
- * @text Allow Magic Skill
+ * @text Allow Magic Skill Always
  * @desc If true, magic skills (skill type ID 1) are never stunned.
  * @default false
  * @type boolean
  *
  * @param AllowSpecialSkill
- * @text Allow Special Skill
+ * @text Allow Special Skill Always
  * @desc If true, special skills (skill type ID 2) are never stunned.
  * @default false
  * @type boolean
@@ -122,31 +122,31 @@
  * @type boolean
  *
  * @param AllowAttack
- * @text 通常攻撃を許可
+ * @text 通常攻撃を常に許可
  * @desc true の場合、通常攻撃はスタンせず必ず行動可能です
  * @default false
  * @type boolean
  *
  * @param AllowGuard
- * @text 防御を許可
+ * @text 防御を常に許可
  * @desc true の場合、防御はスタンせず必ず行動可能です
  * @default false
  * @type boolean
  *
  * @param AllowItem
- * @text アイテム使用を許可
+ * @text アイテム使用を常に許可
  * @desc true の場合、アイテム使用はスタンせず必ず行動可能です
  * @default false
  * @type boolean
  *
  * @param AllowMagicSkill
- * @text 魔法スキルを許可
+ * @text 魔法スキルを常に許可
  * @desc true の場合、魔法スキル（スキルタイプ１番）はスタンせず必ず行動可能です
  * @default false
  * @type boolean
  *
  * @param AllowSpecialSkill
- * @text 必殺技スキルを許可
+ * @text 必殺技スキルを常に許可
  * @desc true の場合、必殺技スキル（スキルタイプ２番）はスタンせず必ず行動可能です
  * @default false
  * @type boolean
