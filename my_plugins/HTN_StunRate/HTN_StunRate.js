@@ -54,21 +54,15 @@
  * @default false
  * @type boolean
  *
- * @param AllowCertainHit
- * @text Allow Certain Hit
- * @desc If true, certain hit actions are never stunned.
+ * @param AllowMagicSkill
+ * @text Allow Magic Skill
+ * @desc If true, magic skills (skill type ID 1) are never stunned.
  * @default false
  * @type boolean
  *
- * @param AllowPhysicalAttack
- * @text Allow Physical Attack
- * @desc If true, physical hit actions are never stunned.
- * @default false
- * @type boolean
- *
- * @param AllowMagicalAttack
- * @text Allow Magical Attack
- * @desc If true, magical hit actions are never stunned.
+ * @param AllowSpecialSkill
+ * @text Allow Special Skill
+ * @desc If true, special skills (skill type ID 2) are never stunned.
  * @default false
  * @type boolean
  *
@@ -145,21 +139,15 @@
  * @default false
  * @type boolean
  *
- * @param AllowCertainHit
- * @text 必中アクションを許可
- * @desc true の場合、必中アクションはスタンせず必ず行動可能です
+ * @param AllowMagicSkill
+ * @text 魔法スキルを許可
+ * @desc true の場合、魔法スキル（スキルタイプ１番）はスタンせず必ず行動可能です
  * @default false
  * @type boolean
  *
- * @param AllowPhysicalAttack
- * @text 物理攻撃を許可
- * @desc true の場合、物理攻撃はスタンせず必ず行動可能です
- * @default false
- * @type boolean
- *
- * @param AllowMagicalAttack
- * @text 魔法攻撃を許可
- * @desc true の場合、魔法攻撃はスタンせず必ず行動可能です
+ * @param AllowSpecialSkill
+ * @text 必殺技スキルを許可
+ * @desc true の場合、必殺技スキル（スキルタイプ２番）はスタンせず必ず行動可能です
  * @default false
  * @type boolean
  *
@@ -206,9 +194,8 @@
   const paramAllowAttack = String(parameters.AllowAttack) === 'true';
   const paramAllowGuard = String(parameters.AllowGuard) === 'true';
   const paramAllowItem = String(parameters.AllowItem) === 'true';
-  const paramAllowCertainHit = String(parameters.AllowCertainHit) === 'true';
-  const paramAllowPhysicalAttack = String(parameters.AllowPhysicalAttack) === 'true';
-  const paramAllowMagicalAttack = String(parameters.AllowMagicalAttack) === 'true';
+  const paramAllowMagicSkill = String(parameters.AllowMagicSkill) === 'true';
+  const paramAllowSpecialSkill = String(parameters.AllowSpecialSkill) === 'true';
 
   /**
    * 文字列や真偽値の入力を真偽値へ変換
@@ -237,6 +224,9 @@
    * @returns {boolean} スタン除外対象の場合は true
    */
   const isNotStunAction = (action, state) => {
+    const isMagicSkill = action.isSkill() && action.item().stypeId === 1;
+    const isSpecialSkill = action.isSkill() && action.item().stypeId === 2;
+
     if (action.isAttack() && toBoolean(state.meta.StunRate_AllowAttack, paramAllowAttack)) {
       return true;
     }
@@ -249,15 +239,11 @@
       return true;
     }
 
-    if (action.isCertainHit() && toBoolean(state.meta.StunRate_AllowCertainHit, paramAllowCertainHit)) {
+    if (isMagicSkill && toBoolean(state.meta.StunRate_AllowMagicSkill, paramAllowMagicSkill)) {
       return true;
     }
 
-    if (action.isPhysical() && toBoolean(state.meta.StunRate_AllowPhysicalAttack, paramAllowPhysicalAttack)) {
-      return true;
-    }
-
-    if (action.isMagical() && toBoolean(state.meta.StunRate_AllowMagicalAttack, paramAllowMagicalAttack)) {
+    if (isSpecialSkill && toBoolean(state.meta.StunRate_AllowSpecialSkill, paramAllowSpecialSkill)) {
       return true;
     }
 

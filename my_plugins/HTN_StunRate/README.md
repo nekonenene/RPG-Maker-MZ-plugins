@@ -58,17 +58,15 @@ RPGツクールMZ用のプラグインです。
 - `<StunRate_ShowStateMessageBeforeAction: true/false>`  
   ステートの継続メッセージを、行動の前に表示するかの設定を上書き
 - `<StunRate_AllowAttack: true/false>`  
-  true の場合、通常攻撃はスタンせず必ず行動可能です
+  true の場合、通常攻撃はスタンせず必ず行動可能
 - `<StunRate_AllowGuard: true/false>`  
-  true の場合、防御はスタンせず必ず行動可能です
+  true の場合、防御はスタンせず必ず行動可能
 - `<StunRate_AllowItem: true/false>`  
-  true の場合、アイテム使用はスタンせず必ず行動可能です
-- `<StunRate_AllowCertainHit: true/false>`  
-  true の場合、必中アクションはスタンせず必ず行動可能です
-- `<StunRate_AllowPhysicalAttack: true/false>`  
-  true の場合、物理攻撃はスタンせず必ず行動可能です
-- `<StunRate_AllowMagicalAttack: true/false>`  
-  true の場合、魔法攻撃はスタンせず必ず行動可能です
+  true の場合、アイテム使用はスタンせず必ず行動可能
+- `<StunRate_AllowMagicSkill: true/false>`  
+  true の場合、魔法スキル（スキルタイプ１番）はスタンせず必ず行動可能
+- `<StunRate_AllowSpecialSkill: true/false>`  
+  true の場合、必殺技スキル（スキルタイプ２番）はスタンせず必ず行動可能
 
 #### コピーしやすい用の一覧
 
@@ -79,10 +77,17 @@ RPGツクールMZ用のプラグインです。
 <StunRate_AllowAttack: false>
 <StunRate_AllowGuard: false>
 <StunRate_AllowItem: false>
-<StunRate_AllowCertainHit: false>
-<StunRate_AllowPhysicalAttack: false>
-<StunRate_AllowMagicalAttack: false>
+<StunRate_AllowMagicSkill: false>
+<StunRate_AllowSpecialSkill: false>
 ```
+
+### 「魔法スキルを許可」「必殺技スキルを許可」オプションについて
+
+「魔法スキルを許可 (AllowMagicSkill)」は、スキルタイプのIDが 1 であるかで判定しています。  
+「必殺技スキルを許可 (AllowSpecialSkill)」は、スキルタイプのIDが 2 であるかで判定しています。  
+
+データベースの「タイプ」で、「スキルタイプ」の「01」や「02」を別の用途に変更している場合には、  
+このオプションは想定と異なる挙動をします。ご注意ください。
 
 ### 行動不能時のメッセージの補足
 
