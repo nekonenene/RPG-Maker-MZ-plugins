@@ -58,19 +58,19 @@
  *
  * @param ItemRecover
  * @text アイテムによるTP回復を許可
- * @desc trueの場合、アイテム効果によるTP増加を許可します。
+ * @desc アイテム効果によるTP増加を許可するかどうか
  * @default false
  * @type boolean
  *
  * @param SkillRecover
  * @text スキルによるTP回復を許可
- * @desc trueの場合、スキル（魔法・必殺技）の効果によるTP増加を許可します。
+ * @desc スキル（魔法・必殺技）の効果によるTP増加を許可するかどうか
  * @default false
  * @type boolean
  *
  * @param RecoverBlockedMessage
  * @text TP回復無効メッセージ
- * @desc アイテムやスキルによるTP回復が失敗したことを示すメッセージです。%1は対象者名、%2はTPの表示名に置き換わります。
+ * @desc アイテムやスキルによるTP回復が失敗したことを示すメッセージ。%1は対象者名、%2はTPの表示名に置き換わります
  * @default %1の%2を回復できない！
  * @type string
  *
