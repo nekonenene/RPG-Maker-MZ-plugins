@@ -186,17 +186,6 @@
 (() => {
   'use strict';
 
-  const pluginName = 'HTN_StunRate';
-  const parameters = PluginManager.parameters(pluginName);
-  const paramStunRate = Number(parameters.StunRate || 25);
-  const paramMessage = String(parameters.Message);
-  const paramShowStateMessageBeforeAction = String(parameters.ShowStateMessageBeforeAction) !== 'false';
-  const paramAllowAttack = String(parameters.AllowAttack) === 'true';
-  const paramAllowGuard = String(parameters.AllowGuard) === 'true';
-  const paramAllowItem = String(parameters.AllowItem) === 'true';
-  const paramAllowMagicSkill = String(parameters.AllowMagicSkill) === 'true';
-  const paramAllowSpecialSkill = String(parameters.AllowSpecialSkill) === 'true';
-
   /**
    * 文字列や真偽値の入力を真偽値へ変換
    *
@@ -215,6 +204,17 @@
 
     return defaultValue;
   };
+
+  const pluginName = 'HTN_StunRate';
+  const parameters = PluginManager.parameters(pluginName);
+  const paramStunRate = Number(parameters.StunRate || 25);
+  const paramMessage = String(parameters.Message).trim();
+  const paramShowStateMessageBeforeAction = toBoolean(parameters.ShowStateMessageBeforeAction, true);
+  const paramAllowAttack = toBoolean(parameters.AllowAttack, false);
+  const paramAllowGuard = toBoolean(parameters.AllowGuard, false);
+  const paramAllowItem = toBoolean(parameters.AllowItem, false);
+  const paramAllowMagicSkill = toBoolean(parameters.AllowMagicSkill, false);
+  const paramAllowSpecialSkill = toBoolean(parameters.AllowSpecialSkill, false);
 
   /**
    * スタン判定をスルーするアクションかどうか
@@ -317,7 +317,7 @@
         isStunned = true;
 
         if (state.meta.StunRate_Message !== undefined) {
-          stunMessage = String(state.meta.StunRate_Message);
+          stunMessage = String(state.meta.StunRate_Message).trim();
         }
 
         break;
