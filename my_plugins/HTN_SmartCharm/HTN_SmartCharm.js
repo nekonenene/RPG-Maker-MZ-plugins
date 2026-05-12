@@ -43,13 +43,13 @@
  *
  * @param AllowMagic
  * @text 魔法スキルの許可
- * @desc 魔法スキル（スキルタイプ：魔法）を味方に使用するか（trueなら使用する）
+ * @desc 魔法スキル（スキルタイプ１番）を味方に使用するか（trueなら使用する）
  * @default true
  * @type boolean
  *
  * @param AllowSpecial
  * @text 必殺技スキルの許可
- * @desc 必殺技スキル（スキルタイプ：必殺技）を味方に使用するか（trueなら使用する）
+ * @desc 必殺技スキル（スキルタイプ２番）を味方に使用するか（trueなら使用する）
  * @default true
  * @type boolean
  *
