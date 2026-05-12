@@ -37,12 +37,11 @@ Scene_Battle.update()
 
 ### BattleManager._phase の遷移
 
-ターン制バトルでは、基本的に次の順で `_phase` が変わる。  
+ターン制バトルでは、基本的に次の順で `_phase` が変わる。`{{ }}` で括られた部分を繰り返す。  
 TPB では `"input"` を経由せず `"start"` から `"turn"` に進む。
 
-```
-"start" → "input" → "turn" → "action" → "turn" → "turnEnd" →
-"start" ... （繰り返す） ... → "battleEnd" → ""（空文字列にリセット）
+```sh
+{{"start" → "input" → {{"turn" → "action"}} → "turn" → "turnEnd"}} → "battleEnd" → ""（空文字列にリセット）
 ```
 
 
