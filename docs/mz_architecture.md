@@ -1,43 +1,96 @@
 # RPGツクールMZ アーキテクチャ・処理フロー
 
-プラグイン開発に役立つクラス構造・処理フロー・フックポイントをまとめたドキュメント。
+プラグイン開発に役立つクラス構造や処理フローをまとめたドキュメント
+
 コアスクリプトを読まないと把握しにくい内部構造を記録する。
 
----
 
 ## バトラーの継承構造
+
+BattleManager.allBattleMembers で取得できる全バトラーのクラス構造
+
+```
+Game_Unit
+  ├── Game_Party : プレイヤーのパーティ
+  └── Game_Troop : 敵グループ
+```
 
 ```
 Game_BattlerBase
   └── Game_Battler
-        ├── Game_Actor
-        └── Game_Enemy
+        ├── Game_Actor : アクター（プレイヤーキャラ）
+        └── Game_Enemy : 敵キャラ
 ```
 
-### Game_BattlerBase の責務
 
-- HP/MP/TP の実値（`_hp`, `_mp`, `_tp`）の保持と `refresh()` によるクランプ
-- `setHp(hp)`, `setMp(mp)`, `setTp(tp)` — 絶対値で直接設定し `refresh()` を呼ぶ
-- ステート・バフ管理の基礎
+## バトル全体のライフサイクル
 
-### Game_Battler の責務
+### 戦闘開始
 
-- `gainHp(value)`, `gainMp(value)`, `gainTp(value)` — **result に変化量を記録してから** `setHp/Mp/Tp` を呼ぶ
-- `gainSilentTp(value)` — result に記録せず `setTp` のみ呼ぶ（TPリジェネ用）
-- リジェネ処理（`regenerateAll` / `regenerateHp` / `regenerateMp` / `regenerateTp`）
-- バトルアクション結果の記録（`_result: Game_ActionResult`）
+```
+BattleManager.startBattle()
+  ├── $gameSystem.onBattleStart()
+  ├── $gameParty.onBattleStart(preemptive)
+  │     └── Game_Battler.onBattleStart(preemptive)
+  │           └── initTp() が呼ばれる（isPreserveTp() が false のとき）
+  ├── $gameTroop.onBattleStart(surprise)
+  │     └── Game_Battler.onBattleStart(surprise)
+  │           └── initTp() が呼ばれる（isPreserveTp() が false のとき）
+  └── displayStartMessages()
+```
 
-### result への記録ルール
+### ターン中の行動
 
-| メソッド | hpDamage / mpDamage / tpDamage への記録 |
-|---|---|
-| `gainHp(value)` | `hpDamage = -value`（回復なら負値） |
-| `gainMp(value)` | `mpDamage = -value` |
-| `gainTp(value)` | `tpDamage = -value` |
-| `gainSilentTp(value)` | **記録しない** |
-| `setHp/Mp/Tp(value)` | **記録しない** |
+```
+BattleManager.processTurn()
+  ├── action = subject.currentAction()
+  ├── action.prepare()
+  │     └── 混乱中かつ強制行動でない場合、setConfusion() で通常攻撃へ変更
+  ├── action.isValid()
+  │     └── 強制行動なら item が存在すれば true、通常行動なら subject.canUse(item)
+  ├── BattleManager.startAction()
+  │     ├── targets = action.makeTargets()
+  │     ├── subject.useItem(action.item())
+  │     ├── action.applyGlobal()
+  │     └── logWindow.startAction(subject, action, targets)
+  └── subject.removeCurrentAction()
 
----
+BattleManager._phase が "action" の間の更新
+  └── Scene_Battle.updateBattleProcess()
+        └── BattleManager.update()
+              └── BattleManager.updatePhase()
+                    └── BattleManager.updateAction()
+                          ├── BattleManager.invokeAction(subject, target)
+                          │     └── Game_Action.apply(target)
+                          └── BattleManager.endAction()
+```
+
+`BattleManager.startAction()` は対象リストとログ開始を準備し、`BattleManager._phase` を `"action"` にする。  
+実際の対象ごとの適用は、その後のバトル更新ループで `BattleManager.updateAction()` が呼ばれたときに進む。
+
+### ターン終了
+
+```
+BattleManager.endAllBattlersTurn()
+  ├── Game_Battler.onTurnEnd()
+  │     ├── clearResult()
+  │     ├── regenerateAll()
+  │     ├── updateStateTurns()
+  │     ├── updateBuffTurns()
+  │     └── removeStatesAuto(2)
+  └── BattleManager.displayBattlerStatus(battler, false)
+```
+
+### 戦闘終了
+
+```
+Scene_Battle.terminate()
+  ├── $gameParty.onBattleEnd()
+  │     └── Game_Battler.onBattleEnd()
+  └── $gameTroop.onBattleEnd()
+        └── Game_Battler.onBattleEnd()
+```
+
 
 ## HP/MP/TP 変化の処理フロー
 
@@ -79,37 +132,6 @@ Game_Battler.onTurnEnd()
 | `initTp()` | バトル開始時のTP初期化（`Math.randomInt(25)`） |
 | `clearTp()` | TPを0にリセット |
 
----
-
-## バトル行動開始の処理フロー
-
-通常のターン処理では、`BattleManager.processTurn()` が現在行動を取得し、
-`Game_Action.prepare()` と `Game_Action.isValid()` を通過した場合だけ `BattleManager.startAction()` を呼ぶ。
-
-```
-BattleManager.processTurn()
-  ├── action = subject.currentAction()
-  ├── action.prepare()
-  │     └── 混乱中かつ強制行動でない場合、setConfusion() で通常攻撃へ変更
-  ├── action.isValid()
-  │     └── 強制行動なら item が存在すれば true、通常行動なら subject.canUse(item)
-  ├── BattleManager.startAction()
-  │     ├── targets = action.makeTargets()
-  │     ├── subject.useItem(action.item())
-  │     ├── action.applyGlobal()
-  │     └── logWindow.startAction(subject, action, targets)
-  └── subject.removeCurrentAction()
-```
-
-`new Game_Action(subject, true)` で作成した行動は `_forcing` が true になり、
-`isValid()` で MP不足、封印、スキルタイプ封印などの `canUse` 判定を通らない。
-また、`makeTargets()` では混乱対象の上書きもおこなわれない。
-
-現在行動を別スキルへ差し替えるプラグインは、`BattleManager.startAction()` のエイリアス内で
-`subject.currentAction()` を置き換えると、対象決定、コスト消費、バトルログ表示が差し替え後のスキル基準になる。
-対象も変えたい場合は、`startAction()` 本体が `makeTargets()` を呼ぶ前に差し替える必要がある。
-
----
 
 ## バトルログの表示フロー
 
@@ -143,36 +165,14 @@ BattleManager.displayBattlerStatus(battler, current)
         └── push("popupDamage", battler)
 ```
 
----
 
 ## ダメージ音の呼び出し構造
 
-`Window_BattleLog.performDamage(target)` は `target.performDamage()` を呼ぶだけで、
+`Window_BattleLog.performDamage(target)` は `target.performDamage()` を呼ぶだけで、  
 音の再生はバトラーのサブクラスに委譲されている。
 
 ```
 Game_Battler.performDamage()   → 何もしない（基底クラス）
 Game_Actor.performDamage()     → ダメージモーション + SoundManager.playActorDamage()
 Game_Enemy.performDamage()     → ブリンクエフェクト + SoundManager.playEnemyDamage()
-```
-
----
-
-## バトル開始・終了のライフサイクル
-
-```
-戦闘開始
-  └── Game_Battler.onBattleStart(advantageous)
-        └── initTp() が呼ばれる（isPreserveTp() が false のとき）
-
-ターン終了
-  └── Game_Battler.onTurnEnd()
-        ├── clearResult()
-        ├── regenerateAll()
-        ├── updateStateTurns()
-        ├── updateBuffTurns()
-        └── removeStatesAuto(2)
-
-戦闘終了
-  └── Game_Battler.onBattleEnd()
 ```
