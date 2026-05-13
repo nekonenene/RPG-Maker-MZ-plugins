@@ -6,13 +6,14 @@
 // This software is released under the MIT License.
 // https://opensource.org/license/mit
 //
+// 2026/05/13 v1.0.1 継続メッセージの重複表示防止用データが初期化されていなかった内部的な問題を修正
 // 2026/05/13 v1.0.0 First release
 //
 // --------------------------------------------------------------------------
 
 /*:
  * @target MZ
- * @plugindesc States that have a probability of preventing action (v1.0.0)
+ * @plugindesc States that have a probability of preventing action (v1.0.1)
  * @author hatonekoe - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_StunRate
  *
@@ -114,7 +115,7 @@
 
 /*:ja
  * @target MZ
- * @plugindesc 一定確率で行動できないステート (v1.0.0)
+ * @plugindesc 一定確率で行動できないステート (v1.0.1)
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_StunRate
  *
@@ -281,19 +282,6 @@
   };
 
   /**
-   * バトル開始時に独自プロパティを初期化する
-   *
-   * @param {boolean} advantageous
-   * @returns {void}
-   */
-  const _Game_Battler_onBattleStart = Game_Battler.prototype.onBattleStart;
-  Game_Battler.prototype.onBattleStart = function(advantageous) {
-    _Game_Battler_onBattleStart.call(this, advantageous);
-
-    this._stunRate_ShownStateIdsBefore = new Set();
-  };
-
-  /**
    * StunRate ステートの継続メッセージ表示とスタン判定をおこなう
    *
    * NumbStates.js では BattleManager.processTurn 内で clearActions を呼び出すため、スタン時は全行動のキャンセルだが、
@@ -311,6 +299,10 @@
     if (stunStates.length === 0) {
       _BattleManager_startAction.call(this);
       return;
+    }
+
+    if (subject._stunRate_ShownStateIdsBefore === undefined) {
+      subject._stunRate_ShownStateIdsBefore = new Set();
     }
 
     const action = subject.currentAction();
@@ -381,7 +373,10 @@
    */
   const _Window_BattleLog_displayCurrentState = Window_BattleLog.prototype.displayCurrentState;
   Window_BattleLog.prototype.displayCurrentState = function(subject) {
-    if (subject._stunRate_ShownStateIdsBefore == null || subject._stunRate_ShownStateIdsBefore.size === 0) {
+    if (
+      subject._stunRate_ShownStateIdsBefore === undefined ||
+      subject._stunRate_ShownStateIdsBefore.size === 0
+    ) {
       _Window_BattleLog_displayCurrentState.call(this, subject);
       return;
     }
@@ -394,6 +389,7 @@
       _Window_BattleLog_displayCurrentState.call(this, subject);
     } finally {
       subject._states = savedStates;
+      subject._stunRate_ShownStateIdsBefore.clear();
     }
   };
 })();
