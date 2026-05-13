@@ -412,14 +412,12 @@
   /**
    * HP増加をHPダメージに反転する
    *
-   * gainHp 経由の呼び出しは反転後に hp < this._hp になるためこのフックを通過しない
-   * this._hp === 0 のとき（戦闘不能からの蘇生）はスキップする
-   *
    * @param {number} hp 設定するHP値
    */
   const _Game_BattlerBase_setHp = Game_BattlerBase.prototype.setHp;
   Game_BattlerBase.prototype.setHp = function(hp) {
     // 指定HPが現在HPより大きく、かつ現在HPが0より大きく（戦闘不能でない）、ゾンビステートを持つ場合に反転処理
+    // gainHp 経由のHP回復は gainHp 側で先に反転処理があるため、この条件には入らない
     if (hp > this._hp && this._hp > 0 && zombieStateByBattler(this) !== null) {
       const delta = hp - this._hp;
 
@@ -431,7 +429,7 @@
   };
 
   /**
-   * MP回復をMPダメージに反転する（AffectMp が有効なときのみ）
+   * MP回復をMPダメージに反転する
    *
    * @param {number} value MP変化量（正=回復、負=ダメージ）
    */
@@ -439,9 +437,9 @@
   Game_Battler.prototype.gainMp = function(value) {
     if (value > 0) {
       const zombieState = zombieStateByBattler(this);
-      const affectsMp = zombieState !== null && toBoolean(zombieState.meta.ZombieState_MpReverse, paramMpReverse);
+      const isMpReverse = zombieState !== null && toBoolean(zombieState.meta.ZombieState_MpReverse, paramMpReverse);
 
-      if (affectsMp) {
+      if (isMpReverse) {
         this._zombieState_MpReverseDamaged = true;
 
         _Game_Battler_gainMp.call(this, -value);
@@ -462,20 +460,19 @@
   };
 
   /**
-   * MP増加をMPダメージに反転する（AffectMp が有効なとき）
-   *
-   * gainMp 経由の呼び出しは反転後に mp < this._mp になるためこのフックを通過しない
+   * MP増加をMPダメージに反転する
    *
    * @param {number} mp 設定するMP値
    */
   const _Game_BattlerBase_setMp = Game_BattlerBase.prototype.setMp;
   Game_BattlerBase.prototype.setMp = function(mp) {
-    // 指定MPが現在MPより大きく、かつゾンビステートのMP反転が有効な場合に反転処理
+    // 指定MPが現在MPより大きい場合
+    // gainMp 経由のMP回復は gainMp 側で先に反転処理があるため、この条件には入らない
     if (mp > this._mp) {
       const zombieState = zombieStateByBattler(this);
-      const affectsMp = zombieState !== null && toBoolean(zombieState.meta.ZombieState_MpReverse, paramMpReverse);
+      const isMpReverse = zombieState !== null && toBoolean(zombieState.meta.ZombieState_MpReverse, paramMpReverse);
 
-      if (affectsMp) {
+      if (isMpReverse) {
         const delta = mp - this._mp;
 
         _Game_BattlerBase_setMp.call(this, this._mp - delta);
@@ -502,7 +499,7 @@
   };
 
   /**
-   * TP増加をTPダメージに反転する（AffectTp が有効なときのみ）
+   * TP増加をTPダメージに反転する
    *
    * @param {number} value TP変化量（正=増加、負=減少）
    */
@@ -510,9 +507,9 @@
   Game_Battler.prototype.gainTp = function(value) {
     if (value > 0) {
       const zombieState = zombieStateByBattler(this);
-      const affectsTp = zombieState !== null && toBoolean(zombieState.meta.ZombieState_TpReverse, paramTpReverse);
+      const isTpReverse = zombieState !== null && toBoolean(zombieState.meta.ZombieState_TpReverse, paramTpReverse);
 
-      if (affectsTp) {
+      if (isTpReverse) {
         _Game_Battler_gainTp.call(this, -value);
         return;
       }
@@ -524,18 +521,17 @@
   /**
    * ターン終了時などにおこなわれる自動的なTP増加を反転させる
    *
-   * AffectTp が有効なとき gainTp 経由に切り替え、result.tpDamage を記録してポップアップを表示させる
-   * フック済みの gainTp が内部で -value に反転して処理する
-   *
    * @param {number} value TP増加量
    */
   const _Game_Battler_gainSilentTp = Game_Battler.prototype.gainSilentTp;
   Game_Battler.prototype.gainSilentTp = function(value) {
     if (value > 0) {
       const zombieState = zombieStateByBattler(this);
-      const affectsTp = zombieState !== null && toBoolean(zombieState.meta.ZombieState_TpReverse, paramTpReverse);
+      const isTpReverse = zombieState !== null && toBoolean(zombieState.meta.ZombieState_TpReverse, paramTpReverse);
 
-      if (affectsTp) {
+      if (isTpReverse) {
+        // gainSilentTp は result.tpDamage を記録しないため
+        // gainTp を呼び出すことでTP減少を記録し、TP減少ポップアップを表示させる
         this.gainTp(value);
         return;
       }
@@ -545,21 +541,19 @@
   };
 
   /**
-   * TP増加をTPダメージに反転する（AffectTp が有効かつ初期TP設定以外の呼び出しのとき）
-   *
-   * gainTp / gainSilentTp 経由の呼び出しは反転後に tp < this._tp になるためこのフックを通過しない
-   * clearTp は常に tp = 0 <= this._tp のためこのフックを通過しない
+   * TP増加をTPダメージに反転する
    *
    * @param {number} tp 設定するTP値
    */
   const _Game_BattlerBase_setTp = Game_BattlerBase.prototype.setTp;
   Game_BattlerBase.prototype.setTp = function(tp) {
     // 指定TPが現在TPより大きく、かつ initTp メソッドからの呼び出しでないときに処理を実行
+    // gainTp や gainSilentTp 経由のTP増加は、各メソッド側で先にTPの反転処理があるためこの条件に入らない
     if (tp > this._tp && !this._zombieState_InitTpProcessing) {
       const zombieState = zombieStateByBattler(this);
-      const affectsTp = zombieState !== null && toBoolean(zombieState.meta.ZombieState_TpReverse, paramTpReverse);
+      const isTpReverse = zombieState !== null && toBoolean(zombieState.meta.ZombieState_TpReverse, paramTpReverse);
 
-      if (affectsTp) {
+      if (isTpReverse) {
         const delta = tp - this._tp;
 
         _Game_BattlerBase_setTp.call(this, this._tp - delta);
