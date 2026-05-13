@@ -365,19 +365,20 @@
   Game_Battler.prototype.onBattleStart = function(advantageous) {
     _Game_Battler_onBattleStart.call(this, advantageous);
 
-    this._zombieHpDamaged = false;
-    this._zombieMpDamaged = false;
+    this._zombieState_HpReverseDamaged = false;
+    this._zombieState_MpReverseDamaged = false;
   };
 
   /**
-   * バトル終了時に独自プロパティをリセットする
+   * バトル終了時に独自プロパティを削除する
    */
   const _Game_Battler_onBattleEnd = Game_Battler.prototype.onBattleEnd;
   Game_Battler.prototype.onBattleEnd = function() {
     _Game_Battler_onBattleEnd.call(this);
 
-    this._zombieHpDamaged = false;
-    this._zombieMpDamaged = false;
+    delete this._zombieState_HpReverseDamaged;
+    delete this._zombieState_MpReverseDamaged;
+    delete this._zombieState_IgnoreSetTp;
   };
 
   /**
@@ -389,20 +390,20 @@
   const _Game_Battler_gainHp = Game_Battler.prototype.gainHp;
   Game_Battler.prototype.gainHp = function(value) {
     if (value > 0 && zombiePriorityState(this) !== null) {
-      this._zombieHpDamaged = true;
+      this._zombieState_HpReverseDamaged = true;
 
       _Game_Battler_gainHp.call(this, -value);
 
       // バトル外では performDamage が呼ばれないため直接再生（ただし、回復音とかぶって再生される）
       if (!$gameParty.inBattle()) {
-        this._zombieHpDamaged = false;
+        this._zombieState_HpReverseDamaged = false;
         playZombieHpDamageSound();
       }
 
       return;
     }
 
-    this._zombieHpDamaged = false;
+    this._zombieState_HpReverseDamaged = false;
 
     _Game_Battler_gainHp.call(this, value);
   };
@@ -440,13 +441,13 @@
       const affectsMp = zombieState !== null && toBoolean(zombieState.meta.ZombieState_MpReverse, paramMpReverse);
 
       if (affectsMp) {
-        this._zombieMpDamaged = true;
+        this._zombieState_MpReverseDamaged = true;
 
         _Game_Battler_gainMp.call(this, -value);
 
         // バトル外では displayMpDamage が呼ばれないため直接再生（ただし、回復音とかぶって再生される）
         if (!$gameParty.inBattle()) {
-          this._zombieMpDamaged = false;
+          this._zombieState_MpReverseDamaged = false;
           playZombieMpDamageSound();
         }
 
@@ -454,7 +455,7 @@
       }
     }
 
-    this._zombieMpDamaged = false;
+    this._zombieState_MpReverseDamaged = false;
 
     _Game_Battler_gainMp.call(this, value);
   };
@@ -489,11 +490,11 @@
    */
   const _Game_Battler_initTp = Game_Battler.prototype.initTp;
   Game_Battler.prototype.initTp = function() {
-    this._zombieIgnoreSetTp = true;
+    this._zombieState_IgnoreSetTp = true;
 
     _Game_Battler_initTp.call(this);
 
-    this._zombieIgnoreSetTp = false;
+    this._zombieState_IgnoreSetTp = false;
   };
 
   /**
@@ -549,7 +550,7 @@
    */
   const _Game_BattlerBase_setTp = Game_BattlerBase.prototype.setTp;
   Game_BattlerBase.prototype.setTp = function(tp) {
-    if (tp > this._tp && !this._zombieIgnoreSetTp) {
+    if (tp > this._tp && this._zombieState_IgnoreSetTp !== true) {
       const zombieState = zombiePriorityState(this);
       const affectsTp = zombieState !== null && toBoolean(zombieState.meta.ZombieState_TpReverse, paramTpReverse);
 
@@ -569,8 +570,8 @@
    */
   const _Game_Actor_performDamage = Game_Actor.prototype.performDamage;
   Game_Actor.prototype.performDamage = function() {
-    if (this._zombieHpDamaged) {
-      this._zombieHpDamaged = false;
+    if (this._zombieState_HpReverseDamaged === true) {
+      this._zombieState_HpReverseDamaged = false;
       _suppressNextDamageSound = true; // playActorDamage を抑制
 
       _Game_Actor_performDamage.call(this); // ダメージモーション + 抑制された音
@@ -586,8 +587,8 @@
    */
   const _Game_Enemy_performDamage = Game_Enemy.prototype.performDamage;
   Game_Enemy.prototype.performDamage = function() {
-    if (this._zombieHpDamaged) {
-      this._zombieHpDamaged = false;
+    if (this._zombieState_HpReverseDamaged === true) {
+      this._zombieState_HpReverseDamaged = false;
       _suppressNextDamageSound = true; // playEnemyDamage を抑制
 
       _Game_Enemy_performDamage.call(this); // ブリンクエフェクト + 抑制された音
@@ -618,8 +619,8 @@
    */
   const _Window_BattleLog_displayMpDamage = Window_BattleLog.prototype.displayMpDamage;
   Window_BattleLog.prototype.displayMpDamage = function(target) {
-    if (target._zombieMpDamaged === true && target.result().mpDamage > 0) {
-      target._zombieMpDamaged = false;
+    if (target._zombieState_MpReverseDamaged === true && target.result().mpDamage > 0) {
+      target._zombieState_MpReverseDamaged = false;
       this.push('zombieState_PlayDamageSound', 'mp');
     }
 
@@ -634,12 +635,12 @@
   const _Window_BattleLog_displayRegeneration = Window_BattleLog.prototype.displayRegeneration;
   Window_BattleLog.prototype.displayRegeneration = function(subject) {
     // gainHp の時点でフラグが立っていることを確認し、result も整合しているかチェック
-    const isZombieHpDamage = subject._zombieHpDamaged === true
+    const isZombieHpDamage = subject._zombieState_HpReverseDamaged === true
       && subject.result().hpAffected
       && subject.result().hpDamage > 0;
 
     if (isZombieHpDamage) {
-      subject._zombieHpDamaged = false;
+      subject._zombieState_HpReverseDamaged = false;
       this.push('zombieState_PlayDamageSound', 'hp'); // ポップアップより前に音をキューへ積む
     }
 
