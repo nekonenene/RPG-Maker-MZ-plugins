@@ -271,10 +271,13 @@
   const paramMpReverse = toBoolean(pluginParams.MpReverse, false);
   const paramTpReverse = toBoolean(pluginParams.TpReverse, false);
 
+  // performDamage 内でダメージ音を鳴らさないためのフラグ
+  let _zombieState_SuppressDamageSound = false;
+
   /**
    * HP回復によるHPダメージ時の音を再生する
    */
-  const playZombieHpDamageSound = () => {
+  const playHpReverseDamageSound = () => {
     if (paramHpDamageSoundType === 'actorDamage') {
       SoundManager.playActorDamage();
     } else if (paramHpDamageSoundType === 'custom') {
@@ -296,7 +299,7 @@
   /**
    * MP回復によるMPダメージ時の音を再生する
    */
-  const playZombieMpDamageSound = () => {
+  const playMpReverseDamageSound = () => {
     if (paramMpDamageSoundType === 'actorDamage') {
       SoundManager.playActorDamage();
     } else if (paramMpDamageSoundType === 'custom') {
@@ -315,16 +318,13 @@
     }
   };
 
-  // performDamage 内で playActorDamage / playEnemyDamage を抑制するためのフラグ
-  let _suppressNextDamageSound = false;
-
   /**
-   * アクターのダメージ音を抑制するフック ( playZombieHpDamageSound で鳴らすため )
+   * アクターのダメージ音を抑制するフック ( playHpReverseDamageSound で鳴らすため )
    */
   const _SoundManager_playActorDamage = SoundManager.playActorDamage;
   SoundManager.playActorDamage = function() {
-    if (_suppressNextDamageSound) {
-      _suppressNextDamageSound = false;
+    if (_zombieState_SuppressDamageSound) {
+      _zombieState_SuppressDamageSound = false;
       return;
     }
 
@@ -332,12 +332,12 @@
   };
 
   /**
-   * 敵キャラのダメージ音を抑制するフック ( playZombieHpDamageSound で鳴らすため )
+   * 敵キャラのダメージ音を抑制するフック ( playHpReverseDamageSound で鳴らすため )
    */
   const _SoundManager_playEnemyDamage = SoundManager.playEnemyDamage;
   SoundManager.playEnemyDamage = function() {
-    if (_suppressNextDamageSound) {
-      _suppressNextDamageSound = false;
+    if (_zombieState_SuppressDamageSound) {
+      _zombieState_SuppressDamageSound = false;
       return;
     }
 
@@ -398,7 +398,7 @@
       // バトル外では performDamage が呼ばれないため直接再生（ただし、回復音とかぶって再生される）
       if (!$gameParty.inBattle()) {
         this._zombieState_HpReverseDamaged = false;
-        playZombieHpDamageSound();
+        playHpReverseDamageSound();
       }
 
       return;
@@ -447,7 +447,7 @@
         // バトル外では displayMpDamage が呼ばれないため直接再生（ただし、回復音とかぶって再生される）
         if (!$gameParty.inBattle()) {
           this._zombieState_MpReverseDamaged = false;
-          playZombieMpDamageSound();
+          playMpReverseDamageSound();
         }
 
         return;
@@ -571,11 +571,11 @@
   Game_Actor.prototype.performDamage = function() {
     if (this._zombieState_HpReverseDamaged === true) {
       this._zombieState_HpReverseDamaged = false;
-      _suppressNextDamageSound = true; // playActorDamage を抑制
+      _zombieState_SuppressDamageSound = true; // ダメージ音を鳴らさないためのフラグ
 
-      _Game_Actor_performDamage.call(this); // ダメージモーション + 抑制された音
+      _Game_Actor_performDamage.call(this); // 内部で SoundManager.playActorDamage() が呼ばれる
 
-      playZombieHpDamageSound();
+      playHpReverseDamageSound(); // ここでダメージ音を鳴らす
     } else {
       _Game_Actor_performDamage.call(this);
     }
@@ -588,11 +588,11 @@
   Game_Enemy.prototype.performDamage = function() {
     if (this._zombieState_HpReverseDamaged === true) {
       this._zombieState_HpReverseDamaged = false;
-      _suppressNextDamageSound = true; // playEnemyDamage を抑制
+      _zombieState_SuppressDamageSound = true; // ダメージ音を鳴らさないためのフラグ
 
-      _Game_Enemy_performDamage.call(this); // ブリンクエフェクト + 抑制された音
+      _Game_Enemy_performDamage.call(this); // 内部で SoundManager.playEnemyDamage() が呼ばれる
 
-      playZombieHpDamageSound();
+      playHpReverseDamageSound(); // ここでダメージ音を鳴らす
     } else {
       _Game_Enemy_performDamage.call(this);
     }
@@ -605,9 +605,9 @@
    */
   Window_BattleLog.prototype.zombieState_PlayDamageSound = function(damageType) {
     if (damageType === 'mp') {
-      playZombieMpDamageSound();
+      playMpReverseDamageSound();
     } else {
-      playZombieHpDamageSound();
+      playHpReverseDamageSound();
     }
   };
 
