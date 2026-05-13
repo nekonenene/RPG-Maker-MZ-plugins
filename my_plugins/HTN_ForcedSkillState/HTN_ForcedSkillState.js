@@ -32,34 +32,50 @@
  *
  * @help
  * [How to Use]
- * First, set the state's Restriction to "None".
- * If it is set to "Cannot move", the battler cannot select actions.
- *
- * Add the following note tag to any state you want this plugin to apply to:
+ * Add tags like the following to the state's Note field:
  * <ForcedSkillState>
+ * <ForcedSkillState_Rate: 50>
+ * <ForcedSkillState_Skill: 2>
+ *
+ * In this example, a character affected by this state has a 50% chance
+ * to use skill ID 2, usually Guard, on their own.
  *
  * [Per-State Settings]
- * You can override plugin parameter settings per state using these tags:
+ * You can override plugin parameter settings per state by writing tags
+ * like the following in the state's Note field.
  *
  * Setting list:
  * <ForcedSkillState> (Required)
  * <ForcedSkillState_Rate: 10> (Forced skill probability)
- * <ForcedSkillState_Skill: 2,2,7,0> (Candidate skill IDs)
- * <ForcedSkillState_SkillName: Guard,Defend> (Candidate skill names)
+ * <ForcedSkillState_Skill: 2> (Skill ID)
+ * <ForcedSkillState_SkillName: Guard> (Skill name. Used when ForcedSkillState_Skill is not specified)
  * <ForcedSkillState_ShowStateMessageBeforeAction: true> (Show continuation message before action)
  *
- * Skill takes priority over SkillName.
- * Only existing positive skill IDs are used.
- * Invalid IDs are ignored.
- *
- * SkillName is used only when Skill has no valid candidates.
- * Use &lt; and &gt; when a skill name contains < or >.
- *
  * If multiple states with the <ForcedSkillState> tag are active at the same time,
- * each state is checked in priority order.
- * The first state that triggers and has valid skill candidates overrides the action.
+ * each state is checked in priority order, and a skill is selected from
+ * the first state that triggers.
  *
- * Forced skills ignore normal use conditions such as MP cost, seals, and skill type seals.
+ * You can specify multiple skills separated by commas, like
+ * <ForcedSkillState_Skill: 2,2,7,9>.
+ * Each entry has the same chance to be selected, so in this example
+ * skill ID 2 has a 50% chance to be selected.
+ *
+ * Forced skills ignore MP/TP shortage, skill seals, whether the battler
+ * has learned the skill, and other normal use conditions.
+ * If the battler is confused due to another state, the skill's original
+ * scope is still used.
+ *
+ * [About ForcedSkillState_SkillName]
+ * ForcedSkillState_SkillName is referenced only when ForcedSkillState_Skill
+ * does not have a valid setting.
+ * In general, using ForcedSkillState_Skill to specify skill IDs is recommended,
+ * but consider SkillName if you are worried that skill IDs may change later.
+ *
+ * When using SkillName, if multiple skills have the same name, the skill
+ * with the lowest skill ID is selected.
+ * If a skill name contains <, >, or ,, write them as &lt;, &gt;, or &comma;.
+ * Example: if the skill name is Strong Attack (>_<), write
+ * <ForcedSkillState_SkillName: Strong Attack (&gt;_&lt;)>
  *
  * [About Continuation Message Timing]
  * RPG Maker MZ only shows one state continuation message per turn:
