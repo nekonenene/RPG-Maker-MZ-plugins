@@ -613,13 +613,14 @@
   const _Window_BattleLog_displayRegeneration = Window_BattleLog.prototype.displayRegeneration;
   Window_BattleLog.prototype.displayRegeneration = function(subject) {
     // gainHp の時点でフラグが立っていることを確認し、result も整合しているかチェック
-    const isZombieHpDamage = subject._zombieState_HpReverseDamaged === true
+    const isHpReverseDamage = subject._zombieState_HpReverseDamaged === true
       && subject.result().hpAffected
       && subject.result().hpDamage > 0;
 
-    if (isZombieHpDamage) {
+    if (isHpReverseDamage) {
       subject._zombieState_HpReverseDamaged = false;
-      this.push('zombieState_PlayDamageSound', 'hp'); // ポップアップより前に音をキューへ積む
+      // リジェネ表示では popupDamage によるダメージ表示のみで音がないため、ここでキューに追加
+      this.push('zombieState_PlayDamageSound', 'hp');
     }
 
     _Window_BattleLog_displayRegeneration.call(this, subject);
