@@ -345,12 +345,12 @@
   };
 
   /**
-   * 優先度が最も高いゾンビステートを返す
+   * バトラーのゾンビステートのうち、もっとも「優先度」が高いものを返す
    *
    * @param {Game_BattlerBase} battler 対象バトラー
-   * @returns {RPG.State | null} 最優先のゾンビステート、なければ null
+   * @returns {RPG.State | null} ゾンビステート、なければ null
    */
-  const zombiePriorityState = (battler) => {
+  const zombieStateByBattler = (battler) => {
     if (typeof battler.states !== 'function') return null;
 
     return battler.states().find((s) => s.meta.ZombieState != null) ?? null;
@@ -365,6 +365,7 @@
   Game_Battler.prototype.onBattleStart = function(advantageous) {
     _Game_Battler_onBattleStart.call(this, advantageous);
 
+    this._zombieState_InitTpProcessing = false;
     this._zombieState_HpReverseDamaged = false;
     this._zombieState_MpReverseDamaged = false;
   };
@@ -376,9 +377,9 @@
   Game_Battler.prototype.onBattleEnd = function() {
     _Game_Battler_onBattleEnd.call(this);
 
+    delete this._zombieState_InitTpProcessing;
     delete this._zombieState_HpReverseDamaged;
     delete this._zombieState_MpReverseDamaged;
-    delete this._zombieState_IgnoreSetTp;
   };
 
   /**
@@ -389,7 +390,7 @@
    */
   const _Game_Battler_gainHp = Game_Battler.prototype.gainHp;
   Game_Battler.prototype.gainHp = function(value) {
-    if (value > 0 && zombiePriorityState(this) !== null) {
+    if (value > 0 && zombieStateByBattler(this) !== null) {
       this._zombieState_HpReverseDamaged = true;
 
       _Game_Battler_gainHp.call(this, -value);
@@ -419,7 +420,7 @@
   const _Game_BattlerBase_setHp = Game_BattlerBase.prototype.setHp;
   Game_BattlerBase.prototype.setHp = function(hp) {
     // 指定HPが現在HPより大きく、かつ現在HPが0より大きく（戦闘不能でない）、ゾンビステートを持つ場合に反転処理
-    if (hp > this._hp && this._hp > 0 && zombiePriorityState(this) !== null) {
+    if (hp > this._hp && this._hp > 0 && zombieStateByBattler(this) !== null) {
       const delta = hp - this._hp;
 
       _Game_BattlerBase_setHp.call(this, this._hp - delta);
@@ -437,7 +438,7 @@
   const _Game_Battler_gainMp = Game_Battler.prototype.gainMp;
   Game_Battler.prototype.gainMp = function(value) {
     if (value > 0) {
-      const zombieState = zombiePriorityState(this);
+      const zombieState = zombieStateByBattler(this);
       const affectsMp = zombieState !== null && toBoolean(zombieState.meta.ZombieState_MpReverse, paramMpReverse);
 
       if (affectsMp) {
@@ -471,7 +472,7 @@
   Game_BattlerBase.prototype.setMp = function(mp) {
     // 指定MPが現在MPより大きく、かつゾンビステートのMP反転が有効な場合に反転処理
     if (mp > this._mp) {
-      const zombieState = zombiePriorityState(this);
+      const zombieState = zombieStateByBattler(this);
       const affectsMp = zombieState !== null && toBoolean(zombieState.meta.ZombieState_MpReverse, paramMpReverse);
 
       if (affectsMp) {
@@ -486,15 +487,18 @@
   };
 
   /**
-   * initTp の setTp 呼び出しを反転から除外するためのフラグを設定する
+   * 初期TP設定中であることを記録する
    */
   const _Game_Battler_initTp = Game_Battler.prototype.initTp;
   Game_Battler.prototype.initTp = function() {
-    this._zombieState_IgnoreSetTp = true;
+    // initTp から setTp を呼び出すときに setTp の反転処理を走らせないようにするフラグ
+    this._zombieState_InitTpProcessing = true;
 
-    _Game_Battler_initTp.call(this);
-
-    this._zombieState_IgnoreSetTp = false;
+    try {
+      _Game_Battler_initTp.call(this);
+    } finally {
+      this._zombieState_InitTpProcessing = false;
+    }
   };
 
   /**
@@ -505,7 +509,7 @@
   const _Game_Battler_gainTp = Game_Battler.prototype.gainTp;
   Game_Battler.prototype.gainTp = function(value) {
     if (value > 0) {
-      const zombieState = zombiePriorityState(this);
+      const zombieState = zombieStateByBattler(this);
       const affectsTp = zombieState !== null && toBoolean(zombieState.meta.ZombieState_TpReverse, paramTpReverse);
 
       if (affectsTp) {
@@ -528,7 +532,7 @@
   const _Game_Battler_gainSilentTp = Game_Battler.prototype.gainSilentTp;
   Game_Battler.prototype.gainSilentTp = function(value) {
     if (value > 0) {
-      const zombieState = zombiePriorityState(this);
+      const zombieState = zombieStateByBattler(this);
       const affectsTp = zombieState !== null && toBoolean(zombieState.meta.ZombieState_TpReverse, paramTpReverse);
 
       if (affectsTp) {
@@ -541,7 +545,7 @@
   };
 
   /**
-   * TP増加をTPダメージに反転する（AffectTp が有効かつ initTp 以外の呼び出しのとき）
+   * TP増加をTPダメージに反転する（AffectTp が有効かつ初期TP設定以外の呼び出しのとき）
    *
    * gainTp / gainSilentTp 経由の呼び出しは反転後に tp < this._tp になるためこのフックを通過しない
    * clearTp は常に tp = 0 <= this._tp のためこのフックを通過しない
@@ -550,8 +554,9 @@
    */
   const _Game_BattlerBase_setTp = Game_BattlerBase.prototype.setTp;
   Game_BattlerBase.prototype.setTp = function(tp) {
-    if (tp > this._tp && this._zombieState_IgnoreSetTp !== true) {
-      const zombieState = zombiePriorityState(this);
+    // 指定TPが現在TPより大きく、かつ initTp メソッドからの呼び出しでないときに処理を実行
+    if (tp > this._tp && !this._zombieState_InitTpProcessing) {
+      const zombieState = zombieStateByBattler(this);
       const affectsTp = zombieState !== null && toBoolean(zombieState.meta.ZombieState_TpReverse, paramTpReverse);
 
       if (affectsTp) {
