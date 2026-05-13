@@ -609,21 +609,21 @@
   };
 
   /**
-   * リジェネ表示をフックし、HPダメージ時にダメージ音をキューへ追加する
+   * リジェネ表示をフックし、反転ダメージ時にダメージ音をキューへ追加する
    *
    * @param {Game_Battler} subject 対象バトラー
    */
   const _Window_BattleLog_displayRegeneration = Window_BattleLog.prototype.displayRegeneration;
   Window_BattleLog.prototype.displayRegeneration = function(subject) {
-    // gainHp の時点でフラグが立っていることを確認し、result も整合しているかチェック
-    const isHpReverseDamage = subject._zombieState_HpReverseDamaged === true
-      && subject.result().hpAffected
-      && subject.result().hpDamage > 0;
-
-    if (isHpReverseDamage) {
+    // リジェネ表示では popupDamage によるダメージ表示のみで音が鳴らないため、ここでキューにSE再生を追加
+    if (subject._zombieState_HpReverseDamaged === true && subject.result().hpDamage > 0) {
       subject._zombieState_HpReverseDamaged = false;
-      // リジェネ表示では popupDamage によるダメージ表示のみで音がないため、ここでキューに追加
       this.push('zombieState_PlayDamageSound', 'hp');
+    }
+
+    if (subject._zombieState_MpReverseDamaged === true && subject.result().mpDamage > 0) {
+      subject._zombieState_MpReverseDamaged = false;
+      this.push('zombieState_PlayDamageSound', 'mp');
     }
 
     _Window_BattleLog_displayRegeneration.call(this, subject);
