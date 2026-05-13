@@ -6,13 +6,14 @@
 // This software is released under the MIT License.
 // https://opensource.org/license/mit
 //
+// 2026/05/13 v1.0.1 セーブデータをロードしたあとの戦闘時にエラーが起こる問題を修正
 // 2026/05/13 v1.0.0 First release
 //
 // --------------------------------------------------------------------------
 
 /*:
  * @target MZ
- * @plugindesc States that randomly force the battler to use specified skills (v1.0.0)
+ * @plugindesc States that randomly force the battler to use specified skills (v1.0.1)
  * @author hatonekoe - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_ForcedSkillState
  *
@@ -87,7 +88,7 @@
 
 /*:ja
  * @target MZ
- * @plugindesc 一定確率で指定スキルを勝手に使ってしまうステート (v1.0.0)
+ * @plugindesc 一定確率で指定スキルを勝手に使ってしまうステート (v1.0.1)
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_ForcedSkillState
  *
@@ -178,6 +179,31 @@
   const pluginParams = PluginManager.parameters(pluginName);
   const paramRate = Number(pluginParams.Rate || 50);
   const paramShowStateMessageBeforeAction = toBoolean(pluginParams.ShowStateMessageBeforeAction, true);
+
+  /**
+   * 戦闘開始時に継続メッセージ表示済みステートIDを初期化
+   *
+   * @param {boolean} advantageous 先制攻撃側に有利な開始か
+   * @returns {void}
+   */
+  const _Game_Battler_onBattleStart = Game_Battler.prototype.onBattleStart;
+  Game_Battler.prototype.onBattleStart = function(advantageous) {
+    _Game_Battler_onBattleStart.call(this, advantageous);
+
+    this._forcedSkillState_ShownStateIdsBefore = new Set();
+  };
+
+  /**
+   * 戦闘終了時に継続メッセージ表示済みステートIDを破棄
+   *
+   * @returns {void}
+   */
+  const _Game_Battler_onBattleEnd = Game_Battler.prototype.onBattleEnd;
+  Game_Battler.prototype.onBattleEnd = function() {
+    _Game_Battler_onBattleEnd.call(this);
+
+    delete this._forcedSkillState_ShownStateIdsBefore;
+  };
 
   /**
    * ステートに設定された強制スキル発動率を取得
@@ -281,10 +307,6 @@
   BattleManager.startAction = function() {
     const subject = this._subject;
     const forcedSkillStates = subject.states().filter(state => state.meta.ForcedSkillState !== undefined);
-
-    if (subject._forcedSkillState_ShownStateIdsBefore === undefined) {
-      subject._forcedSkillState_ShownStateIdsBefore = new Set();
-    }
 
     // 対象ステートにかかっていないなら通常の startAction を呼び出して終了
     if (forcedSkillStates.length === 0) {

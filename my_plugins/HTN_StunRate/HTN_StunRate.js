@@ -6,6 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/license/mit
 //
+// 2026/05/13 v1.0.2 セーブデータをロードしたあとの戦闘時にエラーが起こる問題を修正
 // 2026/05/13 v1.0.1 継続メッセージの重複表示防止用データが初期化されていなかった内部的な問題を修正
 // 2026/05/13 v1.0.0 First release
 //
@@ -13,7 +14,7 @@
 
 /*:
  * @target MZ
- * @plugindesc States that have a probability of preventing action (v1.0.1)
+ * @plugindesc States that have a probability of preventing action (v1.0.2)
  * @author hatonekoe - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_StunRate
  *
@@ -115,7 +116,7 @@
 
 /*:ja
  * @target MZ
- * @plugindesc 一定確率で行動できないステート (v1.0.1)
+ * @plugindesc 一定確率で行動できないステート (v1.0.2)
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_StunRate
  *
@@ -248,6 +249,31 @@
   const paramAllowSpecialSkill = toBoolean(pluginParams.AllowSpecialSkill, false);
 
   /**
+   * 戦闘開始時に継続メッセージ表示済みステートIDを初期化
+   *
+   * @param {boolean} advantageous 先制攻撃側に有利な開始か
+   * @returns {void}
+   */
+  const _Game_Battler_onBattleStart = Game_Battler.prototype.onBattleStart;
+  Game_Battler.prototype.onBattleStart = function(advantageous) {
+    _Game_Battler_onBattleStart.call(this, advantageous);
+
+    this._stunRate_ShownStateIdsBefore = new Set();
+  };
+
+  /**
+   * 戦闘終了時に継続メッセージ表示済みステートIDを破棄
+   *
+   * @returns {void}
+   */
+  const _Game_Battler_onBattleEnd = Game_Battler.prototype.onBattleEnd;
+  Game_Battler.prototype.onBattleEnd = function() {
+    _Game_Battler_onBattleEnd.call(this);
+
+    delete this._stunRate_ShownStateIdsBefore;
+  };
+
+  /**
    * スタン判定をスルーするアクションかどうか
    *
    * @param {Game_Action} action 調査対象のアクション
@@ -299,10 +325,6 @@
     if (stunStates.length === 0) {
       _BattleManager_startAction.call(this);
       return;
-    }
-
-    if (subject._stunRate_ShownStateIdsBefore === undefined) {
-      subject._stunRate_ShownStateIdsBefore = new Set();
     }
 
     const action = subject.currentAction();
