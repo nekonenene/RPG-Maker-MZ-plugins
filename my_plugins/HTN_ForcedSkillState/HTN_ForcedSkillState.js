@@ -19,7 +19,7 @@
  * @param Rate
  * @text Forced Skill Rate (%)
  * @desc Probability (%) of forcing one of the specified skills.
- * @default 5
+ * @default 50
  * @type number
  * @min 0
  * @max 100
@@ -93,7 +93,7 @@
  * @param Rate
  * @text 強制スキル発動率(%)
  * @desc 指定スキルを勝手に使ってしまう確率(%)
- * @default 5
+ * @default 50
  * @type number
  * @min 0
  * @max 100
@@ -175,7 +175,7 @@
 
   const pluginName = 'HTN_ForcedSkillState';
   const pluginParams = PluginManager.parameters(pluginName);
-  const paramRate = Number(pluginParams.Rate || 5);
+  const paramRate = Number(pluginParams.Rate || 50);
   const paramShowStateMessageBeforeAction = toBoolean(pluginParams.ShowStateMessageBeforeAction, true);
 
   /**
