@@ -6,13 +6,14 @@
 // This software is released under the MIT License.
 // https://opensource.org/license/mit
 //
+// 2026/05/14 v1.0.1 MPリジェネ反転時のSE再生漏れを修正。コード全体を大リファクタリング
 // 2026/05/02 v1.0.0 First release
 //
 // --------------------------------------------------------------------------
 
 /*:
  * @target MZ
- * @plugindesc Creates a "zombie" state that reverses HP recovery into HP damage (v1.0.0)
+ * @plugindesc Creates a "zombie" state that reverses HP recovery into HP damage (v1.0.1)
  * @author hatonekoe - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_ZombieState
  *
@@ -121,7 +122,7 @@
 
 /*:ja
  * @target MZ
- * @plugindesc HP回復をHPダメージに反転させる「ゾンビ」状態異常を作成できます (v1.0.0)
+ * @plugindesc HP回復をHPダメージに反転させる「ゾンビ」状態異常を作成できます (v1.0.1)
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_ZombieState
  *
