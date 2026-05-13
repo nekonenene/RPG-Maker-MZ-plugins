@@ -51,10 +51,6 @@
  * <ForcedSkillState_SkillName: Guard> (Skill name. Used when ForcedSkillState_Skill is not specified)
  * <ForcedSkillState_ShowStateMessageBeforeAction: true> (Show continuation message before action)
  *
- * If multiple states with the <ForcedSkillState> tag are active at the same time,
- * each state is checked in priority order, and a skill is selected from
- * the first state that triggers.
- *
  * You can specify multiple skills separated by commas, like
  * <ForcedSkillState_Skill: 2,2,7,9>.
  * Each entry has the same chance to be selected, so in this example
@@ -76,6 +72,11 @@
  * If a skill name contains <, >, or ,, write them as &lt;, &gt;, or &comma;.
  * Example: if the skill name is Strong Attack (>_<), write
  * <ForcedSkillState_SkillName: Strong Attack (&gt;_&lt;)>
+ *
+ * [When Multiple States Exist]
+ * If multiple states with the <ForcedSkillState> tag exist and are active
+ * at the same time, each state is checked in priority order, and the first
+ * selected skill is used.
  *
  * [About Continuation Message Timing]
  * RPG Maker MZ only shows one state continuation message per turn:
