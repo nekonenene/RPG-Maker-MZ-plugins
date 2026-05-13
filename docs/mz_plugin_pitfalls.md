@@ -8,7 +8,7 @@
 
 | セクション | 関連キーワード |
 |---|---|
-| [独自プロパティの初期化は `initMembers` ではなく `onBattleStart` で](#独自プロパティの初期化は-initMembers-ではなく-onBattleStart-で) | バトラー, カスタムプロパティ, セーブデータ読み込み |
+| [既存バトラーの独自プロパティは `initMembers` で初期化されない](#既存バトラーの独自プロパティは-initMembers-で初期化されない) | バトラー, カスタムプロパティ, セーブデータ読み込み |
 | [`removeState` はゲーム開始時にも呼ばれる](#removeState-はゲーム開始時にも呼ばれる) | ステート, removeState, null チェック |
 | [`Game_Action.prototype.apply` はバトル外でも呼ばれる](#Game_Actionprototypeapply-はバトル外でも呼ばれる) | アクション, スキル, アイテム, inBattle |
 | [ターン制バトルでのダメージポップアップは直接呼べない](#ターン制バトルでのダメージポップアップは直接呼べない) | ポップアップ, ダメージ表示, ターン制, TPB |
@@ -27,7 +27,7 @@
 
 ---
 
-## 独自プロパティの初期化は `initMembers` ではなく `onBattleStart` で
+## 既存バトラーの独自プロパティは `initMembers` で初期化されない
 
 **`initMembers` はセーブデータ読み込み時には呼ばれない。**
 
@@ -36,25 +36,14 @@
 すでに生成済みのバトラーインスタンスに対して `initMembers` は実行されない。  
 その結果、独自プロパティが `undefined` のままになり、実行時エラーになる。
 
-**解決策：バトル中にのみ使う独自プロパティは `onBattleStart` で初期化し、`onBattleEnd` でリセットする。**
+独自プロパティを追加する場合は、`initMembers` だけに依存せず、  
+そのプロパティを使う処理の前に `undefined` の可能性を考慮して初期化する。
 
 ```javascript
-const _Game_Battler_onBattleStart = Game_Battler.prototype.onBattleStart;
-Game_Battler.prototype.onBattleStart = function(advantageous) {
-  _Game_Battler_onBattleStart.call(this, advantageous);
-
-  this._myCustomData = {}; // ここで初期化
-};
-
-const _Game_Battler_onBattleEnd = Game_Battler.prototype.onBattleEnd;
-Game_Battler.prototype.onBattleEnd = function() {
-  _Game_Battler_onBattleEnd.call(this);
-
+if (this._myCustomData === undefined) {
   this._myCustomData = {};
-};
+}
 ```
-
-`onBattleStart` は全バトラーに対して毎回戦闘開始時に呼ばれるため、セーブデータ読み込み後でも安全。
 
 ---
 
