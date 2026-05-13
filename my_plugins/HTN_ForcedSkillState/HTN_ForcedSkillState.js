@@ -329,10 +329,6 @@
       const action = new Game_Action(subject, true);
       action.setSkill(skill.id);
 
-      if (action.needsSelection()) {
-        action.decideRandomTarget();
-      }
-
       if (action.item() === null) {
         continue;
       }
