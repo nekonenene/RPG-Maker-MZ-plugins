@@ -273,31 +273,6 @@
   };
 
   /**
-   * バトル開始時に独自プロパティを初期化する
-   *
-   * @param {boolean} advantageous
-   * @returns {void}
-   */
-  const _Game_Battler_onBattleStart = Game_Battler.prototype.onBattleStart;
-  Game_Battler.prototype.onBattleStart = function(advantageous) {
-    _Game_Battler_onBattleStart.call(this, advantageous);
-
-    this._forcedSkillState_ShownStateIdsBefore = new Set();
-  };
-
-  /**
-   * バトル終了時に独自プロパティをリセットする
-   *
-   * @returns {void}
-   */
-  const _Game_Battler_onBattleEnd = Game_Battler.prototype.onBattleEnd;
-  Game_Battler.prototype.onBattleEnd = function() {
-    _Game_Battler_onBattleEnd.call(this);
-
-    this._forcedSkillState_ShownStateIdsBefore = new Set();
-  };
-
-  /**
    * ForcedSkillState ステートの継続メッセージ表示と強制スキル判定をおこなう
    *
    * @returns {void}
@@ -382,6 +357,7 @@
       _Window_BattleLog_displayCurrentState.call(this, subject);
     } finally {
       subject._states = savedStates;
+      subject._forcedSkillState_ShownStateIdsBefore.clear();
     }
   };
 })();
