@@ -271,7 +271,7 @@
   const paramMpReverse = toBoolean(pluginParams.MpReverse, false);
   const paramTpReverse = toBoolean(pluginParams.TpReverse, false);
 
-  // performDamage 内でダメージ音を鳴らさないためのフラグ
+  // performDamage 内でダメージ音を鳴らさないためのフラグ（カスタム設定したSEを鳴らしたいため）
   let _zombieState_SuppressDamageSound = false;
 
   /**
@@ -591,7 +591,10 @@
   };
 
   /**
-   * MPダメージ表示をフックし、MPダメージ時にダメージ音をキューへ追加する
+   * MPダメージ時にダメージ音をキューへ追加する
+   *
+   * displayHpDamage では performDamage が呼ばれダメージ音が鳴るのに対し、
+   * displayMpDamage では performDamage が呼ばれないため
    *
    * @param {Game_Battler} target 対象バトラー
    */
