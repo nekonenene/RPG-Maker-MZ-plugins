@@ -109,18 +109,23 @@
  * <ForcedSkillState_SkillName: 防御> （スキル名。 ForcedSkillState_Skill が指定されていない場合に使用されます）
  * <ForcedSkillState_ShowStateMessageBeforeAction: true> （継続メッセージを行動前に表示するか）
  *
- * Skill は SkillName より優先されます。SkillName は Skill に有効な候補がない場合だけ参照されます。
+ * <ForcedSkillState> タグを持つステートが複数存在し、それらに同時にかかっている場合、
+ * 各ステートで「優先度」の順に確率判定がおこなわれ、
+ * 最初に発動したステートの中からスキルが選ばれます。
+ *
+ * スキルは複数指定が可能で、 <ForcedSkillState_Skill: 2,2,7,9> のようにカンマ区切りで記述します。
+ * 複数の中から同じ確率で選ばれるので、この場合 スキルID: 2 が選ばれる確率が 50% となります。
+ *
+ * 指定されたスキルは、MP/TP不足やスキル封印を無視して実行されます。
+ *
+ * 【ForcedSkillState_SkillName の使用に関して】
+ * ForcedSkillState_SkillName は ForcedSkillState_Skill の設定が有効でないときのみ参照されます。
+ * 基本的にはID指定である ForcedSkillState_Skill の使用が推奨ですが、
  * スキルIDをあとから変更しそうで心配な方は SkillName の使用をご検討ください。
  *
- * SkillName の注意事項として、同じスキル名が複数存在する場合は、スキルIDが小さいものが選ばれます。
- * また、スキル名に < や > が含まれる場合は、 &lt; や &gt; と記述してください。
+ * SkillName 使用時の注意事項として、同じスキル名が複数存在する場合は、スキルIDが小さいものが選ばれます。
+ * また、スキル名に < や > や , が含まれる場合は、 &lt; や &gt; や &comma; と記述してください。
  * （例：スキル名が「つよいこうげき(>_<)」の場合、 <ForcedSkillState_SkillName: つよいこうげき(&gt;_&lt;)> と記述）
- *
- * <ForcedSkillState> タグを持つステートが複数存在し、それらに同時にかかっている場合、
- * 各ステートで「優先度」の順に判定がおこなわれ、
- * 最初に発動し、有効な候補スキルを持つステートが行動を上書きします。
- *
- * 強制スキルは、MP不足、封印、スキルタイプ封印などの使用条件を無視します。
  *
  * 【継続メッセージの表示タイミングについて】
  * ツクールMZは、ステートの継続メッセージに関して「優先度」が
@@ -157,26 +162,6 @@
   const paramShowStateMessageBeforeAction = toBoolean(pluginParams.ShowStateMessageBeforeAction, true);
 
   /**
-   * カンマ区切り文字列を要素配列へ変換
-   *
-   * @param {string} value カンマ区切り文字列
-   * @returns {string[]} 空文字を除いた要素配列を返す
-   */
-  const splitCsv = (value) => {
-    return String(value).split(',').map(str => str.trim()).filter(str => str !== '');
-  };
-
-  /**
-   * スキル名タグ用のエスケープを変換
-   *
-   * @param {string} value 変換対象の文字列
-   * @returns {string} 変換後の文字列を返す
-   */
-  const unescapeSkillName = (value) => {
-    return String(value).replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-  };
-
-  /**
    * ステートに設定された強制スキル発動率を取得
    *
    * @param {object} state ステートデータ
@@ -193,17 +178,28 @@
   };
 
   /**
+   * カンマ区切り文字列を要素配列へ変換
+   *
+   * @param {string} value カンマ区切り文字列
+   * @returns {string[]} 各要素の前後の空白を除いた上で、空文字を除いた配列
+   */
+  const splitByComma = (value) => {
+    return String(value).split(',').map(str => str.trim()).filter(str => str !== '');
+  };
+
+  /**
    * スキルIDタグから有効な候補スキルを取得
    *
    * @param {object} state ステートデータ
-   * @returns {object[]} 候補スキル配列を返す
+   * @returns {object[]} 候補スキルの配列
    */
   const skillCandidatesById = (state) => {
-    if (state.meta.ForcedSkillState_Skill === undefined) {
+    let skillIds = state.meta.ForcedSkillState_Skill ?? state.meta.ForcedSkillState_Skills; // 複数形の Skills も許容
+    if (skillIds === undefined) {
       return [];
     }
 
-    return splitCsv(state.meta.ForcedSkillState_Skill)
+    return splitByComma(skillIds)
       .map(str => Number(str))
       .filter(skillId => Number.isInteger(skillId) && skillId > 0 && $dataSkills[skillId] !== undefined)
       .map(skillId => $dataSkills[skillId]);
@@ -213,24 +209,27 @@
    * スキル名タグから有効な候補スキルを取得
    *
    * @param {object} state ステートデータ
-   * @returns {object[]} 候補スキル配列を返す
+   * @returns {object[]} 候補スキルの配列
    */
   const skillCandidatesByName = (state) => {
-    if (state.meta.ForcedSkillState_SkillName === undefined) {
+    let skillNames = state.meta.ForcedSkillState_SkillName ?? state.meta.ForcedSkillState_SkillNames; // 複数形の SkillNames も許容
+    if (skillNames === undefined) {
       return [];
     }
 
-    return splitCsv(state.meta.ForcedSkillState_SkillName)
-      .map(str => unescapeSkillName(str))
+    // スキル名に <, >, カンマ が含まれる場合のエスケープを元に戻す
+    const unescapedSkillNames = String(skillNames).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&comma;/g, ',');
+
+    return splitByComma(unescapedSkillNames)
       .map(skillName => $dataSkills.find(skill => skill !== null && skill !== undefined && skill.name.trim() === skillName.trim()))
       .filter(skill => skill !== undefined); // find で見つからなかったものを除外
   };
 
   /**
-   * ステートに設定された候補スキルを取得
+   * ステートの「メモ」欄に設定されたタグから、候補となるスキル一覧を取得
    *
    * @param {object} state ステートデータ
-   * @returns {object[]} 候補スキル配列を返す
+   * @returns {object[]} 候補スキルの配列
    */
   const skillCandidates = (state) => {
     const skillsById = skillCandidatesById(state);
@@ -244,8 +243,8 @@
   /**
    * 候補から等確率でスキルを選ぶ
    *
-   * @param {object[]} skills 候補スキル配列
-   * @returns {object|null} 選ばれたスキルを返す
+   * @param {object[]} skills 候補スキルの配列
+   * @returns {object|null} 選ばれたスキル
    */
   const selectRandomSkill = (skills) => {
     if (skills.length === 0) {
