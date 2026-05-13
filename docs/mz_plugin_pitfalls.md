@@ -9,6 +9,8 @@
 | セクション | 関連キーワード |
 |---|---|
 | [既存バトラーの独自プロパティは `initMembers` で初期化されない](#既存バトラーの独自プロパティは-initMembers-で初期化されない) | バトラー, カスタムプロパティ, セーブデータ読み込み |
+| [バトル中だけの独自プロパティもセーブデータに残り得る](#バトル中だけの独自プロパティもセーブデータに残り得る) | バトラー, カスタムプロパティ, 一時プロパティ, onBattleStart, onBattleEnd, delete, セーブデータ |
+| [独自プロパティに `Set` や `Map` を使う場合は保存対象にしない](#独自プロパティに-set-や-map-を使う場合は保存対象にしない) | Set, Map, JSON, セーブデータ, onBattleStart, onBattleEnd |
 | [`removeState` はゲーム開始時にも呼ばれる](#removeState-はゲーム開始時にも呼ばれる) | ステート, removeState, null チェック |
 | [`Game_Action.prototype.apply` はバトル外でも呼ばれる](#Game_Actionprototypeapply-はバトル外でも呼ばれる) | アクション, スキル, アイテム, inBattle |
 | [ターン制バトルでのダメージポップアップは直接呼べない](#ターン制バトルでのダメージポップアップは直接呼べない) | ポップアップ, ダメージ表示, ターン制, TPB |
@@ -44,6 +46,84 @@ if (this._myCustomData === undefined) {
   this._myCustomData = {};
 }
 ```
+
+---
+
+## バトル中だけの独自プロパティもセーブデータに残り得る
+
+`Game_Battler` / `Game_Actor` は戦闘終了時に作り直されるわけではない。  
+アクターは `$gameActors` / `$gameParty` 側に保持され続けるため、  
+バトル中だけのつもりで追加した独自プロパティも、残したままだとセーブデータに入る可能性がある。
+
+バトル中だけ使う一時プロパティは、`onBattleStart` で初期化し、`onBattleEnd` で削除する。  
+`null` 代入でも実行時の参照事故は避けられるが、セーブデータに不要な値を残さない目的では `delete` が明確。
+
+```javascript
+const _Game_Battler_onBattleStart = Game_Battler.prototype.onBattleStart;
+Game_Battler.prototype.onBattleStart = function(advantageous) {
+  _Game_Battler_onBattleStart.call(this, advantageous);
+
+  this._myPlugin_TemporaryData = {};
+};
+
+const _Game_Battler_onBattleEnd = Game_Battler.prototype.onBattleEnd;
+Game_Battler.prototype.onBattleEnd = function() {
+  _Game_Battler_onBattleEnd.call(this);
+
+  delete this._myPlugin_TemporaryData;
+};
+```
+
+既存セーブデータや戦闘中セーブ系プラグインとの併用を考慮する場合は、  
+使用直前にも型チェックを入れて初期化し直すと安全。
+
+```javascript
+if (this._myPlugin_TemporaryData == null) {
+  this._myPlugin_TemporaryData = {};
+}
+```
+
+---
+
+## 独自プロパティに `Set` や `Map` を使う場合は保存対象にしない
+
+RPGツクールMZのセーブデータはJSONとして保存される。  
+`Set` や `Map` はJSON化しても中身が保存されず、ロード後に通常のオブジェクト `{}` になり得る。
+
+```javascript
+JSON.stringify(new Set([1, 2, 3])); // "{}"
+```
+
+そのため、`Set` として保存したつもりの独自プロパティに対して、  
+ロード後に `.has()` / `.add()` / `.clear()` を呼ぶとエラーになる。
+
+```javascript
+this._myPlugin_StateIds = new Set();
+
+// ロード後に {} になっていると TypeError
+this._myPlugin_StateIds.has(stateId);
+```
+
+`Set` / `Map` は、保存されない一時データとして使う場合に限る。  
+使う場合は `onBattleStart` など確実なタイミングで初期化し、`onBattleEnd` などで `delete` する。
+
+```javascript
+const _Game_Battler_onBattleStart = Game_Battler.prototype.onBattleStart;
+Game_Battler.prototype.onBattleStart = function(advantageous) {
+  _Game_Battler_onBattleStart.call(this, advantageous);
+
+  this._myPlugin_StateIds = new Set();
+};
+
+const _Game_Battler_onBattleEnd = Game_Battler.prototype.onBattleEnd;
+Game_Battler.prototype.onBattleEnd = function() {
+  _Game_Battler_onBattleEnd.call(this);
+
+  delete this._myPlugin_StateIds;
+};
+```
+
+セーブデータに残す必要があるデータは、配列や通常オブジェクトなどJSONで正しく復元できる形にする。
 
 ---
 
