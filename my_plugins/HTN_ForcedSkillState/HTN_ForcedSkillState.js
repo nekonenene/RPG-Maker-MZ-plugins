@@ -44,15 +44,15 @@
  * Setting list:
  * <ForcedSkillState> (Required)
  * <ForcedSkillState_Rate: 10> (Forced skill probability)
- * <ForcedSkillState_SkillIds: 2,2,7,0> (Candidate skill IDs)
- * <ForcedSkillState_SkillNames: Guard,Defend> (Candidate skill names)
+ * <ForcedSkillState_Skill: 2,2,7,0> (Candidate skill IDs)
+ * <ForcedSkillState_SkillName: Guard,Defend> (Candidate skill names)
  * <ForcedSkillState_ShowStateMessageBeforeAction: true> (Show continuation message before action)
  *
- * SkillIds takes priority over SkillNames.
+ * Skill takes priority over SkillName.
  * Only existing positive skill IDs are used.
  * Invalid IDs are ignored.
  *
- * SkillNames is used only when SkillIds has no valid candidates.
+ * SkillName is used only when Skill has no valid candidates.
  * Use &lt; and &gt; when a skill name contains < or >.
  *
  * If multiple states with the <ForcedSkillState> tag are active at the same time,
@@ -93,7 +93,7 @@
  * ステートの「メモ」の欄に例えば以下のようにタグを記述します。
  * <ForcedSkillState>
  * <ForcedSkillState_Rate: 50>
- * <ForcedSkillState_SkillIds: 2>
+ * <ForcedSkillState_Skill: 2>
  *
  * この例の場合、このステートが付与されたキャラクターは、
  * 50%の確率でスキルID: 2（通常は防御）のスキルを勝手に使います。
@@ -105,16 +105,16 @@
  * 設定項目一覧：
  * <ForcedSkillState> （※この記述は必須です）
  * <ForcedSkillState_Rate: 10> （指定スキルを勝手に使う確率）
- * <ForcedSkillState_SkillIds: 2> （スキルID）
- * <ForcedSkillState_SkillNames: 防御> （スキル名。 ForcedSkillState_SkillIds が指定されていない場合に使用されます）
+ * <ForcedSkillState_Skill: 2> （スキルID）
+ * <ForcedSkillState_SkillName: 防御> （スキル名。 ForcedSkillState_Skill が指定されていない場合に使用されます）
  * <ForcedSkillState_ShowStateMessageBeforeAction: true> （継続メッセージを行動前に表示するか）
  *
- * SkillIds は SkillNames より優先されます。SkillNames は SkillIds に有効な候補がない場合だけ参照されます。
- * スキルIDをあとから変更しそうで心配な方は SkillNames の使用をご検討ください。
+ * Skill は SkillName より優先されます。SkillName は Skill に有効な候補がない場合だけ参照されます。
+ * スキルIDをあとから変更しそうで心配な方は SkillName の使用をご検討ください。
  *
- * SkillNames の注意事項として、同じスキル名が複数存在する場合は、スキルIDが小さいものが選ばれます。
+ * SkillName の注意事項として、同じスキル名が複数存在する場合は、スキルIDが小さいものが選ばれます。
  * また、スキル名に < や > が含まれる場合は、 &lt; や &gt; と記述してください。
- * （例：スキル名が「つよいこうげき(>_<)」の場合、 <ForcedSkillState_SkillNames: つよいこうげき(&gt;_&lt;)> と記述）
+ * （例：スキル名が「つよいこうげき(>_<)」の場合、 <ForcedSkillState_SkillName: つよいこうげき(&gt;_&lt;)> と記述）
  *
  * <ForcedSkillState> タグを持つステートが複数存在し、それらに同時にかかっている場合、
  * 各ステートで「優先度」の順に判定がおこなわれ、
@@ -198,12 +198,12 @@
    * @param {object} state ステートデータ
    * @returns {object[]} 候補スキル配列を返す
    */
-  const skillCandidatesByIds = (state) => {
-    if (state.meta.ForcedSkillState_SkillIds === undefined) {
+  const skillCandidatesById = (state) => {
+    if (state.meta.ForcedSkillState_Skill === undefined) {
       return [];
     }
 
-    return splitCsv(state.meta.ForcedSkillState_SkillIds)
+    return splitCsv(state.meta.ForcedSkillState_Skill)
       .map(str => Number(str))
       .filter(skillId => Number.isInteger(skillId) && skillId > 0 && $dataSkills[skillId] !== undefined)
       .map(skillId => $dataSkills[skillId]);
@@ -215,12 +215,12 @@
    * @param {object} state ステートデータ
    * @returns {object[]} 候補スキル配列を返す
    */
-  const skillCandidatesByNames = (state) => {
-    if (state.meta.ForcedSkillState_SkillNames === undefined) {
+  const skillCandidatesByName = (state) => {
+    if (state.meta.ForcedSkillState_SkillName === undefined) {
       return [];
     }
 
-    return splitCsv(state.meta.ForcedSkillState_SkillNames)
+    return splitCsv(state.meta.ForcedSkillState_SkillName)
       .map(str => unescapeSkillName(str))
       .map(skillName => $dataSkills.find(skill => skill !== null && skill !== undefined && skill.name.trim() === skillName.trim()))
       .filter(skill => skill !== undefined); // find で見つからなかったものを除外
@@ -233,12 +233,12 @@
    * @returns {object[]} 候補スキル配列を返す
    */
   const skillCandidates = (state) => {
-    const skillsByIds = skillCandidatesByIds(state);
-    if (skillsByIds.length > 0) {
-      return skillsByIds;
+    const skillsById = skillCandidatesById(state);
+    if (skillsById.length > 0) {
+      return skillsById;
     }
 
-    return skillCandidatesByNames(state);
+    return skillCandidatesByName(state);
   };
 
   /**

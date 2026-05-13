@@ -22,7 +22,7 @@ RPGツクールMZ用のプラグインです。
 ```
 <ForcedSkillState>
 <ForcedSkillState_Rate: 50>
-<ForcedSkillState_SkillIds: 2>
+<ForcedSkillState_Skill: 2>
 ```
 
 この例の場合、このステートが付与されたキャラクターは、  
@@ -47,22 +47,22 @@ RPGツクールMZ用のプラグインです。
 ```
 <ForcedSkillState>
 <ForcedSkillState_Rate: 10>
-<ForcedSkillState_SkillIds: 2,2,7,0>
+<ForcedSkillState_Skill: 2,2,7,0>
 ```
 
-`ForcedSkillState_SkillIds` に有効な候補がない場合のみ、  
-`ForcedSkillState_SkillNames` が参照されます。
+`ForcedSkillState_Skill` に有効な候補がない場合のみ、  
+`ForcedSkillState_SkillName` が参照されます。
 
 ```
 <ForcedSkillState>
-<ForcedSkillState_SkillNames: 防御,身を守る>
+<ForcedSkillState_SkillName: 防御,身を守る>
 ```
 
 スキル名に `<` や `>` を含めたい場合は、  
 `&lt;` や `&gt;` と記述してください。
 
 例えば、スキル名が「つよいこうげき(>_<)」の場合、  
-`<ForcedSkillState_SkillNames: つよいこうげき(&gt;_&lt;)>` と記述します。
+`<ForcedSkillState_SkillName: つよいこうげき(&gt;_&lt;)>` と記述します。
 
 `<ForcedSkillState>` が設定されたステートが複数用意されていて、  
 それらのステートに同時にかかっている場合は、「優先度」の高いステートから順番に判定されます。  
@@ -78,10 +78,10 @@ RPGツクールMZ用のプラグインです。
   このプラグインを有効化するために必要なタグ
 - `<ForcedSkillState_Rate: 10>`  
   指定スキルを勝手に使う確率を上書き
-- `<ForcedSkillState_SkillIds: 2,2,7,0>`  
+- `<ForcedSkillState_Skill: 2,2,7,0>`  
   候補スキルIDを指定。正の整数かつ存在するスキルIDだけが候補になります
-- `<ForcedSkillState_SkillNames: 防御,身を守る>`  
-  候補スキル名を指定。SkillIds に有効な候補がない場合のみ参照されます
+- `<ForcedSkillState_SkillName: 防御,身を守る>`  
+  候補スキル名を指定。Skill に有効な候補がない場合のみ参照されます
 - `<ForcedSkillState_ShowStateMessageBeforeAction: true/false>`  
   ステートの継続メッセージを行動前に表示するかを上書き
 
@@ -90,8 +90,8 @@ RPGツクールMZ用のプラグインです。
 ```
 <ForcedSkillState>
 <ForcedSkillState_Rate: 5>
-<ForcedSkillState_SkillIds: 2>
-<ForcedSkillState_SkillNames: 防御>
+<ForcedSkillState_Skill: 2>
+<ForcedSkillState_SkillName: 防御>
 <ForcedSkillState_ShowStateMessageBeforeAction: true>
 ```
 
