@@ -118,6 +118,17 @@ NumbState.js では、 processTurn 内で clearActions を呼び出すため、�
 そのため、アクターや職業などの特徴で「行動回数追加」を設定していて、１ターンに複数回の行動がおこなわれる場合、  
 このプラグインでは、複数回の行動それぞれでスタン判定がおこなわれることになります。
 
+## ⚠️ 注意点
+
+### HTN_ForcedSkillState との併用
+
+これと似たプラグインに、  
+一定確率で特定のスキルを勝手に使ってしまうステート（状態異常）を作成できる「[HTN_ForcedSkillState](https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_ForcedSkillState)」があります。
+
+どちらの判定が先にされるかは、プラグインの読み込み順によります。  
+HTN_StunRate の判定を先にしたい場合、  
+「プラグイン管理」のプラグインリストでの並び順を、 HTN_StunRate を上、 HTN_ForcedSkillState が下になるようにしてください。
+
 ## 📝 作者情報
 
 ハトネコエ  
