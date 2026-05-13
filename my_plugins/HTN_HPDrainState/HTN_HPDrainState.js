@@ -6,6 +6,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/license/mit
 //
+// 2026/05/13 v1.0.3 独自プロパティがセーブデータへ残らないよう修正
 // 2026/05/13 v1.0.2 計算式内の &lt; と &gt; が１箇所しか置換されなかった問題を修正
 // 2026/05/11 v1.0.1 ドレインメッセージの表示時間を増やした
 // 2026/03/24 v1.0.0 First release
@@ -14,7 +15,7 @@
 
 /*:
  * @target MZ
- * @plugindesc Creates a state that drains HP from the afflicted to the drainer each turn (v1.0.2)
+ * @plugindesc Creates a state that drains HP from the afflicted to the drainer each turn (v1.0.3)
  * @author hatonekoe - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_HPDrainState
  *
@@ -109,7 +110,7 @@
 
 /*:ja
  * @target MZ
- * @plugindesc HPを吸収され続けるステート（状態異常）を作成できます (v1.0.2)
+ * @plugindesc HPを吸収され続けるステート（状態異常）を作成できます (v1.0.3)
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_HPDrainState
  *
@@ -641,14 +642,14 @@
   };
 
   /**
-   * バトル終了時に独自プロパティをリセットする
+   * バトル終了時に独自プロパティを削除する
    */
   const _Game_Battler_onBattleEnd = Game_Battler.prototype.onBattleEnd;
   Game_Battler.prototype.onBattleEnd = function() {
     _Game_Battler_onBattleEnd.call(this);
 
-    this._hpDrainerInfo = {};
-    this._hpDrainPendingMessages = [];
-    this._hpDrainPendingPopups = [];
+    delete this._hpDrainerInfo;
+    delete this._hpDrainPendingMessages;
+    delete this._hpDrainPendingPopups;
   };
 })();
