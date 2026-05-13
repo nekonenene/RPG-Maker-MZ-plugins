@@ -125,7 +125,7 @@
  *
  * @param HPDamageSoundType
  * @text HPダメージ音の種類
- * @desc ゾンビ状態でHPダメージを受けたときに鳴る音です。
+ * @desc HP回復によってHPダメージを受けたときに鳴る音
  * @default actorDamage
  * @type select
  * @option アクターダメージ音（システムサウンド）
@@ -137,13 +137,13 @@
  *
  * @param HPDamageSound
  * @text カスタムHPダメージSE
- * @desc ダメージ音の種類が「カスタムSE」のときに使用するSEです。
+ * @desc ダメージ音の種類が「カスタムSE」のときに使用されるSE
  * @type struct<Sound>
  * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
  *
  * @param MPDamageSoundType
  * @text MPダメージ音の種類
- * @desc ゾンビ状態でMPダメージを受けたときに鳴る音です。
+ * @desc MP回復によってMPダメージを受けたときに鳴る音
  * @default actorDamage
  * @type select
  * @option アクターダメージ音（システムサウンド）
@@ -155,19 +155,19 @@
  *
  * @param MPDamageSound
  * @text カスタムMPダメージSE
- * @desc ダメージ音の種類が「カスタムSE」のときに使用するSEです。
+ * @desc ダメージ音の種類が「カスタムSE」のときに使用されるSE
  * @type struct<Sound>
  * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
  *
  * @param MpReverse
  * @text MP回復を反転
- * @desc trueにすると、MP回復もMPダメージに変換されます。
+ * @desc MP回復をMPダメージに変換するかどうか
  * @default false
  * @type boolean
  *
  * @param TpReverse
  * @text TP回復を反転
- * @desc trueにすると、TP増加もTPダメージに変換されます。
+ * @desc TP回復をTPダメージに変換するかどうか
  * @default false
  * @type boolean
  *
@@ -194,9 +194,9 @@
  * データベース上の優先度が最も高いステートのタグ設定が参照されます。
  *
  * 【制限事項】
- * setHp() や setMp() が直接呼び出されてHP・MPが増加する場合、ゾンビ反転は正しく機能しますが、
+ * setHp() や setMp() が直接呼び出されてHP・MPが増加する場合、反転は正しく機能しますが、
  * ダメージポップアップや音は表示されません。
- * 戦闘不能バトラーへの setHp(1)（蘇生）はゾンビ反転の対象外です。
+ * 戦闘不能バトラーへの setHp(1)（蘇生）は反転の対象外です。
  */
 
 /*~struct~Sound:ja
@@ -272,9 +272,9 @@
   };
 
   /**
-   * ゾンビHPダメージ時の音を再生する
+   * HP回復によるHPダメージ時の音を再生する
    */
-  const playZombieDamageSound = () => {
+  const playZombieHpDamageSound = () => {
     if (paramHpDamageSoundType === 'actorDamage') {
       SoundManager.playActorDamage();
     } else if (paramHpDamageSoundType === 'custom') {
@@ -284,6 +284,7 @@
         pitch: Number(paramHpDamageSound.pitch ?? 100),
         pan: Number(paramHpDamageSound.pan ?? 0),
       };
+
       if (se.name !== '') {
         AudioManager.playSe(se);
       }
@@ -293,7 +294,7 @@
   };
 
   /**
-   * ゾンビMPダメージ時の音を再生する
+   * MP回復によるMPダメージ時の音を再生する
    */
   const playZombieMpDamageSound = () => {
     if (paramMpDamageSoundType === 'actorDamage') {
@@ -305,6 +306,7 @@
         pitch: Number(paramMpDamageSound.pitch ?? 100),
         pan: Number(paramMpDamageSound.pan ?? 0),
       };
+
       if (se.name !== '') {
         AudioManager.playSe(se);
       }
@@ -317,7 +319,7 @@
   let _suppressNextDamageSound = false;
 
   /**
-   * ゾンビHPダメージ時にアクターダメージ音を抑制するフック
+   * アクターのダメージ音を抑制するフック（ playZombieHpDamageSound で鳴らすため）
    */
   const _SoundManager_playActorDamage = SoundManager.playActorDamage;
   SoundManager.playActorDamage = function() {
@@ -330,7 +332,7 @@
   };
 
   /**
-   * ゾンビHPダメージ時に敵ダメージ音を抑制するフック
+   * 敵キャラのダメージ音を抑制するフック
    */
   const _SoundManager_playEnemyDamage = SoundManager.playEnemyDamage;
   SoundManager.playEnemyDamage = function() {
@@ -423,7 +425,7 @@
   // ============================================================
 
   /**
-   * HP回復をゾンビHPダメージに反転する
+   * HP回復をHPダメージに反転する
    * value > 0（回復）かつゾンビステートを持つとき、符号を逆にしてHPダメージとして処理する
    *
    * @param {number} value HP変化量（正=回復、負=ダメージ）
@@ -438,7 +440,7 @@
       // バトル外では performDamage が呼ばれないため直接再生（ただし、回復音とかぶって再生される）
       if (!$gameParty.inBattle()) {
         this._zombieHpDamaged = false;
-        playZombieDamageSound();
+        playZombieHpDamageSound();
       }
 
       return;
@@ -450,7 +452,7 @@
   };
 
   /**
-   * MP回復をゾンビMPダメージに反転する（AffectMp が有効なときのみ）
+   * MP回復をMPダメージに反転する（AffectMp が有効なときのみ）
    *
    * @param {number} value MP変化量（正=回復、負=ダメージ）
    */
@@ -476,7 +478,7 @@
   };
 
   /**
-   * TP増加をゾンビTPダメージに反転する（AffectTp が有効なときのみ）
+   * TP増加をTPダメージに反転する（AffectTp が有効なときのみ）
    *
    * @param {number} value TP変化量（正=増加、負=減少）
    */
@@ -491,7 +493,8 @@
   };
 
   /**
-   * サイレントTP増加（リジェネ）をゾンビTP反転に対応させる
+   * ターン終了時などにおこなわれる自動的なTP増加を反転させる
+   *
    * AffectTp が有効なとき gainTp 経由に切り替え、result.tpDamage を記録してポップアップを表示させる
    * フック済みの gainTp が内部で -value に反転して処理する
    *
@@ -507,14 +510,10 @@
     _Game_Battler_gainSilentTp.call(this, value);
   };
 
-  // ============================================================
-  // setHp / setMp / setTp の直接呼び出しへの対応
-  // gain系メソッドを経由しないサードパーティプラグイン向け
-  // ============================================================
-
   /**
-   * HP増加をゾンビHPダメージに反転する（ゾンビステートを持ち生存中のとき）
-   * gainHp 経由の呼び出しはゾンビ反転後に hp < this._hp になるためこのフックを通過しない
+   * HP増加をHPダメージに反転する
+   *
+   * gainHp 経由の呼び出しは反転後に hp < this._hp になるためこのフックを通過しない
    * this._hp === 0 のとき（戦闘不能からの蘇生）はスキップする
    *
    * @param {number} hp 設定するHP値
@@ -533,14 +532,15 @@
   };
 
   /**
-   * MP増加をゾンビMPダメージに反転する（AffectMp が有効なとき）
-   * gainMp 経由の呼び出しはゾンビ反転後に mp < this._mp になるためこのフックを通過しない
+   * MP増加をMPダメージに反転する（AffectMp が有効なとき）
+   *
+   * gainMp 経由の呼び出しは反転後に mp < this._mp になるためこのフックを通過しない
    *
    * @param {number} mp 設定するMP値
    */
   const _Game_BattlerBase_setMp = Game_BattlerBase.prototype.setMp;
   Game_BattlerBase.prototype.setMp = function(mp) {
-    // 指定MPが現在MPより大きく、かつゾンビMP反転が有効な場合に反転処理
+    // 指定MPが現在MPより大きく、かつゾンビステートのMP反転が有効な場合に反転処理
     if (mp > this._mp && this.zombieAffectsMp?.()) {
       const delta = mp - this._mp;
 
@@ -552,7 +552,7 @@
   };
 
   /**
-   * initTp の setTp 呼び出しをゾンビ反転から除外するためのフラグを設定する
+   * initTp の setTp 呼び出しを反転から除外するためのフラグを設定する
    */
   const _Game_Battler_initTp = Game_Battler.prototype.initTp;
   Game_Battler.prototype.initTp = function() {
@@ -564,8 +564,9 @@
   };
 
   /**
-   * TP増加をゾンビTPダメージに反転する（AffectTp が有効かつ initTp 以外の呼び出しのとき）
-   * gainTp / gainSilentTp 経由の呼び出しはゾンビ反転後に tp < this._tp になるためこのフックを通過しない
+   * TP増加をTPダメージに反転する（AffectTp が有効かつ initTp 以外の呼び出しのとき）
+   *
+   * gainTp / gainSilentTp 経由の呼び出しは反転後に tp < this._tp になるためこのフックを通過しない
    * clearTp は常に tp = 0 <= this._tp のためこのフックを通過しない
    *
    * @param {number} tp 設定するTP値
@@ -582,13 +583,8 @@
     _Game_BattlerBase_setTp.call(this, tp);
   };
 
-  // ============================================================
-  // ダメージ音の差し替え（スキル・アイテム時）
-  // displayHpDamage → performDamage の流れで呼ばれる
-  // ============================================================
-
   /**
-   * アクターのダメージ演出をフックし、ゾンビHPダメージ時は通常音をゾンビ音に差し替える
+   * アクターのダメージ演出をフックし、HPダメージ時はダメージ音を設定した音に差し替える
    */
   const _Game_Actor_performDamage = Game_Actor.prototype.performDamage;
   Game_Actor.prototype.performDamage = function() {
@@ -598,14 +594,14 @@
 
       _Game_Actor_performDamage.call(this); // ダメージモーション + 抑制された音
 
-      playZombieDamageSound();
+      playZombieHpDamageSound();
     } else {
       _Game_Actor_performDamage.call(this);
     }
   };
 
   /**
-   * 敵のダメージ演出をフックし、ゾンビHPダメージ時は通常音をゾンビ音に差し替える
+   * 敵キャラのダメージ演出をフックし、HPダメージ時はダメージ音を設定した音に差し替える
    */
   const _Game_Enemy_performDamage = Game_Enemy.prototype.performDamage;
   Game_Enemy.prototype.performDamage = function() {
@@ -615,33 +611,28 @@
 
       _Game_Enemy_performDamage.call(this); // ブリンクエフェクト + 抑制された音
 
-      playZombieDamageSound();
+      playZombieHpDamageSound();
     } else {
       _Game_Enemy_performDamage.call(this);
     }
   };
 
-  // ============================================================
-  // ダメージ音の追加（リジェネ時）
-  // displayRegeneration は performDamage を呼ばないため個別に対応する
-  // ============================================================
-
   /**
-   * ゾンビHPダメージ音をバトルログキュー経由で再生する
+   * HPダメージ音をバトルログキュー経由で再生する
    */
   Window_BattleLog.prototype.playZombieDamageSound = function() {
-    playZombieDamageSound();
+    playZombieHpDamageSound();
   };
 
   /**
-   * ゾンビMPダメージ音をバトルログキュー経由で再生する
+   * MPダメージ音をバトルログキュー経由で再生する
    */
   Window_BattleLog.prototype.playZombieMpDamageSound = function() {
     playZombieMpDamageSound();
   };
 
   /**
-   * MPダメージ表示をフックし、ゾンビMPダメージ時にダメージ音をキューへ追加する
+   * MPダメージ表示をフックし、MPダメージ時にダメージ音をキューへ追加する
    *
    * @param {Game_Battler} target 対象バトラー
    */
@@ -656,7 +647,7 @@
   };
 
   /**
-   * リジェネ表示をフックし、ゾンビHPダメージ時にダメージ音をキューへ追加する
+   * リジェネ表示をフックし、HPダメージ時にダメージ音をキューへ追加する
    *
    * @param {Game_Battler} subject 対象バトラー
    */
