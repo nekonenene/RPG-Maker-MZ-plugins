@@ -85,6 +85,8 @@
  * --- Known Limitations ---
  * When setHp() or setMp() are called directly, HP/MP is reversed correctly
  * but no damage popup or sound will be shown.
+ * When setTp() is called directly, TP is reversed correctly but no battle
+ * log message will be shown.
  * Revival via setHp(1) on a dead battler is not reversed.
  */
 
@@ -196,6 +198,8 @@
  * 【制限事項】
  * setHp() や setMp() が直接呼び出されてHP・MPが増加する場合、反転は正しく機能しますが、
  * ダメージポップアップや音は表示されません。
+ * setTp() が直接呼び出されてTPが増加する場合、反転は正しく機能しますが、
+ * バトルログのメッセージは表示されません。
  * 戦闘不能バトラーへの setHp(1)（蘇生）は反転の対象外です。
  */
 
@@ -514,7 +518,7 @@
 
       if (isTpReverse) {
         // gainSilentTp は result.tpDamage を記録しないため
-        // gainTp を呼び出すことでTP減少を記録し、TP減少ポップアップを表示させる
+        // gainTp を呼び出すことでTP減少を記録し、バトルログにメッセージを表示させる
         this.gainTp(value);
         return;
       }
