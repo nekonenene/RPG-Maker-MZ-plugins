@@ -71,19 +71,20 @@ RPGツクールMZ用のプラグインです。
 ### タグ一覧
 
 ステートの「メモ」欄に記述できるタグの一覧です。  
-`<ForcedSkillState>` 以外のタグは、  
-プラグインのパラメータで設定した値を上書きしない場合には記述しなくて大丈夫です。
+
+`ForcedSkillState_Rate`, `ForcedSkillState_ShowStateMessageBeforeAction` に関しては、  
+プラグインパラメータで設定した値を上書きしない場合には記述しなくても大丈夫です。
 
 - `<ForcedSkillState>`  
   このプラグインを有効化するために必要なタグ
 - `<ForcedSkillState_Rate: 10>`  
-  指定スキルを勝手に使う確率を上書き
-- `<ForcedSkillState_Skill: 2,2,7,0>`  
-  候補スキルIDを指定。正の整数かつ存在するスキルIDだけが候補になります
-- `<ForcedSkillState_SkillName: 防御,身を守る>`  
-  候補スキル名を指定。Skill に有効な候補がない場合のみ参照されます
+  指定スキルを勝手に使う確率
+- `<ForcedSkillState_Skill: 2,2,7,9>`  
+  スキルIDを指定。存在するスキルIDだけが候補になります
+- `<ForcedSkillState_SkillName: 防御>`  
+  スキル名を指定。Skill に有効な候補がない場合のみ参照されます
 - `<ForcedSkillState_ShowStateMessageBeforeAction: true/false>`  
-  ステートの継続メッセージを行動前に表示するかを上書き
+  ステートの継続メッセージを行動前に表示するか
 
 #### コピーしやすい用の一覧
 
