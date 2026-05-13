@@ -231,27 +231,6 @@
 (() => {
   'use strict';
 
-  const pluginName = 'HTN_ZombieState';
-  const parameters = PluginManager.parameters(pluginName);
-  const paramHpDamageSoundType = String(parameters.HPDamageSoundType || 'actorDamage');
-  const paramMpDamageSoundType = String(parameters.MPDamageSoundType || 'actorDamage');
-  const paramHpDamageSound = (() => {
-    try {
-      return JSON.parse(parameters.HPDamageSound || '{}');
-    } catch (_e) {
-      return {};
-    }
-  })();
-  const paramMpDamageSound = (() => {
-    try {
-      return JSON.parse(parameters.MPDamageSound || '{}');
-    } catch (_e) {
-      return {};
-    }
-  })();
-  const paramMpReverse = String(parameters.MpReverse) === 'true';
-  const paramTpReverse = String(parameters.TpReverse) === 'true';
-
   /**
    * 文字列や真偽値の入力を真偽値へ変換
    *
@@ -270,6 +249,27 @@
 
     return defaultValue;
   };
+
+  const pluginName = 'HTN_ZombieState';
+  const pluginParams = PluginManager.parameters(pluginName);
+  const paramHpDamageSoundType = String(pluginParams.HPDamageSoundType || 'actorDamage');
+  const paramMpDamageSoundType = String(pluginParams.MPDamageSoundType || 'actorDamage');
+  const paramHpDamageSound = (() => {
+    try {
+      return JSON.parse(pluginParams.HPDamageSound || '{}');
+    } catch (_e) {
+      return {};
+    }
+  })();
+  const paramMpDamageSound = (() => {
+    try {
+      return JSON.parse(pluginParams.MPDamageSound || '{}');
+    } catch (_e) {
+      return {};
+    }
+  })();
+  const paramMpReverse = toBoolean(pluginParams.MpReverse, false);
+  const paramTpReverse = toBoolean(pluginParams.TpReverse, false);
 
   /**
    * HP回復によるHPダメージ時の音を再生する
@@ -319,7 +319,7 @@
   let _suppressNextDamageSound = false;
 
   /**
-   * アクターのダメージ音を抑制するフック（ playZombieHpDamageSound で鳴らすため）
+   * アクターのダメージ音を抑制するフック ( playZombieHpDamageSound で鳴らすため )
    */
   const _SoundManager_playActorDamage = SoundManager.playActorDamage;
   SoundManager.playActorDamage = function() {
@@ -332,7 +332,7 @@
   };
 
   /**
-   * 敵キャラのダメージ音を抑制するフック
+   * 敵キャラのダメージ音を抑制するフック ( playZombieHpDamageSound で鳴らすため )
    */
   const _SoundManager_playEnemyDamage = SoundManager.playEnemyDamage;
   SoundManager.playEnemyDamage = function() {
@@ -420,10 +420,6 @@
     this._zombieMpDamaged = false;
   };
 
-  // ============================================================
-  // HP/MP/TP 回復の反転
-  // ============================================================
-
   /**
    * HP回復をHPダメージに反転する
    * value > 0（回復）かつゾンビステートを持つとき、符号を逆にしてHPダメージとして処理する
@@ -452,6 +448,27 @@
   };
 
   /**
+   * HP増加をHPダメージに反転する
+   *
+   * gainHp 経由の呼び出しは反転後に hp < this._hp になるためこのフックを通過しない
+   * this._hp === 0 のとき（戦闘不能からの蘇生）はスキップする
+   *
+   * @param {number} hp 設定するHP値
+   */
+  const _Game_BattlerBase_setHp = Game_BattlerBase.prototype.setHp;
+  Game_BattlerBase.prototype.setHp = function(hp) {
+    // 指定HPが現在HPより大きく、かつ現在HPが0より大きく（戦闘不能でない）、ゾンビステートを持つ場合に反転処理
+    if (hp > this._hp && this._hp > 0 && this.hasZombieState?.()) {
+      const delta = hp - this._hp;
+
+      _Game_BattlerBase_setHp.call(this, this._hp - delta);
+      return;
+    }
+
+    _Game_BattlerBase_setHp.call(this, hp);
+  };
+
+  /**
    * MP回復をMPダメージに反転する（AffectMp が有効なときのみ）
    *
    * @param {number} value MP変化量（正=回復、負=ダメージ）
@@ -475,6 +492,38 @@
     this._zombieMpDamaged = false;
 
     _Game_Battler_gainMp.call(this, value);
+  };
+
+  /**
+   * MP増加をMPダメージに反転する（AffectMp が有効なとき）
+   *
+   * gainMp 経由の呼び出しは反転後に mp < this._mp になるためこのフックを通過しない
+   *
+   * @param {number} mp 設定するMP値
+   */
+  const _Game_BattlerBase_setMp = Game_BattlerBase.prototype.setMp;
+  Game_BattlerBase.prototype.setMp = function(mp) {
+    // 指定MPが現在MPより大きく、かつゾンビステートのMP反転が有効な場合に反転処理
+    if (mp > this._mp && this.zombieAffectsMp?.()) {
+      const delta = mp - this._mp;
+
+      _Game_BattlerBase_setMp.call(this, this._mp - delta);
+      return;
+    }
+
+    _Game_BattlerBase_setMp.call(this, mp);
+  };
+
+  /**
+   * initTp の setTp 呼び出しを反転から除外するためのフラグを設定する
+   */
+  const _Game_Battler_initTp = Game_Battler.prototype.initTp;
+  Game_Battler.prototype.initTp = function() {
+    this._zombieIgnoreSetTp = true;
+
+    _Game_Battler_initTp.call(this);
+
+    this._zombieIgnoreSetTp = false;
   };
 
   /**
@@ -508,59 +557,6 @@
     }
 
     _Game_Battler_gainSilentTp.call(this, value);
-  };
-
-  /**
-   * HP増加をHPダメージに反転する
-   *
-   * gainHp 経由の呼び出しは反転後に hp < this._hp になるためこのフックを通過しない
-   * this._hp === 0 のとき（戦闘不能からの蘇生）はスキップする
-   *
-   * @param {number} hp 設定するHP値
-   */
-  const _Game_BattlerBase_setHp = Game_BattlerBase.prototype.setHp;
-  Game_BattlerBase.prototype.setHp = function(hp) {
-    // 指定HPが現在HPより大きく、かつ現在HPが0より大きく（戦闘不能でない）、ゾンビステートを持つ場合に反転処理
-    if (hp > this._hp && this._hp > 0 && this.hasZombieState?.()) {
-      const delta = hp - this._hp;
-
-      _Game_BattlerBase_setHp.call(this, this._hp - delta);
-      return;
-    }
-
-    _Game_BattlerBase_setHp.call(this, hp);
-  };
-
-  /**
-   * MP増加をMPダメージに反転する（AffectMp が有効なとき）
-   *
-   * gainMp 経由の呼び出しは反転後に mp < this._mp になるためこのフックを通過しない
-   *
-   * @param {number} mp 設定するMP値
-   */
-  const _Game_BattlerBase_setMp = Game_BattlerBase.prototype.setMp;
-  Game_BattlerBase.prototype.setMp = function(mp) {
-    // 指定MPが現在MPより大きく、かつゾンビステートのMP反転が有効な場合に反転処理
-    if (mp > this._mp && this.zombieAffectsMp?.()) {
-      const delta = mp - this._mp;
-
-      _Game_BattlerBase_setMp.call(this, this._mp - delta);
-      return;
-    }
-
-    _Game_BattlerBase_setMp.call(this, mp);
-  };
-
-  /**
-   * initTp の setTp 呼び出しを反転から除外するためのフラグを設定する
-   */
-  const _Game_Battler_initTp = Game_Battler.prototype.initTp;
-  Game_Battler.prototype.initTp = function() {
-    this._zombieIgnoreSetTp = true;
-
-    _Game_Battler_initTp.call(this);
-
-    this._zombieIgnoreSetTp = false;
   };
 
   /**
@@ -620,14 +616,14 @@
   /**
    * HPダメージ音をバトルログキュー経由で再生する
    */
-  Window_BattleLog.prototype.playZombieDamageSound = function() {
+  Window_BattleLog.prototype.zombieState_PlayHpDamageSound = function() {
     playZombieHpDamageSound();
   };
 
   /**
    * MPダメージ音をバトルログキュー経由で再生する
    */
-  Window_BattleLog.prototype.playZombieMpDamageSound = function() {
+  Window_BattleLog.prototype.zombieState_PlayMpDamageSound = function() {
     playZombieMpDamageSound();
   };
 
@@ -640,7 +636,7 @@
   Window_BattleLog.prototype.displayMpDamage = function(target) {
     if (target._zombieMpDamaged === true && target.result().mpDamage > 0) {
       target._zombieMpDamaged = false;
-      this.push('playZombieMpDamageSound');
+      this.push('zombieState_PlayMpDamageSound');
     }
 
     _Window_BattleLog_displayMpDamage.call(this, target);
@@ -660,7 +656,7 @@
 
     if (isZombieHpDamage) {
       subject._zombieHpDamaged = false;
-      this.push('playZombieDamageSound'); // ポップアップより前に音をキューへ積む
+      this.push('zombieState_PlayHpDamageSound'); // ポップアップより前に音をキューへ積む
     }
 
     _Window_BattleLog_displayRegeneration.call(this, subject);
