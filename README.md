@@ -52,6 +52,15 @@ HP : [https://hato-neko.x0.com](https://hato-neko.x0.com)
 **https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_EscapeRate**
 
 
+## 👠 HTN_ForcedSkillState
+
+一定確率で、指定したスキルを勝手に使ってしまうステート（状態異常）を作成できるようになるプラグインです。
+
+### 詳しい使い方はこちら：
+
+**https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_ForcedSkillState**
+
+
 ## 🩸 HTN_HPDrainState
 
 ターンが終わるたびにHPを吸収されるステート（状態異常）を作成できるプラグインです。
