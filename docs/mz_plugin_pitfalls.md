@@ -31,9 +31,9 @@
 
 **`initMembers` はセーブデータ読み込み時には呼ばれない。**
 
-`initMembers` が呼ばれるのは `new Game_Actor()` / `new Game_Enemy()` のタイミングのみ。
-プロジェクト途中からプラグインを追加した場合や、セーブデータを読み込んで戦闘を開始した場合は、
-すでに生成済みのバトラーインスタンスに対して `initMembers` は実行されない。
+`initMembers` が呼ばれるのは `new Game_Actor()` / `new Game_Enemy()` のタイミングのみ。  
+プロジェクト途中からプラグインを追加した場合や、セーブデータを読み込んで戦闘を開始した場合は、  
+すでに生成済みのバトラーインスタンスに対して `initMembers` は実行されない。  
 その結果、独自プロパティが `undefined` のままになり、実行時エラーになる。
 
 **解決策：バトル中にのみ使う独自プロパティは `onBattleStart` で初期化し、`onBattleEnd` でリセットする。**
@@ -62,7 +62,7 @@ Game_Battler.prototype.onBattleEnd = function() {
 
 `setupNewGame` → `Game_Battler.prototype.refresh` の流れで、**ゲーム開始時にも `removeState` が呼ばれる**。
 
-`removeState` をフックする場合、独自プロパティがまだ初期化されていない可能性があるため、
+`removeState` をフックする場合、独自プロパティがまだ初期化されていない可能性があるため、  
 必ず `null` チェックを入れること。
 
 ```javascript
@@ -81,10 +81,10 @@ Game_Battler.prototype.removeState = function(stateId) {
 
 ## `Game_Action.prototype.apply` はバトル外でも呼ばれる
 
-メニュー画面でのアイテム使用や、イベントスクリプトからのスキル実行など、
+メニュー画面でのアイテム使用や、イベントスクリプトからのスキル実行など、  
 `apply` は**戦闘中以外でも呼ばれる**。
 
-バトル専用の処理（ドレイン実行者の記録、バトルログへの書き込みなど）をフックする場合は、
+バトル専用の処理（ドレイン実行者の記録、バトルログへの書き込みなど）をフックする場合は、  
 冒頭に `$gameParty.inBattle()` チェックを入れること。
 
 ```javascript
@@ -101,14 +101,14 @@ Game_Action.prototype.apply = function(target) {
 
 ## ターン制バトルでのダメージポップアップは直接呼べない
 
-`regenerateAll`（ターン終了時の自然回復）の中でバトラーの `result` を設定して
+`regenerateAll`（ターン終了時の自然回復）の中でバトラーの `result` を設定して  
 `startDamagePopup()` を呼んでも、**ターン制バトルではポップアップが表示されない**。
 
-**原因：** `endAllBattlersTurn()` → `onTurnEnd()` → `clearResult()` が同期的に走るため、
-スプライト層がポップアップを処理する前に `result` が空になってしまう。
+**原因：** `endAllBattlersTurn()` → `onTurnEnd()` → `clearResult()` が同期的に走るため、  
+スプライト層がポップアップを処理する前に `result` が空になってしまう。  
 （TPBでは処理タイミングが異なるため問題は起きない）
 
-**解決策：** `Window_BattleLog.push('メソッド名', ...)` でキューに積み、
+**解決策：** `Window_BattleLog.push('メソッド名', ...)` でキューに積み、  
 キュー処理のタイミングで `result` を再セットする。
 
 ```javascript
@@ -127,7 +127,7 @@ this.push('showMyPopup', battler, amount);
 
 ## `Window_BattleLog` のキューパターン
 
-`Window_BattleLog.push(methodName, ...args)` でメソッド呼び出しをキューに積める。
+`Window_BattleLog.push(methodName, ...args)` でメソッド呼び出しをキューに積める。  
 キューはフレームごとに非同期で処理される。
 
 標準的なテキスト表示パターン：
@@ -144,7 +144,7 @@ this.push('clear');
 
 ## `displayAutoAffectedStatus` フックでメッセージを挿入する
 
-`Window_BattleLog.prototype.displayAutoAffectedStatus` は、
+`Window_BattleLog.prototype.displayAutoAffectedStatus` は、  
 アクション処理後にステート変化（付与・解除）のメッセージを表示するメソッド。
 
 このメソッドの先頭をフックすると、**ステート変化メッセージの前に**独自メッセージやポップアップを挿入できる。
@@ -172,7 +172,7 @@ Window_BattleLog.prototype.displayAutoAffectedStatus = function(subject) {
 
 ## ステートの `meta` はすべて文字列
 
-RPGツクールMZはメモ欄のタグを自動パースして `state.meta` に格納するが、
+RPGツクールMZはメモ欄のタグを自動パースして `state.meta` に格納するが、  
 **値はすべて文字列型**で返ってくる。数値・真偽値への変換は自分でおこなう必要がある。
 
 ```javascript
@@ -186,14 +186,14 @@ const flag = String(state.meta.MyFlag).toLowerCase() === 'true';
 const exists = state.meta.MyTag != null;
 ```
 
-タグ内の `<` や `>` はHTMLエンティティ（`&lt;` / `&gt;`）でエスケープして書かれる場合があり、
+タグ内の `<` や `>` はHTMLエンティティ（`&lt;` / `&gt;`）でエスケープして書かれる場合があり、  
 RPGツクールMZは自動変換しないため、`eval` などで使う前に手動で置換が必要。
 
 ```javascript
 const formula = String(state.meta.MyFormula ?? '').replace('&lt;', '<').replace('&gt;', '>');
 ```
 
-また、`state.meta` のキーはメモ欄に書かれたタグ名そのままになるため、
+また、`state.meta` のキーはメモ欄に書かれたタグ名そのままになるため、  
 **大文字小文字も含めて完全一致で参照する必要がある**。
 
 ```javascript
@@ -201,15 +201,15 @@ const formula = String(state.meta.MyFormula ?? '').replace('&lt;', '<').replace(
 // <Plugin_IDs: 2>  →  state.meta.Plugin_IDs
 ```
 
-`Ids` と `IDs` のような表記ゆれを許可したい場合は、
+`Ids` と `IDs` のような表記ゆれを許可したい場合は、  
 プラグイン側で別名タグとして明示的に読み取る必要がある。
 
 ---
 
 ## 通常攻撃によるステート付与の検出
 
-`item().effects` の各要素には `{ code, dataId, value1, value2 }` が入っている。
-`code === Game_Action.EFFECT_ADD_STATE`（= 21）がステート付与を意味するが、
+`item().effects` の各要素には `{ code, dataId, value1, value2 }` が入っている。  
+`code === Game_Action.EFFECT_ADD_STATE`（= 21）がステート付与を意味するが、  
 **`dataId === 0` は「通常攻撃のステート付与特性」を意味し、具体的なステートIDではない**。
 
 通常攻撃でのステート付与を検出したい場合は `subject().attackStates()` で実際のステートIDを確認する。
@@ -226,7 +226,7 @@ const hasAddDrainState = this.item().effects.some(
 
 ## エネミーの識別はインデックスでおこなう
 
-エネミーはアクターの `actorId` のような永続IDを持たない。
+エネミーはアクターの `actorId` のような永続IDを持たない。  
 **`$gameTroop.members()` 内のインデックス**（0始まり）で識別する。
 
 ```javascript
@@ -245,11 +245,11 @@ const enemy = $gameTroop.members()[enemyIndex];
 
 `Game_Actor` は `level` プロパティを持つが、**`Game_Enemy` には `level` が存在しない**（`undefined`）。
 
-`formula` タイプのダメージ計算式など、`drainer.level` や `drainTarget.level` を参照する処理では、
+`formula` タイプのダメージ計算式など、`drainer.level` や `drainTarget.level` を参照する処理では、  
 対象がエネミーの場合に `undefined` が返り、計算結果が `NaN` になったりエラーが発生したりする。
 
-ドキュメントやヘルプテキストで `level` を使える変数として紹介する場合は、
-「エネミーには `level` がないため注意」と明記すること。
+ドキュメントやヘルプテキストで `level` を使える変数として紹介する場合は、  
+「エネミーには `level` がないため注意」と明記すること。  
 式の中で使いたい場合は `battler.level ?? 1` のようにフォールバックを設けると安全。
 
 ```javascript
@@ -264,7 +264,7 @@ drainer.level * 10
 
 ## アクターの並び順は actorId とは異なる
 
-`actor.actorId()` はデータベース上の固定IDだが、
+`actor.actorId()` はデータベース上の固定IDだが、  
 **パーティーでの並び順は `$gameParty.members()` のインデックス**であり、これは動的に変わる。
 
 表示順などでパーティー順に並べたい場合は `findIndex` を使う。
@@ -277,10 +277,10 @@ const partyOrder = $gameParty.members().findIndex(m => m.actorId() === info.acto
 
 ## 死亡後のステート解除メッセージを正しい順序で表示する
 
-`die()` のフックの中で `displayAutoAffectedStatus` を直接呼ぶと、
+`die()` のフックの中で `displayAutoAffectedStatus` を直接呼ぶと、  
 **ダメージ表示や「〇〇は倒れた」メッセージより先にキューへ積まれてしまい**、順序が逆転する。
 
-`BattleManager.displayBattlerStatus` をフックし、死亡バトラーの表示処理が済んだ直後に
+`BattleManager.displayBattlerStatus` をフックし、死亡バトラーの表示処理が済んだ直後に  
 ペンディングリストを処理するパターンが有効。
 
 ```javascript
@@ -298,7 +298,7 @@ BattleManager.displayBattlerStatus = function(battler, current) {
 };
 ```
 
-また、解除メッセージだけを表示したい（付与メッセージを出したくない）場合は、
+また、解除メッセージだけを表示したい（付与メッセージを出したくない）場合は、  
 `result.addedStates` を一時的に空にしてから呼び出す。
 
 ```javascript
@@ -312,13 +312,13 @@ battler._result.addedStates = saved;
 
 ## `displayRegeneration` はダメージ音を鳴らさない
 
-スキル・アイテムによるHP変化は `displayHpDamage` → `push("performDamage")` → `target.performDamage()` の流れで
+スキル・アイテムによるHP変化は `displayHpDamage` → `push("performDamage")` → `target.performDamage()` の流れで  
 ダメージ音（`playActorDamage` / `playEnemyDamage`）が鳴る。
 
-一方、ターン終了時のリジェネは `displayRegeneration` → `push("popupDamage")` のみで、
+一方、ターン終了時のリジェネは `displayRegeneration` → `push("popupDamage")` のみで、  
 **`performDamage` は呼ばれない。つまりダメージ音は鳴らない。**
 
-リジェネに対してカスタムな音を鳴らしたい場合は、`displayRegeneration` をフックして
+リジェネに対してカスタムな音を鳴らしたい場合は、`displayRegeneration` をフックして  
 `Window_BattleLog.push` 経由で独自メソッドを積む。
 
 ```javascript
@@ -339,10 +339,10 @@ Window_BattleLog.prototype.displayRegeneration = function(subject) {
 
 ## `gainSilentTp` は result に記録しない
 
-`gainTp` は `result.tpDamage` に値を記録しTPのポップアップ・メッセージが出るが、
+`gainTp` は `result.tpDamage` に値を記録しTPのポップアップ・メッセージが出るが、  
 `gainSilentTp` は `setTp` を直接呼ぶだけで **result に何も記録しない**。
 
-ターン終了のTPリジェネ（`regenerateTp`）は `gainSilentTp` を使うため、
+ターン終了のTPリジェネ（`regenerateTp`）は `gainSilentTp` を使うため、  
 TPリジェネをポップアップ表示させたい場合は `gainSilentTp` を `gainTp` 経由に切り替える必要がある。
 
 ```javascript
@@ -360,11 +360,11 @@ Game_Battler.prototype.gainSilentTp = function(value) {
 
 ## `gainTp` だけフックしても TP 変化を完全には捕捉できない
 
-`gainTp` / `gainSilentTp` を経由せず `setTp` を直接呼んでTPを変化させるプラグインが存在する
+`gainTp` / `gainSilentTp` を経由せず `setTp` を直接呼んでTPを変化させるプラグインが存在する  
 （例：`NRP_RecoverAfterAction`）。
 
-TP変化を全パターンで捕捉したい場合は `setTp` 自体をフックする必要がある。
-ただし `initTp`（バトル開始時のTP初期化）も `setTp` を呼ぶため、
+TP変化を全パターンで捕捉したい場合は `setTp` 自体をフックする必要がある。  
+ただし `initTp`（バトル開始時のTP初期化）も `setTp` を呼ぶため、  
 `initTp` フックでバイパスフラグを設定して除外する。
 
 ```javascript
@@ -388,18 +388,18 @@ Game_BattlerBase.prototype.setTp = function(tp) {
 };
 ```
 
-`gainTp` → `setTp(this.tp + value)` と `gainSilentTp` → `setTp(this.tp + value)` も
-この `setTp` フックを通るが、`gainTp` / `gainSilentTp` 側で先に値を反転していれば
+`gainTp` → `setTp(this.tp + value)` と `gainSilentTp` → `setTp(this.tp + value)` も  
+この `setTp` フックを通るが、`gainTp` / `gainSilentTp` 側で先に値を反転していれば  
 `tp <= this._tp`（減少）になるためフックを素通りする。
 
 ---
 
 ## ダメージ音のカスタマイズは SoundManager フックでおこなう
 
-`performDamage` 内で呼ばれる `playActorDamage` / `playEnemyDamage` を差し替えたい場合、
+`performDamage` 内で呼ばれる `playActorDamage` / `playEnemyDamage` を差し替えたい場合、  
 `performDamage` 自体をオーバーライドすると音以外のアニメーション処理も複製する必要があり保守が難しい。
 
-代わりに `SoundManager.playActorDamage` / `playEnemyDamage` を一時フラグで抑制し、
+代わりに `SoundManager.playActorDamage` / `playEnemyDamage` を一時フラグで抑制し、  
 カスタム音を後から鳴らすパターンが簡潔。
 
 ```javascript
