@@ -344,57 +344,17 @@
     _SoundManager_playEnemyDamage.call(this);
   };
 
-  // ============================================================
-  // Game_Battler ヘルパーメソッド
-  // ============================================================
-
-  /**
-   * ゾンビステートを持つかどうかを返す
-   *
-   * @returns {boolean} ゾンビステートを持つ場合は true
-   */
-  Game_Battler.prototype.hasZombieState = function() {
-    return this.states().some((s) => s.meta.ZombieState != null);
-  };
-
   /**
    * 優先度が最も高いゾンビステートを返す
    *
+   * @param {Game_BattlerBase} battler 対象バトラー
    * @returns {RPG.State | null} 最優先のゾンビステート、なければ null
    */
-  Game_Battler.prototype.zombiePriorityState = function() {
-    return this.states().find((s) => s.meta.ZombieState != null) ?? null;
+  const zombiePriorityState = (battler) => {
+    if (typeof battler.states !== 'function') return null;
+
+    return battler.states().find((s) => s.meta.ZombieState != null) ?? null;
   };
-
-  /**
-   * MP回復反転が有効かどうかを返す
-   * ステートタグの設定がプラグインパラメータより優先される
-   *
-   * @returns {boolean} MP回復反転が有効な場合は true
-   */
-  Game_Battler.prototype.zombieAffectsMp = function() {
-    const state = this.zombiePriorityState();
-    if (state === null) return false;
-
-    return toBoolean(state.meta.ZombieState_MpReverse, paramMpReverse);
-  };
-
-  /**
-   * TP回復反転が有効かどうかを返す
-   * ステートタグの設定がプラグインパラメータより優先される
-   *
-   * @returns {boolean} TP回復反転が有効な場合は true
-   */
-  Game_Battler.prototype.zombieAffectsTp = function() {
-    const state = this.zombiePriorityState();
-    if (state === null) return false;
-
-    return toBoolean(state.meta.ZombieState_TpReverse, paramTpReverse);
-  };
-
-  // ============================================================
-  // バトル開始・終了時の独自プロパティ初期化
-  // ============================================================
 
   /**
    * バトル開始時に独自プロパティを初期化する
@@ -428,7 +388,7 @@
    */
   const _Game_Battler_gainHp = Game_Battler.prototype.gainHp;
   Game_Battler.prototype.gainHp = function(value) {
-    if (value > 0 && this.hasZombieState()) {
+    if (value > 0 && zombiePriorityState(this) !== null) {
       this._zombieHpDamaged = true;
 
       _Game_Battler_gainHp.call(this, -value);
@@ -458,7 +418,7 @@
   const _Game_BattlerBase_setHp = Game_BattlerBase.prototype.setHp;
   Game_BattlerBase.prototype.setHp = function(hp) {
     // 指定HPが現在HPより大きく、かつ現在HPが0より大きく（戦闘不能でない）、ゾンビステートを持つ場合に反転処理
-    if (hp > this._hp && this._hp > 0 && this.hasZombieState?.()) {
+    if (hp > this._hp && this._hp > 0 && zombiePriorityState(this) !== null) {
       const delta = hp - this._hp;
 
       _Game_BattlerBase_setHp.call(this, this._hp - delta);
@@ -475,18 +435,23 @@
    */
   const _Game_Battler_gainMp = Game_Battler.prototype.gainMp;
   Game_Battler.prototype.gainMp = function(value) {
-    if (value > 0 && this.zombieAffectsMp()) {
-      this._zombieMpDamaged = true;
+    if (value > 0) {
+      const zombieState = zombiePriorityState(this);
+      const affectsMp = zombieState !== null && toBoolean(zombieState.meta.ZombieState_MpReverse, paramMpReverse);
 
-      _Game_Battler_gainMp.call(this, -value);
+      if (affectsMp) {
+        this._zombieMpDamaged = true;
 
-      // バトル外では displayMpDamage が呼ばれないため直接再生（ただし、回復音とかぶって再生される）
-      if (!$gameParty.inBattle()) {
-        this._zombieMpDamaged = false;
-        playZombieMpDamageSound();
+        _Game_Battler_gainMp.call(this, -value);
+
+        // バトル外では displayMpDamage が呼ばれないため直接再生（ただし、回復音とかぶって再生される）
+        if (!$gameParty.inBattle()) {
+          this._zombieMpDamaged = false;
+          playZombieMpDamageSound();
+        }
+
+        return;
       }
-
-      return;
     }
 
     this._zombieMpDamaged = false;
@@ -504,11 +469,16 @@
   const _Game_BattlerBase_setMp = Game_BattlerBase.prototype.setMp;
   Game_BattlerBase.prototype.setMp = function(mp) {
     // 指定MPが現在MPより大きく、かつゾンビステートのMP反転が有効な場合に反転処理
-    if (mp > this._mp && this.zombieAffectsMp?.()) {
-      const delta = mp - this._mp;
+    if (mp > this._mp) {
+      const zombieState = zombiePriorityState(this);
+      const affectsMp = zombieState !== null && toBoolean(zombieState.meta.ZombieState_MpReverse, paramMpReverse);
 
-      _Game_BattlerBase_setMp.call(this, this._mp - delta);
-      return;
+      if (affectsMp) {
+        const delta = mp - this._mp;
+
+        _Game_BattlerBase_setMp.call(this, this._mp - delta);
+        return;
+      }
     }
 
     _Game_BattlerBase_setMp.call(this, mp);
@@ -533,9 +503,14 @@
    */
   const _Game_Battler_gainTp = Game_Battler.prototype.gainTp;
   Game_Battler.prototype.gainTp = function(value) {
-    if (value > 0 && this.zombieAffectsTp()) {
-      _Game_Battler_gainTp.call(this, -value);
-      return;
+    if (value > 0) {
+      const zombieState = zombiePriorityState(this);
+      const affectsTp = zombieState !== null && toBoolean(zombieState.meta.ZombieState_TpReverse, paramTpReverse);
+
+      if (affectsTp) {
+        _Game_Battler_gainTp.call(this, -value);
+        return;
+      }
     }
 
     _Game_Battler_gainTp.call(this, value);
@@ -551,9 +526,14 @@
    */
   const _Game_Battler_gainSilentTp = Game_Battler.prototype.gainSilentTp;
   Game_Battler.prototype.gainSilentTp = function(value) {
-    if (value > 0 && this.zombieAffectsTp()) {
-      this.gainTp(value);
-      return;
+    if (value > 0) {
+      const zombieState = zombiePriorityState(this);
+      const affectsTp = zombieState !== null && toBoolean(zombieState.meta.ZombieState_TpReverse, paramTpReverse);
+
+      if (affectsTp) {
+        this.gainTp(value);
+        return;
+      }
     }
 
     _Game_Battler_gainSilentTp.call(this, value);
@@ -569,11 +549,16 @@
    */
   const _Game_BattlerBase_setTp = Game_BattlerBase.prototype.setTp;
   Game_BattlerBase.prototype.setTp = function(tp) {
-    if (tp > this._tp && !this._zombieIgnoreSetTp && this.zombieAffectsTp?.()) {
-      const delta = tp - this._tp;
+    if (tp > this._tp && !this._zombieIgnoreSetTp) {
+      const zombieState = zombiePriorityState(this);
+      const affectsTp = zombieState !== null && toBoolean(zombieState.meta.ZombieState_TpReverse, paramTpReverse);
 
-      _Game_BattlerBase_setTp.call(this, this._tp - delta);
-      return;
+      if (affectsTp) {
+        const delta = tp - this._tp;
+
+        _Game_BattlerBase_setTp.call(this, this._tp - delta);
+        return;
+      }
     }
 
     _Game_BattlerBase_setTp.call(this, tp);
@@ -614,17 +599,16 @@
   };
 
   /**
-   * HPダメージ音をバトルログキュー経由で再生する
+   * ダメージ音をバトルログキュー経由で再生する
+   *
+   * @param {string} damageType ダメージ種別
    */
-  Window_BattleLog.prototype.zombieState_PlayHpDamageSound = function() {
-    playZombieHpDamageSound();
-  };
-
-  /**
-   * MPダメージ音をバトルログキュー経由で再生する
-   */
-  Window_BattleLog.prototype.zombieState_PlayMpDamageSound = function() {
-    playZombieMpDamageSound();
+  Window_BattleLog.prototype.zombieState_PlayDamageSound = function(damageType) {
+    if (damageType === 'mp') {
+      playZombieMpDamageSound();
+    } else {
+      playZombieHpDamageSound();
+    }
   };
 
   /**
@@ -636,7 +620,7 @@
   Window_BattleLog.prototype.displayMpDamage = function(target) {
     if (target._zombieMpDamaged === true && target.result().mpDamage > 0) {
       target._zombieMpDamaged = false;
-      this.push('zombieState_PlayMpDamageSound');
+      this.push('zombieState_PlayDamageSound', 'mp');
     }
 
     _Window_BattleLog_displayMpDamage.call(this, target);
@@ -656,7 +640,7 @@
 
     if (isZombieHpDamage) {
       subject._zombieHpDamaged = false;
-      this.push('zombieState_PlayHpDamageSound'); // ポップアップより前に音をキューへ積む
+      this.push('zombieState_PlayDamageSound', 'hp'); // ポップアップより前に音をキューへ積む
     }
 
     _Window_BattleLog_displayRegeneration.call(this, subject);
