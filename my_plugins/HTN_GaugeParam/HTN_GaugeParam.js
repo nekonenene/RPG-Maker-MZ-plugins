@@ -61,8 +61,8 @@
  * @type string
  *
  * @param RecoverySoundTrigger
- * @text Recovery Sound Direction
- * @desc Which change direction plays the recovery sound.
+ * @text Recovery Sound Trigger
+ * @desc Condition for playing the recovery sound during battle.
  * @default increase
  * @type select
  * @option On Increase
@@ -181,13 +181,18 @@
  * In formulas:
  *   a = action user (attacker/caster)
  *   b = target
- *   v = $gameVariables._data
+ *   v = game variables (e.g., v[1] accesses game variable ID 0001)
  *
  * Examples:
- *   <GaugeParam_Increase: 30>
+ *   <GaugeParam_Increase: 5>
  *   <GaugeParam_Increase: a.atk * 0.5>
- *   <GaugeParam_Decrease: b.mhp * 0.1>
+ *   <GaugeParam_Decrease: (a.mat - b.mdf) / 2>
  *   <GaugeParam_Decrease: v[1]>
+ *
+ * Boundary Value Triggers:
+ * When the value transitions to the maximum, the MaxCommonEvent common event is called.
+ * When the value transitions to 0, the MinCommonEvent common event is called.
+ * Neither re-triggers if the value is already at the boundary and changes further.
  *
  * Other plugins can access this parameter via the global HTN_GaugeParam class:
  *   HTN_GaugeParam.getValue(actor)
