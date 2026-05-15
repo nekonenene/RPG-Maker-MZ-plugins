@@ -60,7 +60,7 @@
  * @default %1's %2 decreased by %3!
  * @type string
  *
- * @param RecoverySound
+ * @param RecoverySoundTrigger
  * @text Recovery Sound Direction
  * @desc Which change direction plays the recovery sound.
  * @default increase
@@ -245,7 +245,7 @@
  * @default %1の%2が %3 減った！
  * @type string
  *
- * @param RecoverySound
+ * @param RecoverySoundTrigger
  * @text 戦闘中の回復音
  * @desc 戦闘中に回復音を鳴らす条件
  * @default increase
@@ -401,7 +401,7 @@
   const gaugeLabel = String(pluginParams.GaugeLabel || 'EP');
   const gaugeIncreaseMessage = String(pluginParams.GaugeIncreaseMessage ?? '');
   const gaugeDecreaseMessage = String(pluginParams.GaugeDecreaseMessage ?? '');
-  const recoverySoundDirection = String(pluginParams.RecoverySound || 'increase');
+  const recoverySoundTrigger = String(pluginParams.RecoverySoundTrigger || 'increase');
   const minCommonEventId = Number(pluginParams.MinCommonEvent || 0);
   const maxCommonEventId = Number(pluginParams.MaxCommonEvent || 0);
   const showInStatus = String(pluginParams.ShowInStatus) !== 'false';
@@ -728,10 +728,10 @@
     const amount = Math.abs(change);
 
     if (change > 0) {
-      if (recoverySoundDirection === 'increase') this.push('performRecovery', target);
+      if (recoverySoundTrigger === 'increase') this.push('performRecovery', target);
       if (gaugeIncreaseMessage !== '') this.push('addText', gaugeIncreaseMessage.format(target.name(), gaugeName, amount));
     } else {
-      if (recoverySoundDirection === 'decrease') this.push('performRecovery', target);
+      if (recoverySoundTrigger === 'decrease') this.push('performRecovery', target);
       if (gaugeDecreaseMessage !== '') this.push('addText', gaugeDecreaseMessage.format(target.name(), gaugeName, amount));
     }
   };
@@ -754,10 +754,10 @@
     const amount = Math.abs(change);
 
     if (change > 0) {
-      if (recoverySoundDirection === 'increase') this.push('performRecovery', subject);
+      if (recoverySoundTrigger === 'increase') this.push('performRecovery', subject);
       if (gaugeIncreaseMessage !== '') this.push('addText', gaugeIncreaseMessage.format(subject.name(), gaugeName, amount));
     } else {
-      if (recoverySoundDirection === 'decrease') this.push('performRecovery', subject);
+      if (recoverySoundTrigger === 'decrease') this.push('performRecovery', subject);
       if (gaugeDecreaseMessage !== '') this.push('addText', gaugeDecreaseMessage.format(subject.name(), gaugeName, amount));
     }
   };
