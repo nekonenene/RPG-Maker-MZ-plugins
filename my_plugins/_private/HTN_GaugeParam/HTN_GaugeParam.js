@@ -33,15 +33,15 @@
  * @default EP
  * @type string
  *
- * @param MaxCommonEvent
- * @text Common Event on Max
- * @desc Common event ID called when the value reaches the maximum. Set 0 to disable.
- * @default 0
- * @type common_event
- *
  * @param MinCommonEvent
  * @text Common Event on Min
  * @desc Common event ID called when the value reaches 0. Set 0 to disable.
+ * @default 0
+ * @type common_event
+ *
+ * @param MaxCommonEvent
+ * @text Common Event on Max
+ * @desc Common event ID called when the value reaches the maximum. Set 0 to disable.
  * @default 0
  * @type common_event
  *
@@ -158,15 +158,15 @@
  * @default EP
  * @type string
  *
- * @param MaxCommonEvent
- * @text 最大値到達コモンイベント
- * @desc 値が最大値に達したときに呼び出すコモンイベントID（0で無効）
- * @default 0
- * @type common_event
- *
  * @param MinCommonEvent
  * @text 最小値到達コモンイベント
  * @desc 値が0に達したときに呼び出すコモンイベントID（0で無効）
+ * @default 0
+ * @type common_event
+ *
+ * @param MaxCommonEvent
+ * @text 最大値到達コモンイベント
+ * @desc 値が最大値に達したときに呼び出すコモンイベントID（0で無効）
  * @default 0
  * @type common_event
  *
@@ -273,8 +273,8 @@
   const gaugeMax = Math.max(1, Number(pluginParams.GaugeMax || 100));
   const gaugeInitialValue = Math.max(0, Math.min(gaugeMax, Number(pluginParams.GaugeInitialValue || 0)));
   const gaugeLabel = String(pluginParams.GaugeLabel || 'EP');
-  const maxCommonEventId = Number(pluginParams.MaxCommonEvent || 0);
   const minCommonEventId = Number(pluginParams.MinCommonEvent || 0);
+  const maxCommonEventId = Number(pluginParams.MaxCommonEvent || 0);
   const gaugeColor1 = String(pluginParams.GaugeColor1 || '#ff80b0');
   const gaugeColor2 = String(pluginParams.GaugeColor2 || '#ff0060');
 
