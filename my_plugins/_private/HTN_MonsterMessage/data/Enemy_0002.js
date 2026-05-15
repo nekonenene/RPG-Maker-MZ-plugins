@@ -5,11 +5,22 @@ const S = HTN_MonsterMessage.STATE;
 const GV = HTN_MonsterMessage.GAME_VARIABLE;
 const CE = HTN_MonsterMessage.COMMON_EVENT;
 
+let encounterMessageShown = false; // 遭遇時のセリフを表示済みか保存
 let targetBeforeAttackStateIds = []; // 攻撃前の時点で対象に付与されていたステートID一覧
+
+// 戦闘開始時に変数を初期化する
+HTN_MonsterMessage.registerBattleStart(() => {
+  encounterMessageShown = false;
+  targetBeforeAttackStateIds = [];
+});
 
 // 遭遇時のセリフ
 HTN_MonsterMessage.registerEncountering(ENEMY_ID, ({ enemy, targets, target, messages, callCommonEvent }) => {
+  // 同一の敵キャラIDのセリフが表示済みなら、セリフ表示をスキップ
+  if (encounterMessageShown) return;
+
   messages.push('遭遇時のセリフのテスト');
+  encounterMessageShown = true;
 });
 
 // 攻撃前のセリフ
@@ -30,4 +41,9 @@ HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ enemy, skill, targets, targe
   if (messages.pending.length === 0) {
     messages.push('攻撃後のセリフのテスト');
   }
+});
+
+// ターン終了時のセリフ
+HTN_MonsterMessage.registerTurnEnd(ENEMY_ID, ({ enemy, targets, target, messages, callCommonEvent, setNextAction }) => {
+  messages.push('ターン終了時のセリフのテスト');
 });

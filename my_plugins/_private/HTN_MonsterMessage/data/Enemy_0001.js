@@ -6,8 +6,15 @@ const GV = HTN_MonsterMessage.GAME_VARIABLE;
 const CE = HTN_MonsterMessage.COMMON_EVENT;
 
 let targetBeforeAttackStateIds = []; // 攻撃前の時点で対象に付与されていたステートID一覧
+let maxTpMessageShown = {};          // TPが最大になったときのセリフを表示済みか保存
 
-// 遭遇時のセリフ
+// 戦闘開始時に変数を初期化する
+HTN_MonsterMessage.registerBattleStart(() => {
+  targetBeforeAttackStateIds = [];
+  maxTpMessageShown = {};
+});
+
+// 遭遇時
 HTN_MonsterMessage.registerEncountering(ENEMY_ID, ({ enemy, target, messages, callCommonEvent }) => {
   const metCount = $gameVariables.value(GV.MET_ENEMY_0001);
 
@@ -20,7 +27,7 @@ HTN_MonsterMessage.registerEncountering(ENEMY_ID, ({ enemy, target, messages, ca
   $gameVariables.setValue(GV.MET_ENEMY_0001, metCount + 1);
 });
 
-// 攻撃前のセリフ
+// 攻撃前
 HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ enemy, skill, target, messages, callCommonEvent, overwriteNextAction }) => {
   const rand = Math.random();
   targetBeforeAttackStateIds = target ? target.states().map(state => state.id) : [];
@@ -65,7 +72,7 @@ HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ enemy, skill, target, messa
   }
 });
 
-// 攻撃後のセリフ
+// 攻撃後
 HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ enemy, skill, target, messages, callCommonEvent, comboCount, addComboAttack }) => {
   const rand = Math.random();
 
@@ -126,5 +133,22 @@ HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ enemy, skill, target, messag
         messages.push('もう！\nこんなに起きないなんて、もう知りませんからね！');
       }
     }
+  }
+});
+
+// ターン終了時
+HTN_MonsterMessage.registerTurnEnd(ENEMY_ID, ({ enemy, messages, setNextAction }) => {
+  const enemyIndex = enemy.index();
+
+  if (enemy.tp >= enemy.maxTp() && maxTpMessageShown[enemyIndex] !== true) {
+    messages.name = '';
+    messages.push(`${enemy.name()}の力が満ちた！`);
+    messages.name = enemy.name();
+
+    setNextAction('誘惑の歌', { forcing: true });
+
+    maxTpMessageShown[enemyIndex] = true;
+  } else if (enemy.tp < enemy.maxTp() && maxTpMessageShown[enemyIndex] === true) {
+    maxTpMessageShown[enemyIndex] = false;
   }
 });
