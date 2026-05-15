@@ -48,6 +48,11 @@ HTN_MonsterMessage.loadDataScript('HTN_MonsterMessage/data/Enemy_0002');
 ### 登録メソッド
 
 ```javascript
+HTN_MonsterMessage.registerBattleStart(fn)
+```
+戦闘ごとにリセットしたい変数の初期化処理を登録します。
+
+```javascript
 HTN_MonsterMessage.registerEncountering(敵キャラID, fn)
 ```
 バトル開始時のセリフを登録します。  
@@ -177,15 +182,24 @@ HTN_MonsterMessage.registerTurnEnd(ENEMY_ID, ({ enemy, setNextAction }) => {
 });
 ```
 
-### 同じ敵キャラIDが複数いる場合のフラグ管理
+### 敵グループに同じ敵キャラIDの敵が複数いる場合
 
-`data/Enemy_0001.js` などのファイルスコープに定義した `let` 変数は、  
-同じ敵キャラIDの全個体で共有されます。  
+`data/Enemy_0001.js` などの敵ごとのファイルに定義した `let` 変数は、  
+同じ敵キャラIDの全個体で共有されます。また、戦闘後も値は保持されます。  
+
 個体別に値を持ちたい場合は `enemy.index()` をキーにしてください。  
 
-```javascript
-let maxTpMessageShown = {};
+フラグを個体別に管理する例：
 
+```javascript
+let maxTpMessageShown = {}; // TPが最大になったときのセリフを表示済みか保存
+
+// 戦闘ごとに変数が初期化されるようにする
+HTN_MonsterMessage.registerBattleStart(() => {
+  maxTpMessageShown = {};
+});
+
+// ターン終了時
 HTN_MonsterMessage.registerTurnEnd(ENEMY_ID, ({ enemy, messages }) => {
   const enemyIndex = enemy.index();
   if (enemy.tp >= 100 && maxTpMessageShown[enemyIndex] !== true) {
@@ -194,6 +208,8 @@ HTN_MonsterMessage.registerTurnEnd(ENEMY_ID, ({ enemy, messages }) => {
     messages.name = enemy.name();
 
     maxTpMessageShown[enemyIndex] = true;
+  } else if (enemy.tp < 100 && maxTpMessageShown[enemyIndex] === true) {
+    maxTpMessageShown[enemyIndex] = false;
   }
 });
 ```

@@ -23,6 +23,9 @@
  *
  * --- 登録メソッド ---
  *
+ * HTN_MonsterMessage.registerBattleStart(fn)
+ *   戦闘開始時の処理を登録する
+ *
  * HTN_MonsterMessage.registerEncountering(敵キャラID, fn)
  *   バトル開始時（「○○があらわれた！」の直後）のセリフを登録する
  *
@@ -73,6 +76,9 @@
 (() => {
   'use strict';
 
+  // registerBattleStart で登録されるコールバック一覧
+  const _battleStartCallbacks = [];
+
   // 敵キャラIDをキーとするコールバックのレジストリ
   const _encounterRegistry = {};
   const _beforeRegistry    = {};
@@ -80,6 +86,15 @@
   const _turnEndRegistry   = {};
 
   const _api = {
+    /**
+     * 戦闘開始時のコールバックを登録する
+     *
+     * @param {function} fn
+     */
+    registerBattleStart(fn) {
+      _battleStartCallbacks.push(fn);
+    },
+
     /**
      * 遭遇時のセリフコールバックを登録する
      *
@@ -449,6 +464,11 @@
   const _BattleManager_startBattle = BattleManager.startBattle;
   BattleManager.startBattle = function() {
     this._HTN_MonsterMessage_NextActionRequests = {};
+
+    // registerBattleStart で登録された処理を順番に呼び出す
+    for (const fn of _battleStartCallbacks) {
+      fn();
+    }
 
     _BattleManager_startBattle.call(this);
   };
