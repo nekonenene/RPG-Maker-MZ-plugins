@@ -45,6 +45,24 @@
  * @default 0
  * @type common_event
  *
+ * @param ShowInStatus
+ * @text Show in Status Screen
+ * @desc Show the gauge in the status screen.
+ * @default true
+ * @type boolean
+ *
+ * @param PriorityOverTP
+ * @text Priority Over TP in Status
+ * @desc When TP is displayed, replace the TP gauge with this gauge in the status screen. Has no effect when ShowInStatus is false.
+ * @default true
+ * @type boolean
+ *
+ * @param ShowInBattle
+ * @text Show in Battle Status
+ * @desc Show the gauge in the battle status window. It is displayed after HP/MP/TP as a fourth gauge.
+ * @default true
+ * @type boolean
+ *
  * @param GaugeColor1
  * @text Gauge Color 1
  * @desc Left gradient color of the gauge (CSS color string).
@@ -170,6 +188,24 @@
  * @default 0
  * @type common_event
  *
+ * @param ShowInStatus
+ * @text ステータス画面に表示
+ * @desc ステータス画面にゲージを表示する
+ * @default true
+ * @type boolean
+ *
+ * @param PriorityOverTP
+ * @text ステータス画面でTPより優先
+ * @desc 「ステータス画面に表示」がオンで、TP表示もオンのとき、TPゲージでなくこのゲージを表示する
+ * @default true
+ * @type boolean
+ *
+ * @param ShowInBattle
+ * @text 戦闘画面に表示
+ * @desc 戦闘画面のバトルステータスにゲージを表示する。HP/MP/TPの後に4本目として表示される
+ * @default true
+ * @type boolean
+ *
  * @param GaugeColor1
  * @text ゲージカラー1
  * @desc ゲージのグラデーション左端の色（CSS カラー文字列）
@@ -275,6 +311,9 @@
   const gaugeLabel = String(pluginParams.GaugeLabel || 'EP');
   const minCommonEventId = Number(pluginParams.MinCommonEvent || 0);
   const maxCommonEventId = Number(pluginParams.MaxCommonEvent || 0);
+  const showInStatus = String(pluginParams.ShowInStatus) !== 'false';
+  const priorityOverTP = String(pluginParams.PriorityOverTP) !== 'false';
+  const showInBattle = String(pluginParams.ShowInBattle) !== 'false';
   const gaugeColor1 = String(pluginParams.GaugeColor1 || '#ff80b0');
   const gaugeColor2 = String(pluginParams.GaugeColor2 || '#ff0060');
 
@@ -321,6 +360,7 @@
     }
   }
 
+  // グローバルクラスとして公開
   window.HTN_GaugeParam = HTN_GaugeParam;
 
   PluginManager.registerCommand(pluginName, 'ChangeValue', (args) => {
@@ -489,7 +529,13 @@
   };
 
   /**
-   * バトルステータスやステータス画面にゲージを追加する
+   * ゲージをステータス画面・戦闘画面に配置する
+   *
+   * 戦闘画面: ShowInBattle が true のとき、HP/MP/TP の後に4本目として配置
+   * ステータス画面:
+   *   ShowInStatus が false → オリジナルのまま
+   *   TP非表示 or PriorityOverTP が true → HP/MP/独自パラメーター の3本
+   *   TP表示 かつ PriorityOverTP が false → オリジナルのまま
    *
    * @param {Game_Actor} actor 対象アクター
    * @param {number} x X座標
@@ -497,20 +543,38 @@
    */
   const _Window_StatusBase_placeBasicGauges = Window_StatusBase.prototype.placeBasicGauges;
   Window_StatusBase.prototype.placeBasicGauges = function(actor, x, y) {
-    _Window_StatusBase_placeBasicGauges.call(this, actor, x, y);
+    if (this instanceof Window_BattleStatus) {
+      _Window_StatusBase_placeBasicGauges.call(this, actor, x, y);
 
-    const offset = $dataSystem.optDisplayTp ? 3 : 2;
-    this.placeGauge(actor, 'gaugeparam', x, y + this.gaugeLineHeight() * offset);
+      if (showInBattle) {
+        const offset = $dataSystem.optDisplayTp ? 3 : 2;
+        this.placeGauge(actor, 'gaugeparam', x, y + this.gaugeLineHeight() * offset);
+      }
+
+      return;
+    }
+
+    if (!showInStatus || ($dataSystem.optDisplayTp && !priorityOverTP)) {
+      _Window_StatusBase_placeBasicGauges.call(this, actor, x, y);
+    } else {
+      this.placeGauge(actor, 'hp', x, y);
+      this.placeGauge(actor, 'mp', x, y + this.gaugeLineHeight());
+      this.placeGauge(actor, 'gaugeparam', x, y + this.gaugeLineHeight() * 2);
+    }
   };
 
   /**
-   * ゲージ1行分を確保するためゲージ開始位置を上にずらす
+   * 戦闘時のステータス表示において、独自パラメーターのゲージ分を確保するため Y 座標を調整
    *
    * @param {Rectangle} rect アイテム矩形
    * @returns {number}
    */
   const _Window_BattleStatus_basicGaugesY = Window_BattleStatus.prototype.basicGaugesY;
   Window_BattleStatus.prototype.basicGaugesY = function(rect) {
-    return _Window_BattleStatus_basicGaugesY.call(this, rect) - this.gaugeLineHeight();
+    if (showInBattle) {
+      return _Window_BattleStatus_basicGaugesY.call(this, rect) - this.gaugeLineHeight();
+    }
+
+    return _Window_BattleStatus_basicGaugesY.call(this, rect);
   };
 })();
