@@ -166,6 +166,16 @@
  * @default 1
  * @type variable
  *
+ * @command InitValue
+ * @text Init Value
+ * @desc Resets the parameter value of an actor to the initial value.
+ *
+ * @arg actorId
+ * @text Actor ID
+ * @desc ID of the actor to reset.
+ * @default 1
+ * @type actor
+ *
  * @help
  * Adds a gauge-based custom parameter to actors.
  * The value ranges from 0 to the configured maximum (default: 100).
@@ -195,9 +205,10 @@
  * Neither re-triggers if the value is already at the boundary and changes further.
  *
  * Other plugins can access this parameter via the global HTN_GaugeParam class:
- *   HTN_GaugeParam.getValue(actor)
- *   HTN_GaugeParam.setValue(actor, value)
- *   HTN_GaugeParam.changeValue(actor, delta)
+ *   HTN_GaugeParam.getValue(actor)           Get value
+ *   HTN_GaugeParam.initValue(actor)          Reset to initial value
+ *   HTN_GaugeParam.setValue(actor, value)    Set to specified value
+ *   HTN_GaugeParam.changeValue(actor, delta) Increase or decrease by delta
  */
 
 /*:ja
@@ -356,6 +367,16 @@
  * @default 1
  * @type variable
  *
+ * @command InitValue
+ * @text 値を初期値に戻す
+ * @desc アクターのパラメータ値を初期値に戻します
+ *
+ * @arg actorId
+ * @text アクターID
+ * @desc 対象のアクターID
+ * @default 1
+ * @type actor
+ *
  * @help
  * アクターにゲージ付きの独自パラメータを追加します。
  * 値は０〜設定した最大値の範囲で変動します。
@@ -390,6 +411,7 @@
  * このプラグインを先に読み込んでいるとき、
  * グローバルクラス HTN_GaugeParam を通じてパラメータの値にアクセスできます：
  *   HTN_GaugeParam.getValue(actor)           値の取得
+ *   HTN_GaugeParam.initValue(actor)          初期値に戻す
  *   HTN_GaugeParam.setValue(actor, value)    第２引数の値に設定
  *   HTN_GaugeParam.changeValue(actor, delta) 第２引数の値で増減
  */
@@ -424,6 +446,15 @@
      */
     static getValue(actor) {
       return actor._HTN_GaugeParam_Value ?? gaugeInitialValue;
+    }
+
+    /**
+     * アクターのパラメータ値を初期値に戻す
+     *
+     * @param {Game_Actor} actor 対象アクター
+     */
+    static initValue(actor) {
+      actor._HTN_GaugeParam_Value = gaugeInitialValue;
     }
 
     /**
@@ -472,6 +503,13 @@
     if (actor == null) return;
 
     HTN_GaugeParam.setValue(actor, Number(args.value));
+  });
+
+  PluginManager.registerCommand(pluginName, 'InitValue', (args) => {
+    const actor = $gameActors.actor(Number(args.actorId));
+    if (actor == null) return;
+
+    HTN_GaugeParam.initValue(actor);
   });
 
   PluginManager.registerCommand(pluginName, 'GetValue', (args) => {
