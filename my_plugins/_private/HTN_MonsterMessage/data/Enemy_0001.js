@@ -8,7 +8,7 @@ const CE = HTN_MonsterMessage.COMMON_EVENT;
 let targetBeforeAttackStateIds = []; // 攻撃前の時点で対象に付与されていたステートID一覧
 
 // 遭遇時のセリフ
-HTN_MonsterMessage.registerEncountering(ENEMY_ID, ({ subject, target, messages, callCommonEvent }) => {
+HTN_MonsterMessage.registerEncountering(ENEMY_ID, ({ enemy, target, messages, callCommonEvent }) => {
   const metCount = $gameVariables.value(GV.MET_ENEMY_0001);
 
   if (metCount === 0) {
@@ -21,7 +21,7 @@ HTN_MonsterMessage.registerEncountering(ENEMY_ID, ({ subject, target, messages, 
 });
 
 // 攻撃前のセリフ
-HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, target, messages, callCommonEvent, overwriteNextAction }) => {
+HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ enemy, skill, target, messages, callCommonEvent, overwriteNextAction }) => {
   const rand = Math.random();
   targetBeforeAttackStateIds = target ? target.states().map(state => state.id) : [];
 
@@ -66,15 +66,15 @@ HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, target, mes
 });
 
 // 攻撃後のセリフ
-HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, target, messages, callCommonEvent, comboCount, addComboAttack }) => {
+HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ enemy, skill, target, messages, callCommonEvent, comboCount, addComboAttack }) => {
   const rand = Math.random();
 
   if (target.hp <= 0) {
     messages.push('お疲れですか？\nでは、ゆっくりお休みください……♥');
 
     messages.name = '';
-    messages.push(`${subject.name()}は${target.name()}に顔を近付け、\nにこやかと見つめている`);
-    messages.name = subject.name();
+    messages.push(`${enemy.name()}は${target.name()}に顔を近付け、\nにこやかと見つめている`);
+    messages.name = enemy.name();
     return;
   }
 
@@ -85,7 +85,7 @@ HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, target, mess
 
         messages.name = '';
         messages.push(`${target.name()}の混乱は魅了に変化した！`);
-        messages.name = subject.name();
+        messages.name = enemy.name();
 
         target.addState(S.CHARM);
         target.removeState(S.CONFUSION);

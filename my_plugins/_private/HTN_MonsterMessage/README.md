@@ -66,13 +66,13 @@ HTN_MonsterMessage.registerAfterAttack(敵キャラID, fn)
 ### コールバック引数
 
 ```javascript
-fn({ skill, subject, targets, target, messages, callCommonEvent, overwriteNextAction, addComboAttack, comboCount })
+fn({ enemy, skill, targets, target, messages, callCommonEvent, overwriteNextAction, addComboAttack, comboCount })
 ```
 
 | 引数 | 型 | 説明 |
 |---|---|---|
+| `enemy` | Game_Enemy | セリフを喋る敵キャラ |
 | `skill` | object | 使用スキル（`$dataSkills` の要素）。`skill.id` や `skill.name` で参照。`registerEncountering` では渡されない |
-| `subject` | Game_Enemy | 行動中の敵キャラ |
 | `targets` | Game_Battler[] | 対象バトラーの配列（パーティー並び順） |
 | `target` | Game_Battler or null | `targets[0]` のショートハンド。対象なしの場合 null |
 | `messages` | object | メッセージビルダー（後述） |
@@ -188,19 +188,19 @@ const CE = HTN_MonsterMessage.COMMON_EVENT;
 let targetBeforeAttackStateIds = []; // 攻撃前の時点で対象に付与されていたステートID一覧
 
 // 遭遇時のセリフ
-HTN_MonsterMessage.registerEncountering(ENEMY_ID, ({ subject, targets, target, messages, callCommonEvent }) => {
+HTN_MonsterMessage.registerEncountering(ENEMY_ID, ({ enemy, targets, target, messages, callCommonEvent }) => {
   messages.push('遭遇時のセリフのテスト');
 });
 
 // 攻撃前のセリフ
-HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ skill, subject, targets, target, messages, callCommonEvent, comboCount }) => {
+HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ enemy, skill, targets, target, messages, callCommonEvent, comboCount }) => {
   targetBeforeAttackStateIds = target ? target.states().map(state => state.id) : [];
 
   messages.push('攻撃前のセリフのテスト');
 });
 
 // 攻撃後のセリフ
-HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ skill, subject, targets, target, messages, callCommonEvent, comboCount, addComboAttack }) => {
+HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ enemy, skill, targets, target, messages, callCommonEvent, comboCount, addComboAttack }) => {
   // 敵すべてに攻撃が当たった後のセリフ
   if (targets.every(t => t.result().success)) {
     messages.push('攻撃成功時のセリフ');

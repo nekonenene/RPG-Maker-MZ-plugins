@@ -35,13 +35,13 @@
  *
  * --- コールバック引数 ---
  *
- *   fn({ skill, subject, targets, target, messages, callCommonEvent, overwriteNextAction, addComboAttack, comboCount })
+ *   fn({ enemy, skill, targets, target, messages, callCommonEvent, overwriteNextAction, addComboAttack, comboCount })
  *   ※ registerEncountering の fn は skill / comboCount / overwriteNextAction / addComboAttack を持たない
  *   ※ overwriteNextAction は registerBeforeAttack のみ有効
  *   ※ addComboAttack は registerAfterAttack のみ有効
  *
+ *   enemy      : セリフを喋る敵キャラ (Game_Enemy)
  *   skill      : 使用スキル ($dataSkills の要素。skill.id や skill.name で参照)
- *   subject    : 行動中の敵キャラ (Game_Enemy)
  *   targets    : 対象バトラーの配列（パーティー並び順）
  *   target     : targets[0]（単体攻撃向けショートハンド。対象なしの場合 null）
  *   messages   : メッセージビルダー
@@ -139,14 +139,14 @@
   /**
    * messages ビルダーオブジェクトと内部バッファを生成して返す
    *
-   * @param {Game_Enemy} subject
+   * @param {Game_Enemy} enemy
    * @param {number} [defaultBackground=1] background のデフォルト値
    * @returns {{ pending: object[], messages: object }}
    */
-  function createMessagesBuilder(subject, defaultBackground = 1) {
+  function createMessagesBuilder(enemy, defaultBackground = 1) {
     const pending = [];
     const messages = {
-      name:       subject.name(),    // デフォルト話者名はモンスター名。空文字にすると話者名なしになる
+      name:       enemy.name(),      // デフォルト話者名はモンスター名。空文字にすると話者名なしになる
       face:       ['', 0],           // 顔グラ。例えば妖精は ['Nature', 5]
       background: defaultBackground, // 0: 通常, 1: 暗く, 2: 透明
       position:   2,                 // 0: 上, 1: 中, 2: 下
@@ -321,7 +321,7 @@
         // そのため ID をここでは保持しておき、updateStart でメッセージキューが尽きたときにコモンイベントが走るようにする。
         const callCommonEvent = (commonEventId) => { this._HTN_MonsterMessage_EncounterCommonEvents.push(commonEventId); };
 
-        fn({ subject: enemy, targets, target: targets[0] ?? null, messages, callCommonEvent });
+        fn({ enemy, targets, target: targets[0] ?? null, messages, callCommonEvent });
 
         this._HTN_MonsterMessage_EncounterQueue.push(...pending);
       }
@@ -365,12 +365,12 @@
    * コールバックを呼び出し、メッセージとコモンイベントをログウィンドウのキューへ積む
    *
    * @param {function} fn
-   * @param {{skill: object, subject: Game_Enemy, targets: Game_Battler[], comboCount: number}} ctx
+   * @param {{enemy: Game_Enemy, skill: object, targets: Game_Battler[], comboCount: number}} ctx
    * @param {Window_BattleLog} logWindow
    * @param {object} [extraArgs={}] fn に追加で渡す引数（overwriteNextAction / addComboAttack など）
    */
   function invokeCallbackAndQueue(fn, ctx, logWindow, extraArgs = {}) {
-    const { pending, messages } = createMessagesBuilder(ctx.subject);
+    const { pending, messages } = createMessagesBuilder(ctx.enemy);
     const _commonEventRequests = [];
     const callCommonEvent = (commonEventId) => { _commonEventRequests.push(commonEventId); };
 
@@ -412,7 +412,7 @@
           }
         };
 
-        invokeCallbackAndQueue(fn, { skill: action.item(), subject, targets, comboCount }, this._logWindow, { overwriteNextAction });
+        invokeCallbackAndQueue(fn, { enemy: subject, skill: action.item(), targets, comboCount }, this._logWindow, { overwriteNextAction });
 
         if (_overwriteRequest !== null) {
           const originalActions = [...subject._actions];
@@ -457,7 +457,7 @@
           _comboRequest = { skillIdOrName: skillIdOrName ?? null };
         };
 
-        invokeCallbackAndQueue(fn, { skill: action.item(), subject, targets, comboCount }, this._logWindow, { addComboAttack });
+        invokeCallbackAndQueue(fn, { enemy: subject, skill: action.item(), targets, comboCount }, this._logWindow, { addComboAttack });
 
         if (_comboRequest != null) {
           this._logWindow.push('setupComboAttack', subject, _comboRequest.skillIdOrName);
