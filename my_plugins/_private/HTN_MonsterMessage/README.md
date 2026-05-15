@@ -63,10 +63,17 @@ HTN_MonsterMessage.registerAfterAttack(敵キャラID, fn)
 ```
 行動後のセリフを登録します。
 
+```javascript
+HTN_MonsterMessage.registerTurnEnd(敵キャラID, fn)
+```
+ターン終了時のセリフを登録します。  
+ターン終了時のステート解除・リジェネ表示が終わった後に呼び出されます。TPB バトルでは呼び出されません。  
+登録済みかつ生存している敵キャラ全員に対して、敵グループの並び順で実行されます。  
+
 ### コールバック引数
 
 ```javascript
-fn({ enemy, skill, targets, target, messages, callCommonEvent, overwriteNextAction, addComboAttack, comboCount })
+fn({ enemy, skill, targets, target, messages, callCommonEvent, overwriteNextAction, addComboAttack, setNextAction, comboCount })
 ```
 
 | 引数 | 型 | 説明 |
@@ -79,6 +86,7 @@ fn({ enemy, skill, targets, target, messages, callCommonEvent, overwriteNextActi
 | `callCommonEvent` | function | メッセージ後にコモンイベントを呼び出す（後述） |
 | `overwriteNextAction` | function or undefined | 発動スキル上書き関数（`registerBeforeAttack` のみ有効。後述） |
 | `addComboAttack` | function or undefined | 連撃予約関数（`registerAfterAttack` のみ有効。後述） |
+| `setNextAction` | function or undefined | 次ターンの行動予約関数（`registerTurnEnd` のみ有効。後述） |
 | `comboCount` | number | 連撃回数（0 = 初撃、1 = 1回目の連撃…）。`registerEncountering` では渡されない |
 
 ### messages ビルダー
@@ -114,6 +122,7 @@ registerBeforeAttack もしくは registerAfterAttack 内で callCommonEvent を
 | `registerEncountering` | セリフ完了後 | `$gameTroop._interpreter` で実行（`$gameTemp.reserveCommonEvent` 経由） |
 | `registerBeforeAttack` | セリフ完了後・アクション実行直前 | ログウィンドウ内の独立したインタープリタで実行 |
 | `registerAfterAttack` | セリフ完了後 | 同上 |
+| `registerTurnEnd` | セリフ完了後 | 同上 |
 
 ### overwriteNextAction
 
@@ -128,6 +137,8 @@ overwriteNextAction(skillIdOrName)
 混乱やスキル封印、MP/TP不足などの使用可否判定を加味せず、指定したスキルを使用します。  
 MPやTPが必要量より不足していても発動し、 paySkillCost の実装を見る限りではマイナスになりえます。
 
+混乱や魅了時にスキルを上書きしないようにするには `if (!enemy.isConfused())` で分岐するとよいでしょう。  
+
 ### addComboAttack
 
 ```javascript
@@ -141,6 +152,52 @@ addComboAttack(skillIdOrName?)
 - 省略または `null` を渡した場合や、スキル名が見つからない場合は自動で行動が決まる
 
 `comboCount` をチェックすることで連撃回数を制限できます。
+
+### setNextAction
+
+```javascript
+setNextAction(skillIdOrName, options)
+```
+
+`registerTurnEnd` のコールバック内でのみ有効です。  
+次ターンの行動決定後に、指定したスキルへ上書きします。  
+
+- `number` を渡すとスキルIDで、`string` を渡すとスキル名で検索して使用する
+- `options.forcing` は省略時 `true`
+- `options.forcing: true` の場合、混乱やスキル封印、MP/TP不足などの使用可否判定を加味しない
+- `options.forcing: false` の場合、混乱や魅了時には通常攻撃になり、MP/TP不足やスキル封印時には行動せずに終了する
+
+混乱や魅了時にはその通りに動いてほしいけど、MP不足などは無視したい場合は、  
+以下のように `!enemy.isConfused()` を活用するとよいでしょう。
+
+```javascript
+HTN_MonsterMessage.registerTurnEnd(ENEMY_ID, ({ enemy, setNextAction }) => {
+  if (!enemy.isConfused() && enemy.hp / enemy.mhp < 0.1) {
+    setNextAction('すごい必殺技', { forcing: true });
+  }
+});
+```
+
+### 同じ敵キャラIDが複数いる場合のフラグ管理
+
+`data/Enemy_0001.js` などのファイルスコープに定義した `let` 変数は、  
+同じ敵キャラIDの全個体で共有されます。  
+個体別に値を持ちたい場合は `enemy.index()` をキーにしてください。  
+
+```javascript
+let maxTpMessageShown = {};
+
+HTN_MonsterMessage.registerTurnEnd(ENEMY_ID, ({ enemy, messages }) => {
+  const enemyIndex = enemy.index();
+  if (enemy.tp >= 100 && maxTpMessageShown[enemyIndex] !== true) {
+    messages.name = '';
+    messages.push(`${enemy.name()}の力が満ちた！`);
+    messages.name = enemy.name();
+
+    maxTpMessageShown[enemyIndex] = true;
+  }
+});
+```
 
 ## data/ ファイルの書き方
 

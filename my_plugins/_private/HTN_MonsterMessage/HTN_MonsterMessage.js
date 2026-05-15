@@ -33,12 +33,17 @@
  * HTN_MonsterMessage.registerAfterAttack(敵キャラID, fn)
  *   行動後（モンスターが元の位置に戻ったあと）のセリフを登録する
  *
+ * HTN_MonsterMessage.registerTurnEnd(敵キャラID, fn)
+ *   ターン終了時のセリフを登録する
+ *
  * --- コールバック引数 ---
  *
  *   fn({ enemy, skill, targets, target, messages, callCommonEvent, overwriteNextAction, addComboAttack, comboCount })
  *   ※ registerEncountering の fn は skill / comboCount / overwriteNextAction / addComboAttack を持たない
+ *   ※ registerTurnEnd の fn は skill / comboCount / overwriteNextAction / addComboAttack を持たない
  *   ※ overwriteNextAction は registerBeforeAttack のみ有効
  *   ※ addComboAttack は registerAfterAttack のみ有効
+ *   ※ setNextAction は registerTurnEnd のみ有効
  *
  *   enemy      : セリフを喋る敵キャラ (Game_Enemy)
  *   skill      : 使用スキル ($dataSkills の要素。skill.id や skill.name で参照)
@@ -62,6 +67,8 @@
  *                        混乱やスキル封印、MP/TP不足などの使用可否判定を加味しない
  *                        省略または null のとき AI に行動を委ねる
  *                        コールバック内で comboCount をチェックすることで連撃回数を制限できる
+ *   setNextAction(skillIdOrName, { forcing }) : 次ターンの行動を予約する（registerTurnEnd のみ有効）
+ *                        forcing は省略時 true。false の場合は使用可否判定を加味され、設定した行動が上書きされうる
  */
 
 (() => {
@@ -71,6 +78,7 @@
   const _encounterRegistry = {};
   const _beforeRegistry    = {};
   const _afterRegistry     = {};
+  const _turnEndRegistry   = {};
 
   const _api = {
     /**
@@ -101,6 +109,16 @@
      */
     registerAfterAttack(enemyId, fn) {
       _afterRegistry[enemyId] = fn;
+    },
+
+    /**
+     * ターン終了時のセリフコールバックを登録する
+     *
+     * @param {number} enemyId
+     * @param {function} fn
+     */
+    registerTurnEnd(enemyId, fn) {
+      _turnEndRegistry[enemyId] = fn;
     },
   };
 
@@ -385,6 +403,86 @@
   }
 
   /**
+   * ターン終了時コールバックを、生存している登録済みモンスター全員に対して呼び出す
+   *
+   * @param {Window_BattleLog} logWindow
+   */
+  function invokeTurnEndCallbacks(logWindow) {
+    const actors = $gameParty.battleMembers();
+    const enemies = $gameTroop.aliveMembers();
+
+    for (const enemy of enemies) {
+      const fn = _turnEndRegistry[enemy.enemyId()];
+      if (fn == null) continue;
+
+      const { pending, messages } = createMessagesBuilder(enemy);
+      const commonEventRequests = [];
+      let nextActionRequest = null;
+      const callCommonEvent = (commonEventId) => { commonEventRequests.push(commonEventId); };
+      const setNextAction = function(skillIdOrName, options = {}) {
+        if (skillIdOrName == null) return;
+
+        nextActionRequest = {
+          skillIdOrName,
+          forcing: options == null || options.forcing !== false,
+        };
+      };
+
+      fn({
+        enemy,
+        targets: actors,
+        target: actors[0] ?? null,
+        messages,
+        callCommonEvent,
+        setNextAction,
+      });
+
+      if (nextActionRequest != null) {
+        BattleManager._HTN_MonsterMessage_NextActionRequests[enemy.index()] = nextActionRequest;
+      }
+
+      for (const m of pending) {
+        logWindow.push('htnMonsterMessage_ShowMonsterMessage', m.text, m.name, m.face[0], m.face[1], m.background, m.position);
+      }
+      for (const id of commonEventRequests) {
+        logWindow.push('htnMonsterMessage_RunCommonEvent', id);
+      }
+    }
+  }
+
+  /**
+   * 戦闘開始時に独自プロパティを初期化
+   */
+  const _BattleManager_startBattle = BattleManager.startBattle;
+  BattleManager.startBattle = function() {
+    this._HTN_MonsterMessage_NextActionRequests = {};
+
+    _BattleManager_startBattle.call(this);
+  };
+
+  /**
+   * 行動予約があれば、敵キャラの行動決定後に上書きする
+   */
+  const _Game_Enemy_makeActions = Game_Enemy.prototype.makeActions;
+  Game_Enemy.prototype.makeActions = function() {
+    _Game_Enemy_makeActions.call(this);
+
+    const requests = BattleManager._HTN_MonsterMessage_NextActionRequests;
+    const request = requests[this.index()] ?? null;
+    delete requests[this.index()];
+
+    if (request == null) return;
+
+    const originalActions = [...this._actions];
+    setupNextAction(this, request.skillIdOrName, request.forcing);
+
+    // スキルが見つからなかった場合は通常の行動決定に戻す
+    if (this.currentAction() == null) {
+      this._actions = originalActions;
+    }
+  };
+
+  /**
    * 行動開始時に行動前セリフを表示
    * overwriteNextAction が指定された場合はアクションを差し替える
    * 連撃でない場合は comboCount をリセットする
@@ -464,6 +562,29 @@
         }
       }
     }
+  };
+
+  /**
+   * ターン終了処理後に、モンスターのターン終了時セリフを表示する
+   *
+   * リジェネや、ターン経過でのステート解消後に呼ばれる処理。
+   * TPB バトルでこのメソッドは呼ばれない
+   */
+  const _BattleManager_endAllBattlersTurn = BattleManager.endAllBattlersTurn;
+  BattleManager.endAllBattlersTurn = function() {
+    _BattleManager_endAllBattlersTurn.call(this);
+
+    invokeTurnEndCallbacks(this._logWindow);
+  };
+
+  /**
+   * 戦闘終了時に独自プロパティを削除
+   */
+  const _BattleManager_endBattle = BattleManager.endBattle;
+  BattleManager.endBattle = function(result) {
+    _BattleManager_endBattle.call(this, result);
+
+    delete this._HTN_MonsterMessage_NextActionRequests;
   };
 
   //// ---- 以下、 NW.js（デスクトップ）とブラウザ両対応の、データ読み込み処理 ----
