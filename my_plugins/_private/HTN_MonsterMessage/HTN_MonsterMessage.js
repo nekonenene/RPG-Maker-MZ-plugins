@@ -606,7 +606,6 @@
     delete this._HTN_MonsterMessage_NextActionRequests;
 
     if (this._logWindow != null) {
-      console.log(this._logWindow);
       delete this._logWindow._HTN_MonsterMessage_CommonEventInterpreter;
     }
   };
