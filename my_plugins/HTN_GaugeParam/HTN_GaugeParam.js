@@ -84,6 +84,12 @@
  * @default 0
  * @type common_event
  *
+ * @param CommonEventActorVariableId
+ * @text Common Event Actor Variable
+ * @desc Variable ID to store the actor ID that triggered the boundary common event. Set 0 to disable.
+ * @default 0
+ * @type variable
+ *
  * @param ShowInStatus
  * @text Show in Status Screen
  * @desc Show the gauge in the status screen.
@@ -120,7 +126,7 @@
  *
  * @arg actorId
  * @text Actor ID
- * @desc ID of the actor to change.
+ * @desc ID of the actor to change. To reference a game variable, enter via Text (e.g., v[1]).
  * @default 1
  * @type actor
  *
@@ -138,7 +144,7 @@
  *
  * @arg actorId
  * @text Actor ID
- * @desc ID of the actor to set.
+ * @desc ID of the actor to set. To reference a game variable, enter via Text (e.g., v[1]).
  * @default 1
  * @type actor
  *
@@ -156,7 +162,7 @@
  *
  * @arg actorId
  * @text Actor ID
- * @desc ID of the actor to read.
+ * @desc ID of the actor to read. To reference a game variable, enter via Text (e.g., v[1]).
  * @default 1
  * @type actor
  *
@@ -172,7 +178,7 @@
  *
  * @arg actorId
  * @text Actor ID
- * @desc ID of the actor to reset.
+ * @desc ID of the actor to reset. To reference a game variable, enter via Text (e.g., v[1]).
  * @default 1
  * @type actor
  *
@@ -285,6 +291,12 @@
  * @default 0
  * @type common_event
  *
+ * @param CommonEventActorVariableId
+ * @text 発動アクター格納変数
+ * @desc コモンイベントが発動したとき、発動のきっかけとなったアクターIDをこの変数に格納する（0で無効）
+ * @default 0
+ * @type variable
+ *
  * @param ShowInStatus
  * @text ステータス画面に表示
  * @desc ステータス画面にゲージを表示する
@@ -321,7 +333,7 @@
  *
  * @arg actorId
  * @text アクターID
- * @desc 対象のアクターID
+ * @desc 対象のアクターID（ゲーム変数を参照する場合は「テキスト」から v[1] のように入力）
  * @default 1
  * @type actor
  *
@@ -339,7 +351,7 @@
  *
  * @arg actorId
  * @text アクターID
- * @desc 対象のアクターID
+ * @desc 対象のアクターID（ゲーム変数を参照する場合は「テキスト」から v[1] のように入力）
  * @default 1
  * @type actor
  *
@@ -357,7 +369,7 @@
  *
  * @arg actorId
  * @text アクターID
- * @desc 対象のアクターID
+ * @desc 対象のアクターID（ゲーム変数を参照する場合は「テキスト」から v[1] のように入力）
  * @default 1
  * @type actor
  *
@@ -373,7 +385,7 @@
  *
  * @arg actorId
  * @text アクターID
- * @desc 対象のアクターID
+ * @desc 対象のアクターID（ゲーム変数を参照する場合は「テキスト」から v[1] のように入力）
  * @default 1
  * @type actor
  *
@@ -431,6 +443,7 @@
   const recoverySoundTrigger = String(pluginParams.RecoverySoundTrigger || 'increase');
   const minCommonEventId = Number(pluginParams.MinCommonEvent || 0);
   const maxCommonEventId = Number(pluginParams.MaxCommonEvent || 0);
+  const commonEventActorVariableId = Number(pluginParams.CommonEventActorVariableId || 0);
   const showInStatus = String(pluginParams.ShowInStatus) !== 'false';
   const priorityOverTP = String(pluginParams.PriorityOverTP) !== 'false';
   const showInBattle = String(pluginParams.ShowInBattle) !== 'false';
@@ -470,10 +483,18 @@
       actor._HTN_GaugeParam_Value = newValue;
 
       if (oldValue > 0 && newValue === 0 && minCommonEventId > 0) {
+        if (commonEventActorVariableId > 0) {
+          $gameVariables.setValue(commonEventActorVariableId, actor.actorId());
+        }
+
         $gameTemp.reserveCommonEvent(minCommonEventId);
       }
 
       if (oldValue < gaugeMax && newValue === gaugeMax && maxCommonEventId > 0) {
+        if (commonEventActorVariableId > 0) {
+          $gameVariables.setValue(commonEventActorVariableId, actor.actorId());
+        }
+
         $gameTemp.reserveCommonEvent(maxCommonEventId);
       }
     }
@@ -491,29 +512,44 @@
 
   window.HTN_GaugeParam = HTN_GaugeParam; // グローバルクラスとして公開
 
+  /**
+   * v[N] 形式の文字列であれば、ツクールの変数の値を返す。異なる形式なら単純に数値化
+   *
+   * @param {string} str アクターIDまたは v[N] 形式の文字列
+   * @returns {number} アクターID
+   */
+  const resolveActorId = (str) => {
+    const match = String(str).match(/^v\[(\d+)\]$/);
+    if (match !== null) {
+      return $gameVariables.value(Number(match[1]));
+    }
+
+    return Number(str);
+  };
+
   PluginManager.registerCommand(pluginName, 'ChangeValue', (args) => {
-    const actor = $gameActors.actor(Number(args.actorId));
+    const actor = $gameActors.actor(resolveActorId(args.actorId));
     if (actor == null) return;
 
     HTN_GaugeParam.changeValue(actor, Number(args.amount));
   });
 
   PluginManager.registerCommand(pluginName, 'SetValue', (args) => {
-    const actor = $gameActors.actor(Number(args.actorId));
+    const actor = $gameActors.actor(resolveActorId(args.actorId));
     if (actor == null) return;
 
     HTN_GaugeParam.setValue(actor, Number(args.value));
   });
 
   PluginManager.registerCommand(pluginName, 'InitValue', (args) => {
-    const actor = $gameActors.actor(Number(args.actorId));
+    const actor = $gameActors.actor(resolveActorId(args.actorId));
     if (actor == null) return;
 
     HTN_GaugeParam.initValue(actor);
   });
 
   PluginManager.registerCommand(pluginName, 'GetValue', (args) => {
-    const actor = $gameActors.actor(Number(args.actorId));
+    const actor = $gameActors.actor(resolveActorId(args.actorId));
     const variableId = Number(args.variableId);
     if (actor == null || variableId <= 0) return;
 
