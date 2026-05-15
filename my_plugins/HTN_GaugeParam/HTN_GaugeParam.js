@@ -14,6 +14,7 @@
  * @target MZ
  * @plugindesc Adds a gauge-based custom parameter to actors (v1.0.0)
  * @author hatonekoe - https://hato-neko.x0.com
+ * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_GaugeParam
  *
  * @param GaugeMax
  * @text Max Value
@@ -198,6 +199,7 @@
  * @target MZ
  * @plugindesc アクターにゲージ付きの独自パラメータを追加 (v1.0.0)
  * @author ハトネコエ - https://hato-neko.x0.com
+ * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_GaugeParam
  *
  * @param GaugeMax
  * @text 最大値
