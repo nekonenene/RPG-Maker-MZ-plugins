@@ -193,7 +193,7 @@
 
 /*:ja
  * @target MZ
- * @plugindesc アクターにゲージ付きの独自パラメータを追加します (v1.0.0)
+ * @plugindesc アクターにゲージ付きの独自パラメータを追加 (v1.0.0)
  * @author ハトネコエ - https://hato-neko.x0.com
  *
  * @param GaugeMax
@@ -230,13 +230,13 @@
  *
  * @param GaugeIncreaseMessage
  * @text 増加メッセージ
- * @desc パラメータが増加したときに表示するメッセージ。%1=対象者名、%2=パラメータ名、%3=変化量。空文字で非表示
+ * @desc パラメータが増加したときに表示するメッセージ。空欄にすると非表示
  * @default %1の%2が %3 増えた！
  * @type string
  *
  * @param GaugeDecreaseMessage
  * @text 減少メッセージ
- * @desc パラメータが減少したときに表示するメッセージ。%1=対象者名、%2=パラメータ名、%3=変化量。空文字で非表示
+ * @desc パラメータが減少したときに表示するメッセージ。空欄にすると非表示
  * @default %1の%2が %3 減った！
  * @type string
  *
@@ -245,21 +245,21 @@
  * @desc 戦闘中に回復音を鳴らす条件
  * @default increase
  * @type select
- * @option パラメーター増加時
+ * @option パラメータ増加時
  * @value increase
- * @option パラメーター減少時
+ * @option パラメータ減少時
  * @value decrease
  * @option 鳴らさない
  * @value none
  *
  * @param MinCommonEvent
- * @text 最小値到達コモンイベント
+ * @text 最小値でのコモンイベント
  * @desc 値が0に達したときに呼び出すコモンイベントID（0で無効）
  * @default 0
  * @type common_event
  *
  * @param MaxCommonEvent
- * @text 最大値到達コモンイベント
+ * @text 最大値でのコモンイベント
  * @desc 値が最大値に達したときに呼び出すコモンイベントID（0で無効）
  * @default 0
  * @type common_event
@@ -283,14 +283,14 @@
  * @type boolean
  *
  * @param GaugeColor1
- * @text ゲージカラー1
- * @desc ゲージのグラデーション左端の色（CSS カラー文字列）
+ * @text ゲージ左端カラー
+ * @desc ゲージのグラデーション左端の色（HTMLカラーコード）
  * @default #ff80b0
  * @type string
  *
  * @param GaugeColor2
- * @text ゲージカラー2
- * @desc ゲージのグラデーション右端の色（CSS カラー文字列）
+ * @text ゲージ右端カラー
+ * @desc ゲージのグラデーション右端の色（HTMLカラーコード）
  * @default #ff0060
  * @type string
  *
@@ -366,18 +366,18 @@
  *   v = $gameVariables._data（ゲーム変数の配列）
  *
  * 記述例：
- *   <GaugeParam_Increase: 30>
+ *   <GaugeParam_Increase: 5>
  *   <GaugeParam_Increase: a.atk * 0.5>
- *   <GaugeParam_Decrease: b.mhp * 0.1>
+ *   <GaugeParam_Decrease: (a.mat - b.mdf) / 2>
  *
  * ■ 境界値トリガー
  * 値が最大値に遷移した瞬間に MaxCommonEvent のコモンイベントが呼び出されます。
  * 値が0に遷移した瞬間に MinCommonEvent のコモンイベントが呼び出されます。
- * いずれもすでに境界値の状態からさらに変化しても再発動しません。
+ * いずれも、すでに境界値の状態からさらに変化しても再発動しません。
  *
  * ■ 他プラグインからの利用
  * このプラグインを先に読み込んでいるとき、
- * グローバルクラス HTN_GaugeParam を通じてアクセスできます：
+ * グローバルクラス HTN_GaugeParam を通じてパラメータの値にアクセスできます：
  *   HTN_GaugeParam.getValue(actor)           値の取得
  *   HTN_GaugeParam.setValue(actor, value)    第２引数の値に設定
  *   HTN_GaugeParam.changeValue(actor, delta) 第２引数の値で増減
@@ -406,7 +406,7 @@
 
   class HTN_GaugeParam {
     /**
-     * アクターのパラメータ値を取得する
+     * アクターのパラメータ値を取得
      *
      * @param {Game_Actor} actor 対象アクター
      * @returns {number} パラメータ値
@@ -416,7 +416,7 @@
     }
 
     /**
-     * アクターのパラメータ値を設定し、境界値への遷移時にコモンイベントを予約する
+     * アクターのパラメータ値を設定し、境界値への遷移時にはコモンイベントを予約
      *
      * @param {Game_Actor} actor 対象アクター
      * @param {number} value 設定する値
@@ -437,10 +437,10 @@
     }
 
     /**
-     * アクターのパラメータ値を変化させる
+     * アクターのパラメータ値を増加・減少させる
      *
      * @param {Game_Actor} actor 対象アクター
-     * @param {number} delta 変化量（正数で増加、負数で減少）
+     * @param {number} delta 変化量（正で増加、負で減少）
      */
     static changeValue(actor, delta) {
       HTN_GaugeParam.setValue(actor, HTN_GaugeParam.getValue(actor) + delta);
@@ -472,7 +472,8 @@
   });
 
   /**
-   * パラメータ値を初期値で初期化する
+   * ニューゲーム開始時などの createGameObjects から、 new Game_Actor を介して呼ばれるメソッド
+   * 独自パラメータの値を初期値にセットする
    */
   const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
   Game_Actor.prototype.initMembers = function() {
@@ -499,7 +500,7 @@
    * メモタグの数式を評価して0以上の整数を返す
    *
    * @param {string} formula 数式文字列
-   * @param {Game_Battler} subject 使用者
+   * @param {Game_Battler} subject 行動の主体（スキル・アイテムの使用者、ステートの持ち主）
    * @param {Game_Battler} targetBattler 対象
    * @returns {number} 計算結果（0以上の整数）
    */
@@ -509,6 +510,7 @@
       const b = targetBattler; // eslint-disable-line no-unused-vars
       const v = $gameVariables._data; // eslint-disable-line no-unused-vars
       const result = eval(formula);
+
       return Math.max(0, Math.round(isNaN(result) ? 0 : Number(result)));
     } catch (_e) {
       return 0;
@@ -526,7 +528,7 @@
   };
 
   /**
-   * メニュー画面でのスキル・アイテムの使用可否を判断する部分に影響
+   * メニュー画面でのスキル・アイテムの使用可否を判断する
    *
    * @param {Game_Battler} target 対象バトラー
    * @returns {boolean} 意味のある使用効果が含まれるか
@@ -552,7 +554,7 @@
   };
 
   /**
-   * スキル・アイテム使用時にメモタグに基づいてパラメータ値を変化させる
+   * スキル・アイテム使用時に、メモ欄のタグに基づいてパラメータ値を変化させる
    *
    * @param {Game_Battler} target 対象バトラー
    */
@@ -589,7 +591,7 @@
   };
 
   /**
-   * 毎ターン、アクターが持つステートのメモタグに基づいてパラメータ値を変化させる
+   * アクターがかかっているステートのタグに基づいて、毎ターン、パラメータ値を変化させる
    *
    * @returns {void}
    */
@@ -701,7 +703,7 @@
   };
 
   /**
-   * スキル・アイテム使用時のパラメータ変化をバトルログに表示する
+   * スキル・アイテム使用時のパラメータ変化をバトルログに表示
    *
    * @param {Game_Battler} target 対象バトラー
    */
@@ -727,7 +729,7 @@
   };
 
   /**
-   * ターン終了時のパラメータ変化をバトルログに表示する
+   * ターン終了時のパラメータ変化をバトルログに表示（ステートによる変化を想定）
    *
    * @param {Game_Battler} subject バトラー
    */
@@ -753,13 +755,10 @@
   };
 
   /**
-   * ゲージをステータス画面・戦闘画面に配置する
+   * ゲージを戦闘画面・ステータス画面に配置
    *
-   * 戦闘画面: ShowInBattle が true のとき、HP/MP/TP の後に4本目として配置
-   * ステータス画面:
-   *   ShowInStatus が false → オリジナルのまま
-   *   TP非表示 or PriorityOverTP が true → HP/MP/独自パラメーター の3本
-   *   TP表示 かつ PriorityOverTP が false → オリジナルのまま
+   * 戦闘画面: ShowInBattle が true のとき HP/MP/TP の後に4本目として配置
+   * ステータス画面: デフォルトの画面レイアウトだと最大で3本までしか配置できないので、priorityOverTP が true のときは TP ゲージの代わりに配置
    *
    * @param {Game_Actor} actor 対象アクター
    * @param {number} x X座標
@@ -788,7 +787,7 @@
   };
 
   /**
-   * 戦闘時のステータス表示において、独自パラメーターのゲージ分を確保するため Y 座標を調整
+   * 戦闘時のステータス表示において、独自パラメータのゲージ分を確保するため Y 座標を調整
    *
    * @param {Rectangle} rect アイテム矩形
    * @returns {number}
