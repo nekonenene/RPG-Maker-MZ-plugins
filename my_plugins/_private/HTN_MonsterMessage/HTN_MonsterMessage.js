@@ -25,7 +25,6 @@
  *
  * HTN_MonsterMessage.registerEncountering(敵キャラID, fn)
  *   バトル開始時（「○○があらわれた！」の直後）のセリフを登録する
- *   同じIDの敵キャラが複数いる場合、1体分のみ表示される
  *
  * HTN_MonsterMessage.registerBeforeAttack(敵キャラID, fn)
  *   行動前（スキル発動前）のセリフを登録する
@@ -313,7 +312,6 @@
 
   /**
    * バトル開始時、遭遇時セリフをキューに積む（表示は updateStart でおこなう）
-   * 同一エネミーIDが複数体いる場合は最初の1体分のみ表示する
    */
   const _BattleManager_displayStartMessages = BattleManager.displayStartMessages;
   BattleManager.displayStartMessages = function() {
@@ -322,13 +320,8 @@
     this._HTN_MonsterMessage_EncounterQueue        = [];
     this._HTN_MonsterMessage_EncounterCommonEvents = [];
 
-    const seenIds = new Set();
-
     for (const enemy of $gameTroop.members()) {
       const enemyId = enemy.enemyId();
-      if (seenIds.has(enemyId)) continue;
-      seenIds.add(enemyId);
-
       const fn = _encounterRegistry[enemyId];
       if (fn != null) {
         const targets = $gameParty.battleMembers();

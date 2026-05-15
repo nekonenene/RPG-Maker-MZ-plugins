@@ -51,7 +51,6 @@ HTN_MonsterMessage.loadDataScript('HTN_MonsterMessage/data/Enemy_0002');
 HTN_MonsterMessage.registerEncountering(敵キャラID, fn)
 ```
 バトル開始時のセリフを登録します。  
-同じIDの敵キャラが複数いる場合、1体分のみ表示されます。
 
 ```javascript
 HTN_MonsterMessage.registerBeforeAttack(敵キャラID, fn)
