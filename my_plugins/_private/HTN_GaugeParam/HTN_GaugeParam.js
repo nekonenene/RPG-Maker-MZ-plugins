@@ -6,6 +6,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/license/mit
 //
+// 2026/05/16 v0.0.1 開発開始
+//
 // --------------------------------------------------------------------------
 
 /*:
