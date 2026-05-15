@@ -235,8 +235,6 @@
  * @type variable
  *
  * @help
- * 【ゲージ付き独自パラメータ追加プラグイン】
- *
  * アクターにゲージ付きの独自パラメータを追加します。
  * 値は0〜設定した最大値（初期値: 100）の範囲で変動します。
  *
@@ -263,8 +261,8 @@
  * ■ 他プラグインからの利用
  * グローバルクラス HTN_GaugeParam を通じてアクセスできます:
  *   HTN_GaugeParam.getValue(actor)           値の取得
- *   HTN_GaugeParam.setValue(actor, value)    値の設定
- *   HTN_GaugeParam.changeValue(actor, delta) 値の変化
+ *   HTN_GaugeParam.setValue(actor, value)    第２引数の値に設定
+ *   HTN_GaugeParam.changeValue(actor, delta) 第２引数の値で増減
  */
 
 (() => {
