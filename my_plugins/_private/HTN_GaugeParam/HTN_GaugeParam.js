@@ -135,6 +135,10 @@
  *   <GaugeParam_Increase: formula>   Increases the target's value.
  *   <GaugeParam_Decrease: formula>   Decreases the target's value.
  *
+ * Note tags for states (applied each turn, like poison):
+ *   <GaugeParam_Increase: formula>   Increases the bearer's value each turn.
+ *   <GaugeParam_Decrease: formula>   Decreases the bearer's value each turn.
+ *
  * In formulas:
  *   a = action user (attacker/caster)
  *   b = target
@@ -278,6 +282,11 @@
  * 対象のパラメータ値を変化させるタグをスキルやアイテムのメモ欄に記述します。
  *   <GaugeParam_Increase: 数式>  対象の値を増やします
  *   <GaugeParam_Decrease: 数式>  対象の値を減らします
+ *
+ * ■ ステートのメモ欄タグ（毒などのように毎ターン効果を適用）
+ * ステートのメモ欄に記述すると、そのステートを持つアクターのターン開始時に毎回効果を適用します。
+ *   <GaugeParam_Increase: 数式>  毎ターン値を増やします
+ *   <GaugeParam_Decrease: 数式>  毎ターン値を減らします
  *
  * 数式内で使用できる変数:
  *   a = 使用者
@@ -441,6 +450,30 @@
     if (meta.GaugeParam_Decrease != null) {
       const value = evalFormula(String(meta.GaugeParam_Decrease), this.subject(), target);
       HTN_GaugeParam.changeValue(target, -value);
+    }
+  };
+
+  /**
+   * 毎ターン、アクターが持つステートのメモタグに基づいてパラメータ値を変化させる
+   *
+   * @returns {void}
+   */
+  const _Game_Battler_regenerateAll = Game_Battler.prototype.regenerateAll;
+  Game_Battler.prototype.regenerateAll = function() {
+    _Game_Battler_regenerateAll.call(this);
+
+    if (!this.isAlive() || !this.isActor()) return;
+
+    for (const state of this.states()) {
+      if (state.meta.GaugeParam_Increase != null) {
+        const value = evalFormula(String(state.meta.GaugeParam_Increase), this, this);
+        HTN_GaugeParam.changeValue(this, value);
+      }
+
+      if (state.meta.GaugeParam_Decrease != null) {
+        const value = evalFormula(String(state.meta.GaugeParam_Decrease), this, this);
+        HTN_GaugeParam.changeValue(this, -value);
+      }
     }
   };
 
