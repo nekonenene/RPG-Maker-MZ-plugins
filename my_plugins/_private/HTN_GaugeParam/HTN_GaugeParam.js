@@ -501,6 +501,32 @@
   };
 
   /**
+   * メニュー画面でのスキル・アイテムの使用可否を判断する部分に影響
+   *
+   * @param {Game_Battler} target 対象バトラー
+   * @returns {boolean} 意味のある使用効果が含まれるか
+   */
+  const _Game_Action_hasItemAnyValidEffects = Game_Action.prototype.hasItemAnyValidEffects;
+  Game_Action.prototype.hasItemAnyValidEffects = function(target) {
+    // 元のメソッドを呼び出し、有効な効果があるならそのまま true を返す
+    if (_Game_Action_hasItemAnyValidEffects.call(this, target)) return true;
+
+    if (!target.isActor()) return false;
+
+    const item = this.item();
+    if (item == null) return false;
+
+    const meta = item.meta;
+    if (meta == null) return false;
+
+    const currentValue = HTN_GaugeParam.getValue(target);
+    if (meta.GaugeParam_Increase != null && currentValue === gaugeMax) return false;
+    if (meta.GaugeParam_Decrease != null && currentValue === 0) return false;
+
+    return true;
+  };
+
+  /**
    * スキル・アイテム使用時にメモタグに基づいてパラメータ値を変化させる
    *
    * @param {Game_Battler} target 対象バトラー
