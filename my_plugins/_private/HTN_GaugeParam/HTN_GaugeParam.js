@@ -299,7 +299,7 @@
  *
  * @command ChangeValue
  * @text 値を変化させる
- * @desc アクターのパラメータ値を指定した量だけ変化させます
+ * @desc アクターのパラメータ値を指定した量だけ変化させます（正の数で増加、負の数で減少）
  *
  * @arg actorId
  * @text アクターID
@@ -309,7 +309,7 @@
  *
  * @arg amount
  * @text 変化量
- * @desc 変化量（正数で増加、負数で減少）
+ * @desc 変化量（正の数で増加、負の数で減少）
  * @default 0
  * @type number
  * @min -9999
