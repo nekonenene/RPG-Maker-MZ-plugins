@@ -171,7 +171,7 @@
    *
    * @param {Game_Enemy} subject 行動主体
    * @param {number|string|null} skillIdOrName number ならスキルID、string ならスキル名で検索
-   * @param {boolean} [forcing=true] true なら混乱の影響を受けない強制行動として扱う
+   * @param {boolean} [forcing=true] 混乱やスキル封印、MP/TP不足などの影響を加味せずセットするか
    */
   function setupNextAction(subject, skillIdOrName, forcing = true) {
     subject.clearActions();
