@@ -27,10 +27,28 @@
  * @type number
  * @min 0
  *
+ * @param GaugeName
+ * @text Parameter Name
+ * @desc Name of the parameter used in messages.
+ * @default EP
+ * @type string
+ *
  * @param GaugeLabel
  * @text Gauge Label
  * @desc Short label shown inside the gauge.
  * @default EP
+ * @type string
+ *
+ * @param GaugeIncreaseMessage
+ * @text Increase Message
+ * @desc Message when the value increases. %1=target name, %2=parameter name, %3=amount. Leave empty to hide.
+ * @default %1's %2 increased by %3!
+ * @type string
+ *
+ * @param GaugeDecreaseMessage
+ * @text Decrease Message
+ * @desc Message when the value decreases. %1=target name, %2=parameter name, %3=amount. Leave empty to hide.
+ * @default %1's %2 decreased by %3!
  * @type string
  *
  * @param MinCommonEvent
@@ -174,10 +192,28 @@
  * @type number
  * @min 0
  *
+ * @param GaugeName
+ * @text パラメータ名
+ * @desc メッセージで使用するパラメータの名称
+ * @default EP
+ * @type string
+ *
  * @param GaugeLabel
  * @text ゲージラベル
  * @desc ゲージ内に表示する短いラベル文字
  * @default EP
+ * @type string
+ *
+ * @param GaugeIncreaseMessage
+ * @text 増加メッセージ
+ * @desc パラメータが増加したときに表示するメッセージ。%1=対象者名、%2=パラメータ名、%3=変化量。空文字で非表示
+ * @default %1の%2が %3 増えた！
+ * @type string
+ *
+ * @param GaugeDecreaseMessage
+ * @text 減少メッセージ
+ * @desc パラメータが減少したときに表示するメッセージ。%1=対象者名、%2=パラメータ名、%3=変化量。空文字で非表示
+ * @default %1の%2が %3 減った！
  * @type string
  *
  * @param MinCommonEvent
@@ -317,7 +353,10 @@
   const pluginParams = PluginManager.parameters(pluginName);
   const gaugeMax = Math.max(1, Number(pluginParams.GaugeMax || 100));
   const gaugeInitialValue = Math.max(0, Math.min(gaugeMax, Number(pluginParams.GaugeInitialValue || 0)));
+  const gaugeName = String(pluginParams.GaugeName || 'EP');
   const gaugeLabel = String(pluginParams.GaugeLabel || 'EP');
+  const gaugeIncreaseMessage = String(pluginParams.GaugeIncreaseMessage ?? '');
+  const gaugeDecreaseMessage = String(pluginParams.GaugeDecreaseMessage ?? '');
   const minCommonEventId = Number(pluginParams.MinCommonEvent || 0);
   const maxCommonEventId = Number(pluginParams.MaxCommonEvent || 0);
   const showInStatus = String(pluginParams.ShowInStatus) !== 'false';
@@ -424,6 +463,16 @@
   };
 
   /**
+   * 行動結果の初期化で独自プロパティも初期化
+   */
+  const _Game_ActionResult_clear = Game_ActionResult.prototype.clear;
+  Game_ActionResult.prototype.clear = function() {
+    _Game_ActionResult_clear.call(this);
+
+    this._HTN_GaugeParam_Change = 0;
+  };
+
+  /**
    * スキル・アイテム使用時にメモタグに基づいてパラメータ値を変化させる
    *
    * @param {Game_Battler} target 対象バトラー
@@ -441,6 +490,8 @@
     const meta = item.meta;
     if (meta == null) return;
 
+    const valueBefore = HTN_GaugeParam.getValue(target);
+
     if (meta.GaugeParam_Increase != null) {
       const value = evalFormula(String(meta.GaugeParam_Increase), this.subject(), target);
       HTN_GaugeParam.changeValue(target, value);
@@ -450,6 +501,8 @@
       const value = evalFormula(String(meta.GaugeParam_Decrease), this.subject(), target);
       HTN_GaugeParam.changeValue(target, -value);
     }
+
+    target.result()._HTN_GaugeParam_Change = HTN_GaugeParam.getValue(target) - valueBefore;
   };
 
   /**
@@ -463,6 +516,8 @@
 
     if (!this.isAlive() || !this.isActor()) return;
 
+    const valueBefore = HTN_GaugeParam.getValue(this);
+
     for (const state of this.states()) {
       if (state.meta.GaugeParam_Increase != null) {
         const value = evalFormula(String(state.meta.GaugeParam_Increase), this, this);
@@ -474,6 +529,8 @@
         HTN_GaugeParam.changeValue(this, -value);
       }
     }
+
+    this._HTN_GaugeParam_RegenChange = HTN_GaugeParam.getValue(this) - valueBefore;
   };
 
   /**
@@ -558,6 +615,54 @@
     }
 
     return _Sprite_Gauge_gaugeColor2.call(this);
+  };
+
+  /**
+   * スキル・アイテム使用時のパラメータ変化をバトルログに表示する
+   *
+   * @param {Game_Battler} target 対象バトラー
+   */
+  const _Window_BattleLog_displayDamage = Window_BattleLog.prototype.displayDamage;
+  Window_BattleLog.prototype.displayDamage = function(target) {
+    _Window_BattleLog_displayDamage.call(this, target);
+
+    if (!target.isAlive()) return;
+
+    const change = target.result()._HTN_GaugeParam_Change;
+
+    if (change == null || change === 0) return;
+
+    const amount = Math.abs(change);
+
+    if (change > 0 && gaugeIncreaseMessage !== '') {
+      this.push('addText', gaugeIncreaseMessage.format(target.name(), gaugeName, amount));
+    } else if (change < 0 && gaugeDecreaseMessage !== '') {
+      this.push('addText', gaugeDecreaseMessage.format(target.name(), gaugeName, amount));
+    }
+  };
+
+  /**
+   * ターン終了時のパラメータ変化をバトルログに表示する
+   *
+   * @param {Game_Battler} subject バトラー
+   */
+  const _Window_BattleLog_displayRegeneration = Window_BattleLog.prototype.displayRegeneration;
+  Window_BattleLog.prototype.displayRegeneration = function(subject) {
+    _Window_BattleLog_displayRegeneration.call(this, subject);
+
+    if (!subject.isActor()) return;
+
+    const change = subject._HTN_GaugeParam_RegenChange;
+
+    if (change == null || change === 0) return;
+
+    const amount = Math.abs(change);
+
+    if (change > 0 && gaugeIncreaseMessage !== '') {
+      this.push('addText', gaugeIncreaseMessage.format(subject.name(), gaugeName, amount));
+    } else if (change < 0 && gaugeDecreaseMessage !== '') {
+      this.push('addText', gaugeDecreaseMessage.format(subject.name(), gaugeName, amount));
+    }
   };
 
   /**
