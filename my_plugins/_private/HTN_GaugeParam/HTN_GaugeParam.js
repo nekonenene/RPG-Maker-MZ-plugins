@@ -27,6 +27,12 @@
  * @type number
  * @min 0
  *
+ * @param ResetOnRecoverAll
+ * @text Reset on Full Recovery
+ * @desc If true, resets the parameter value to the initial value when a full recovery occurs (e.g., inn, event command).
+ * @default true
+ * @type boolean
+ *
  * @param GaugeName
  * @text Parameter Name
  * @desc Name of the parameter used in messages.
@@ -192,6 +198,12 @@
  * @type number
  * @min 0
  *
+ * @param ResetOnRecoverAll
+ * @text 全回復時に初期値にリセット
+ * @desc 全回復（宿屋・イベントコマンドなど）が発生したとき、パラメータ値を初期値に戻す
+ * @default true
+ * @type boolean
+ *
  * @param GaugeName
  * @text パラメータ名
  * @desc メッセージで使用するパラメータの名称
@@ -354,6 +366,7 @@
   const pluginParams = PluginManager.parameters(pluginName);
   const gaugeMax = Math.max(1, Number(pluginParams.GaugeMax || 100));
   const gaugeInitialValue = Math.max(0, Math.min(gaugeMax, Number(pluginParams.GaugeInitialValue || 0)));
+  const resetOnRecoverAll = String(pluginParams.ResetOnRecoverAll) !== 'false';
   const gaugeName = String(pluginParams.GaugeName || 'EP');
   const gaugeLabel = String(pluginParams.GaugeLabel || 'EP');
   const gaugeIncreaseMessage = String(pluginParams.GaugeIncreaseMessage ?? '');
@@ -441,6 +454,20 @@
     _Game_Actor_initMembers.call(this);
 
     this._HTN_GaugeParam_Value = gaugeInitialValue;
+  };
+
+  /**
+   * 全回復時にパラメータ値を初期値にリセットする
+   *
+   * @returns {void}
+   */
+  const _Game_BattlerBase_recoverAll = Game_BattlerBase.prototype.recoverAll;
+  Game_BattlerBase.prototype.recoverAll = function() {
+    _Game_BattlerBase_recoverAll.call(this);
+
+    if (resetOnRecoverAll && this.isActor()) {
+      this._HTN_GaugeParam_Value = gaugeInitialValue;
+    }
   };
 
   /**
