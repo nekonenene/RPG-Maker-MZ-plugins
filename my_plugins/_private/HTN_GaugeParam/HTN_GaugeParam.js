@@ -483,7 +483,7 @@
    */
   const _Sprite_Gauge_isValid = Sprite_Gauge.prototype.isValid;
   Sprite_Gauge.prototype.isValid = function() {
-    if (this._statusType === 'gaugeparam') {
+    if (this._statusType === 'htn_gauge_param') {
       return this._battler != null && this._battler.isActor();
     }
 
@@ -497,7 +497,7 @@
    */
   const _Sprite_Gauge_currentValue = Sprite_Gauge.prototype.currentValue;
   Sprite_Gauge.prototype.currentValue = function() {
-    if (this._battler && this._statusType === 'gaugeparam') {
+    if (this._battler && this._statusType === 'htn_gauge_param') {
       return HTN_GaugeParam.getValue(this._battler);
     }
 
@@ -511,7 +511,7 @@
    */
   const _Sprite_Gauge_currentMaxValue = Sprite_Gauge.prototype.currentMaxValue;
   Sprite_Gauge.prototype.currentMaxValue = function() {
-    if (this._statusType === 'gaugeparam') {
+    if (this._statusType === 'htn_gauge_param') {
       return gaugeMax;
     }
 
@@ -525,7 +525,7 @@
    */
   const _Sprite_Gauge_label = Sprite_Gauge.prototype.label;
   Sprite_Gauge.prototype.label = function() {
-    if (this._statusType === 'gaugeparam') {
+    if (this._statusType === 'htn_gauge_param') {
       return gaugeLabel;
     }
 
@@ -539,7 +539,7 @@
    */
   const _Sprite_Gauge_gaugeColor1 = Sprite_Gauge.prototype.gaugeColor1;
   Sprite_Gauge.prototype.gaugeColor1 = function() {
-    if (this._statusType === 'gaugeparam') {
+    if (this._statusType === 'htn_gauge_param') {
       return gaugeColor1;
     }
 
@@ -553,7 +553,7 @@
    */
   const _Sprite_Gauge_gaugeColor2 = Sprite_Gauge.prototype.gaugeColor2;
   Sprite_Gauge.prototype.gaugeColor2 = function() {
-    if (this._statusType === 'gaugeparam') {
+    if (this._statusType === 'htn_gauge_param') {
       return gaugeColor2;
     }
 
@@ -580,7 +580,7 @@
 
       if (showInBattle) {
         const offset = $dataSystem.optDisplayTp ? 3 : 2;
-        this.placeGauge(actor, 'gaugeparam', x, y + this.gaugeLineHeight() * offset);
+        this.placeGauge(actor, 'htn_gauge_param', x, y + this.gaugeLineHeight() * offset);
       }
 
       return;
@@ -591,7 +591,7 @@
     } else {
       this.placeGauge(actor, 'hp', x, y);
       this.placeGauge(actor, 'mp', x, y + this.gaugeLineHeight());
-      this.placeGauge(actor, 'gaugeparam', x, y + this.gaugeLineHeight() * 2);
+      this.placeGauge(actor, 'htn_gauge_param', x, y + this.gaugeLineHeight() * 2);
     }
   };
 
