@@ -206,7 +206,7 @@
    * @param {number} background
    * @param {number} positionType
    */
-  Window_BattleLog.prototype.showMonsterMessage = function(
+  Window_BattleLog.prototype.htnMonsterMessage_ShowMonsterMessage = function(
     message, name, faceName, faceIndex, background, positionType
   ) {
     $gameMessage.setBackground(background);
@@ -223,7 +223,7 @@
    *
    * @param {number} commonEventId
    */
-  Window_BattleLog.prototype.runCommonEvent = function(commonEventId) {
+  Window_BattleLog.prototype.htnMonsterMessage_RunCommonEvent = function(commonEventId) {
     const commonEvent = $dataCommonEvents[commonEventId];
     if (commonEvent != null) {
       this._HTN_MonsterMessage_CommonEventInterpreter = new Game_Interpreter();
@@ -238,7 +238,7 @@
    * @param {Game_Enemy} subject 攻撃をおこなう対象
    * @param {number|string|null} skillIdOrName number ならスキルID、string ならスキル名で検索。null の場合は AI に委ねる
    */
-  Window_BattleLog.prototype.setupComboAttack = function(subject, skillIdOrName) {
+  Window_BattleLog.prototype.htnMonsterMessage_SetupComboAttack = function(subject, skillIdOrName) {
     setupNextAction(subject, skillIdOrName, true);
 
     if (subject.numActions() > 0) {
@@ -377,10 +377,10 @@
     fn({ ...ctx, target: ctx.targets[0] ?? null, messages, callCommonEvent, ...extraArgs });
 
     for (const m of pending) {
-      logWindow.push('showMonsterMessage', m.text, m.name, m.face[0], m.face[1], m.background, m.position);
+      logWindow.push('htnMonsterMessage_ShowMonsterMessage', m.text, m.name, m.face[0], m.face[1], m.background, m.position);
     }
     for (const id of _commonEventRequests) {
-      logWindow.push('runCommonEvent', id);
+      logWindow.push('htnMonsterMessage_RunCommonEvent', id);
     }
   }
 
@@ -460,7 +460,7 @@
         invokeCallbackAndQueue(fn, { enemy: subject, skill: action.item(), targets, comboCount }, this._logWindow, { addComboAttack });
 
         if (_comboRequest != null) {
-          this._logWindow.push('setupComboAttack', subject, _comboRequest.skillIdOrName);
+          this._logWindow.push('htnMonsterMessage_SetupComboAttack', subject, _comboRequest.skillIdOrName);
         }
       }
     }
