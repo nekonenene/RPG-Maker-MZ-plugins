@@ -312,7 +312,7 @@
  *
  * @help
  * アクターにゲージ付きの独自パラメータを追加します。
- * 値は0〜設定した最大値（初期値: 100）の範囲で変動します。
+ * 値は０〜設定した最大値の範囲で変動します。
  *
  * ■ スキル・アイテムのメモ欄タグ
  * 対象のパラメータ値を変化させるタグをスキルやアイテムのメモ欄に記述します。
@@ -324,12 +324,12 @@
  *   <GaugeParam_Increase: 数式>  毎ターン値を増やします
  *   <GaugeParam_Decrease: 数式>  毎ターン値を減らします
  *
- * 数式内で使用できる変数:
+ * 数式内で使用できる変数：
  *   a = 使用者
  *   b = 対象
  *   v = $gameVariables._data（ゲーム変数の配列）
  *
- * 記述例:
+ * 記述例：
  *   <GaugeParam_Increase: 30>
  *   <GaugeParam_Increase: a.atk * 0.5>
  *   <GaugeParam_Decrease: b.mhp * 0.1>
@@ -340,7 +340,8 @@
  * いずれもすでに境界値の状態からさらに変化しても再発動しません。
  *
  * ■ 他プラグインからの利用
- * グローバルクラス HTN_GaugeParam を通じてアクセスできます:
+ * このプラグインを先に読み込んでいるとき、
+ * グローバルクラス HTN_GaugeParam を通じてアクセスできます：
  *   HTN_GaugeParam.getValue(actor)           値の取得
  *   HTN_GaugeParam.setValue(actor, value)    第２引数の値に設定
  *   HTN_GaugeParam.changeValue(actor, delta) 第２引数の値で増減
