@@ -186,6 +186,7 @@
  *   <GaugeParam_Increase: 30>
  *   <GaugeParam_Increase: a.atk * 0.5>
  *   <GaugeParam_Decrease: b.mhp * 0.1>
+ *   <GaugeParam_Decrease: v[1]>
  *
  * Other plugins can access this parameter via the global HTN_GaugeParam class:
  *   HTN_GaugeParam.getValue(actor)
@@ -365,12 +366,13 @@
  * 数式内で使用できる変数：
  *   a = 使用者
  *   b = 対象
- *   v = $gameVariables._data（ゲーム変数の配列）
+ *   v = ゲーム変数（例えば v[1] でゲーム変数ID 0001 の値）
  *
  * 記述例：
  *   <GaugeParam_Increase: 5>
  *   <GaugeParam_Increase: a.atk * 0.5>
  *   <GaugeParam_Decrease: (a.mat - b.mdf) / 2>
+ *   <GaugeParam_Decrease: v[1]>
  *
  * ■ 境界値トリガー
  * 値が最大値に遷移した瞬間に MaxCommonEvent のコモンイベントが呼び出されます。
