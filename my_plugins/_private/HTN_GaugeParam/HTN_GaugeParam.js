@@ -510,10 +510,12 @@
    */
   const evalFormula = (formula, subject, targetBattler) => {
     try {
+      const unescapedFormula = String(formula).replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim();
+
       const a = subject; // eslint-disable-line no-unused-vars
       const b = targetBattler; // eslint-disable-line no-unused-vars
       const v = $gameVariables._data; // eslint-disable-line no-unused-vars
-      const result = eval(formula);
+      const result = eval(unescapedFormula);
 
       return Math.max(0, Math.round(isNaN(result) ? 0 : Number(result)));
     } catch (_e) {
