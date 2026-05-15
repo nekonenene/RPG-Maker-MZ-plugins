@@ -557,6 +557,10 @@
     }
 
     target.result()._HTN_GaugeParam_Change = HTN_GaugeParam.getValue(target) - valueBefore;
+
+    if (target.result()._HTN_GaugeParam_Change !== 0) {
+      this.makeSuccess(target);
+    }
   };
 
   /**
