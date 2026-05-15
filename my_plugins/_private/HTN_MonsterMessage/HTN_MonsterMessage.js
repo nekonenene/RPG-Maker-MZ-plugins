@@ -294,7 +294,7 @@
   };
 
   /**
-   * バトル開始時、遭遇時セリフをキューに積む（表示は updateStart で行う）
+   * バトル開始時、遭遇時セリフをキューに積む（表示は updateStart でおこなう）
    * 同一エネミーIDが複数体いる場合は最初の1体分のみ表示する
    */
   const _BattleManager_displayStartMessages = BattleManager.displayStartMessages;
