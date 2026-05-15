@@ -125,6 +125,7 @@ overwriteNextAction(skillIdOrName)
 `number` を渡すとスキルIDで、`string` を渡すとスキル名で検索し、指定したスキルを使用するようアクションを変更します。
 
 ただし、このアクションは `forcing = true`（強制行動）として実行されるため、  
+混乱やスキル封印、MP/TP不足などの使用可否判定を加味せず、指定したスキルを使用します。  
 MPやTPが必要量より不足していても発動し、 paySkillCost の実装を見る限りではマイナスになりえます。
 
 ### addComboAttack
@@ -136,7 +137,7 @@ addComboAttack(skillIdOrName?)
 `registerAfterAttack` のコールバック内でのみ有効です。  
 呼ぶと、現在の行動が終わった後にもう一度モンスターが行動します。
 
-- `number` を渡すとスキルIDで、`string` を渡すとスキル名で検索して強制使用する（混乱などのステートを加味しない）
+- `number` を渡すとスキルIDで、`string` を渡すとスキル名で検索して強制使用する（混乱やスキル封印、MP/TP不足などは加味しない）
 - 省略または `null` を渡した場合や、スキル名が見つからない場合は自動で行動が決まる
 
 `comboCount` をチェックすることで連撃回数を制限できます。

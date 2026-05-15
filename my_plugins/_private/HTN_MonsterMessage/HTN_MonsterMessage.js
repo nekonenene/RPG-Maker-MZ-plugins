@@ -55,9 +55,11 @@
  *   comboCount : 連撃回数（0 = 初撃、1 = 1 回目の連撃、2 = 2 回目の連撃…）
  *   overwriteNextAction(skillIdOrName) : 発動スキルを上書きする（registerBeforeAttack のみ有効）
  *                        number を渡すとスキルIDで、string を渡すとスキル名で検索して強制使用
+ *                        混乱やスキル封印、MP/TP不足などの使用可否判定を加味しない
  *                        null または引数なしの場合は上書き処理をしない
  *   addComboAttack(skillIdOrName?) : 連撃を予約する（registerAfterAttack のみ有効）
  *                        number を渡すとスキルIDで、string を渡すとスキル名で検索して強制使用
+ *                        混乱やスキル封印、MP/TP不足などの使用可否判定を加味しない
  *                        省略または null のとき AI に行動を委ねる
  *                        コールバック内で comboCount をチェックすることで連撃回数を制限できる
  */
@@ -164,13 +166,14 @@
   }
 
   /**
-   * エネミーに強制アクションをセットする
-   * スキル指定がある場合は forcing=true で強制使用、null の場合は AI に行動を委ねる
+   * 次におこなうアクションをセットする
+   * スキル指定がある場合は指定スキルを使用、null の場合は AI に行動を委ねる
    *
-   * @param {Game_Enemy} subject
+   * @param {Game_Enemy} subject 行動主体
    * @param {number|string|null} skillIdOrName number ならスキルID、string ならスキル名で検索
+   * @param {boolean} [forcing=true] true なら混乱の影響を受けない強制行動として扱う
    */
-  function setupForcedAction(subject, skillIdOrName) {
+  function setupNextAction(subject, skillIdOrName, forcing = true) {
     subject.clearActions();
 
     if (skillIdOrName != null) {
@@ -184,7 +187,7 @@
       }
 
       if (skillId != null) {
-        const action = new Game_Action(subject, true); // forcing = true で混乱の影響を受けない
+        const action = new Game_Action(subject, forcing);
         action.setSkill(skillId);
         subject._actions = [action];
       }
@@ -236,7 +239,7 @@
    * @param {number|string|null} skillIdOrName number ならスキルID、string ならスキル名で検索。null の場合は AI に委ねる
    */
   Window_BattleLog.prototype.setupComboAttack = function(subject, skillIdOrName) {
-    setupForcedAction(subject, skillIdOrName);
+    setupNextAction(subject, skillIdOrName, true);
 
     if (subject.numActions() > 0) {
       BattleManager._HTN_MonsterMessage_ComboCount = (BattleManager._HTN_MonsterMessage_ComboCount ?? 0) + 1;
@@ -413,7 +416,7 @@
 
         if (_overwriteRequest !== null) {
           const originalActions = [...subject._actions];
-          setupForcedAction(subject, _overwriteRequest);
+          setupNextAction(subject, _overwriteRequest, true);
 
           // スキルが見つからなかった場合は元のアクションに戻す
           if (subject.currentAction() == null) {
