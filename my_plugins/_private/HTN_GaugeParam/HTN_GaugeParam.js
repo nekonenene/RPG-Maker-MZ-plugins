@@ -57,6 +57,18 @@
  * @default %1's %2 decreased by %3!
  * @type string
  *
+ * @param RecoverySound
+ * @text Recovery Sound Direction
+ * @desc Which change direction plays the recovery sound.
+ * @default increase
+ * @type select
+ * @option On Increase
+ * @value increase
+ * @option On Decrease
+ * @value decrease
+ * @option None
+ * @value none
+ *
  * @param MinCommonEvent
  * @text Common Event on Min
  * @desc Common event ID called when the value reaches 0. Set 0 to disable.
@@ -228,6 +240,18 @@
  * @default %1の%2が %3 減った！
  * @type string
  *
+ * @param RecoverySound
+ * @text 戦闘中の回復音
+ * @desc 戦闘中に回復音を鳴らす条件
+ * @default increase
+ * @type select
+ * @option パラメーター増加時
+ * @value increase
+ * @option パラメーター減少時
+ * @value decrease
+ * @option 鳴らさない
+ * @value none
+ *
  * @param MinCommonEvent
  * @text 最小値到達コモンイベント
  * @desc 値が0に達したときに呼び出すコモンイベントID（0で無効）
@@ -371,6 +395,7 @@
   const gaugeLabel = String(pluginParams.GaugeLabel || 'EP');
   const gaugeIncreaseMessage = String(pluginParams.GaugeIncreaseMessage ?? '');
   const gaugeDecreaseMessage = String(pluginParams.GaugeDecreaseMessage ?? '');
+  const recoverySoundDirection = String(pluginParams.RecoverySound || 'increase');
   const minCommonEventId = Number(pluginParams.MinCommonEvent || 0);
   const maxCommonEventId = Number(pluginParams.MaxCommonEvent || 0);
   const showInStatus = String(pluginParams.ShowInStatus) !== 'false';
@@ -692,10 +717,12 @@
 
     const amount = Math.abs(change);
 
-    if (change > 0 && gaugeIncreaseMessage !== '') {
-      this.push('addText', gaugeIncreaseMessage.format(target.name(), gaugeName, amount));
-    } else if (change < 0 && gaugeDecreaseMessage !== '') {
-      this.push('addText', gaugeDecreaseMessage.format(target.name(), gaugeName, amount));
+    if (change > 0) {
+      if (recoverySoundDirection === 'increase') this.push('performRecovery', target);
+      if (gaugeIncreaseMessage !== '') this.push('addText', gaugeIncreaseMessage.format(target.name(), gaugeName, amount));
+    } else {
+      if (recoverySoundDirection === 'decrease') this.push('performRecovery', target);
+      if (gaugeDecreaseMessage !== '') this.push('addText', gaugeDecreaseMessage.format(target.name(), gaugeName, amount));
     }
   };
 
@@ -716,10 +743,12 @@
 
     const amount = Math.abs(change);
 
-    if (change > 0 && gaugeIncreaseMessage !== '') {
-      this.push('addText', gaugeIncreaseMessage.format(subject.name(), gaugeName, amount));
-    } else if (change < 0 && gaugeDecreaseMessage !== '') {
-      this.push('addText', gaugeDecreaseMessage.format(subject.name(), gaugeName, amount));
+    if (change > 0) {
+      if (recoverySoundDirection === 'increase') this.push('performRecovery', subject);
+      if (gaugeIncreaseMessage !== '') this.push('addText', gaugeIncreaseMessage.format(subject.name(), gaugeName, amount));
+    } else {
+      if (recoverySoundDirection === 'decrease') this.push('performRecovery', subject);
+      if (gaugeDecreaseMessage !== '') this.push('addText', gaugeDecreaseMessage.format(subject.name(), gaugeName, amount));
     }
   };
 
