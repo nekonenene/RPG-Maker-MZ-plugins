@@ -369,8 +369,7 @@
     }
   }
 
-  // グローバルクラスとして公開
-  window.HTN_GaugeParam = HTN_GaugeParam;
+  window.HTN_GaugeParam = HTN_GaugeParam; // グローバルクラスとして公開
 
   PluginManager.registerCommand(pluginName, 'ChangeValue', (args) => {
     const actor = $gameActors.actor(Number(args.actorId));
