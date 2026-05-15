@@ -584,7 +584,18 @@
   BattleManager.endBattle = function(result) {
     _BattleManager_endBattle.call(this, result);
 
+    delete this._HTN_MonsterMessage_ComboCount;
+    delete this._HTN_MonsterMessage_EncounterCommonEvents;
+    delete this._HTN_MonsterMessage_EncounterQueue;
+    delete this._HTN_MonsterMessage_IsComboAction;
+    delete this._HTN_MonsterMessage_LastAction;
+    delete this._HTN_MonsterMessage_LastTargets;
     delete this._HTN_MonsterMessage_NextActionRequests;
+
+    if (this._logWindow != null) {
+      console.log(this._logWindow);
+      delete this._logWindow._HTN_MonsterMessage_CommonEventInterpreter;
+    }
   };
 
   //// ---- 以下、 NW.js（デスクトップ）とブラウザ両対応の、データ読み込み処理 ----
