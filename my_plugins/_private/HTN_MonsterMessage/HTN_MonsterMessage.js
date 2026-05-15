@@ -31,7 +31,7 @@
  *   行動前（スキル発動前）のセリフを登録する
  *
  * HTN_MonsterMessage.registerAfterAttack(敵キャラID, fn)
- *   行動後（モンスターが元の位置に戻ったあと）のセリフを登録する
+ *   行動後のセリフを登録する
  *
  * HTN_MonsterMessage.registerTurnEnd(敵キャラID, fn)
  *   ターン終了時のセリフを登録する
@@ -535,7 +535,7 @@
   };
 
   /**
-   * 行動終了時（モンスターが元の位置に戻ったあと）に行動後セリフを表示する
+   * 行動結果の表示（ダメージ表示など）がされた後にセリフを表示する。連撃のためのキュー追加もおこなう
    */
   const _BattleManager_endAction = BattleManager.endAction;
   BattleManager.endAction = function() {
