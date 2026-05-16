@@ -210,8 +210,11 @@ BattleManager.updatePhase()
         │     └── _phase = "start" → BattleManager.updateStart により _phase = "turn"
         ├── ターン制: BattleManager.endAllBattlersTurn()
         │     ├── Game_Battler.onTurnEnd()
-        │     │     ├── clearResult()
+        │     │     ├── clearResult() : result をリセット
         │     │     ├── regenerateAll()
+        │     │     │     ├── regenerateHp() → gainHp(value)       ← result に記録されメッセージ表示
+        │     │     │     ├── regenerateMp() → gainMp(value)       ← result に記録されメッセージ表示
+        │     │     │     └── regenerateTp() → gainSilentTp(value) ← result に記録されない
         │     │     ├── updateStateTurns()
         │     │     ├── updateBuffTurns()
         │     │     └── removeStatesAuto(2) : ターン終了時のステート解除処理
@@ -304,19 +307,6 @@ Game_Action.apply(target)
         │     └── target.gainMp(value)
         └── itemEffectGainTp(target, effect)
               └── target.gainTp(value)
-```
-
-### ターン終了時のリジェネ
-
-```
-Game_Battler.onTurnEnd()
-  ├── clearResult()          ← resultをリセット
-  ├── regenerateAll()
-  │     ├── regenerateHp()  → gainHp(value)      ← result に記録される
-  │     ├── regenerateMp()  → gainMp(value)      ← result に記録される
-  │     └── regenerateTp()  → gainSilentTp(value) ← result に記録されない
-  ├── updateStateTurns()
-  └── removeStatesAuto(2)
 ```
 
 ### setTp が呼ばれる主なケース
