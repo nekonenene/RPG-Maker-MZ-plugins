@@ -8,6 +8,10 @@ RPGツクールMZ用のプラグインです。
 スキルやアイテムのメモ欄にタグを記述することで、使用時にパラメータ値を変化させることや、  
 ステートのメモ欄にタグを記述することで、毒などのように毎ターン値を変化させることが可能です。
 
+| メニュー画面 | ステータス画面 | 戦闘画面 |
+|:---:|:---:|:---:|
+| ![メニュー画面のスクリーンショット](./images/HTN_GaugeParam_menu.png) | ![ステータス画面のスクリーンショット](./images/HTN_GaugeParam_status.png) | ![戦闘画面のスクリーンショット](./images/HTN_GaugeParam_battle.png) |
+
 ## 🛠️ 導入方法
 
 **[【ここを右クリックして「名前を付けてリンク先を保存」みたいな項目を選んでダウンロード】](https://raw.githubusercontent.com/nekonenene/RPG-Maker-MZ-plugins/main/my_plugins/HTN_GaugeParam/HTN_GaugeParam.js)**
