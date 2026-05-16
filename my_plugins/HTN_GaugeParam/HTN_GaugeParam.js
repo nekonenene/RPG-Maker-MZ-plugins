@@ -90,20 +90,20 @@
  * @default 0
  * @type variable
  *
- * @param ShowInStatus
- * @text Show in Status Screen
+ * @param ShowGaugeInStatus
+ * @text Show Gauge in Status Screen
  * @desc Show the gauge in the status screen.
  * @default true
  * @type boolean
  *
  * @param PriorityOverTP
  * @text Priority Over TP in Status
- * @desc When TP is displayed, replace the TP gauge with this gauge in the status screen. Has no effect when ShowInStatus is false.
+ * @desc Replace the TP gauge with this gauge on the status screen. No effect if "Show Gauge in Status Screen" is disabled.
  * @default true
  * @type boolean
  *
- * @param ShowInBattle
- * @text Show in Battle Status
+ * @param ShowGaugeInBattle
+ * @text Show Gauge in Battle Status
  * @desc Show the gauge in the battle status window. It is displayed after HP/MP/TP as a fourth gauge.
  * @default true
  * @type boolean
@@ -297,7 +297,7 @@
  * @default 0
  * @type variable
  *
- * @param ShowInStatus
+ * @param ShowGaugeInStatus
  * @text ステータス画面に表示
  * @desc ステータス画面にゲージを表示する
  * @default true
@@ -305,11 +305,11 @@
  *
  * @param PriorityOverTP
  * @text ステータス画面でTPより優先
- * @desc 「ステータス画面に表示」がオンで、TP表示もオンのとき、TPゲージでなくこのゲージを表示する
+ * @desc 「ステータス画面にゲージを表示」がオンで、TP表示もオンのとき、TPゲージでなくこのゲージを表示する
  * @default true
  * @type boolean
  *
- * @param ShowInBattle
+ * @param ShowGaugeInBattle
  * @text 戦闘画面に表示
  * @desc 戦闘画面のバトルステータスにゲージを表示する。HP/MP/TPの後に4本目として表示される
  * @default true
@@ -445,9 +445,9 @@
   const minCommonEventId = Number(pluginParams.MinCommonEvent || 0);
   const maxCommonEventId = Number(pluginParams.MaxCommonEvent || 0);
   const commonEventActorVariableId = Number(pluginParams.CommonEventActorVariableId || 0);
-  const showInStatus = String(pluginParams.ShowInStatus) !== 'false';
+  const showGaugeInStatus = String(pluginParams.ShowGaugeInStatus) !== 'false';
   const priorityOverTP = String(pluginParams.PriorityOverTP) !== 'false';
-  const showInBattle = String(pluginParams.ShowInBattle) !== 'false';
+  const showGaugeInBattle = String(pluginParams.ShowGaugeInBattle) !== 'false';
   const gaugeColor1 = String(pluginParams.GaugeColor1 || '#ff80b0');
   const gaugeColor2 = String(pluginParams.GaugeColor2 || '#ff0060');
 
@@ -845,7 +845,7 @@
   /**
    * ゲージを戦闘画面・ステータス画面に配置
    *
-   * 戦闘画面: ShowInBattle が true のとき HP/MP/TP の後に4本目として配置
+   * 戦闘画面: ShowGaugeInBattle が true のとき HP/MP/TP の後に4本目として配置
    * ステータス画面: デフォルトの画面レイアウトだと最大で3本までしか配置できないので、priorityOverTP が true のときは TP ゲージの代わりに配置
    *
    * @param {Game_Actor} actor 対象アクター
@@ -857,7 +857,7 @@
     if (this instanceof Window_BattleStatus) {
       _Window_StatusBase_placeBasicGauges.call(this, actor, x, y);
 
-      if (showInBattle) {
+      if (showGaugeInBattle) {
         const offset = $dataSystem.optDisplayTp ? 3 : 2;
         this.placeGauge(actor, 'htn_gauge_param', x, y + this.gaugeLineHeight() * offset);
       }
@@ -865,7 +865,7 @@
       return;
     }
 
-    if (!showInStatus || ($dataSystem.optDisplayTp && !priorityOverTP)) {
+    if (!showGaugeInStatus || ($dataSystem.optDisplayTp && !priorityOverTP)) {
       _Window_StatusBase_placeBasicGauges.call(this, actor, x, y);
     } else {
       this.placeGauge(actor, 'hp', x, y);
@@ -882,7 +882,7 @@
    */
   const _Window_BattleStatus_basicGaugesY = Window_BattleStatus.prototype.basicGaugesY;
   Window_BattleStatus.prototype.basicGaugesY = function(rect) {
-    if (showInBattle) {
+    if (showGaugeInBattle) {
       return _Window_BattleStatus_basicGaugesY.call(this, rect) - this.gaugeLineHeight();
     }
 
