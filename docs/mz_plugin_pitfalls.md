@@ -14,7 +14,6 @@
 | [`removeState` はゲーム開始時にも呼ばれる](#removeState-はゲーム開始時にも呼ばれる) | ステート, removeState, null チェック |
 | [`Game_Action.prototype.apply` はバトル外でも呼ばれる](#Game_Actionprototypeapply-はバトル外でも呼ばれる) | アクション, スキル, アイテム, inBattle |
 | [ターン制バトルでのダメージポップアップは直接呼べない](#ターン制バトルでのダメージポップアップは直接呼べない) | ポップアップ, ダメージ表示, ターン制, TPB |
-| [`displayAutoAffectedStatus` フックでメッセージを挿入する](#displayAutoAffectedStatus-フックでメッセージを挿入する) | ステート変化メッセージ, バトルログ, 挿入 |
 | [ステートの `meta` はすべて文字列](#ステートの-meta-はすべて文字列) | ステート, メモ欄, meta, タグ, 型変換, 大文字小文字 |
 | [通常攻撃によるステート付与の検出](#通常攻撃によるステート付与の検出) | ステート付与, 通常攻撃, effects, dataId |
 | [エネミーの識別はインデックスでおこなう](#エネミーの識別はインデックスでおこなう) | エネミー, 識別, インデックス, actorId |
@@ -188,34 +187,6 @@ Window_BattleLog.prototype.showMyPopup = function(battler, amount) {
 
 // キュー経由で呼び出す
 this.push('showMyPopup', battler, amount);
-```
-
----
-
-## `displayAutoAffectedStatus` フックでメッセージを挿入する
-
-`Window_BattleLog.prototype.displayAutoAffectedStatus` は、  
-アクション処理後にステート変化（付与・解除）のメッセージを表示するメソッド。
-
-このメソッドの先頭をフックすると、**ステート変化メッセージの前に**独自メッセージやポップアップを挿入できる。
-
-```javascript
-const _displayAutoAffectedStatus = Window_BattleLog.prototype.displayAutoAffectedStatus;
-Window_BattleLog.prototype.displayAutoAffectedStatus = function(subject) {
-  // ここでキューに積んだものが、ステート変化メッセージより先に処理される
-  if (subject._myPendingMessages?.length > 0) {
-    for (const msg of subject._myPendingMessages) {
-      this.push('addText', msg);
-    }
-
-    this.push('wait');
-    this.push('clear');
-
-    subject._myPendingMessages = [];
-  }
-
-  _displayAutoAffectedStatus.call(this, subject);
-};
 ```
 
 ---
