@@ -61,6 +61,16 @@ HP : [https://hato-neko.x0.com](https://hato-neko.x0.com)
 **https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_ForcedSkillState**
 
 
+## 🌡️ HTN_GaugeParam
+
+プレイヤーキャラに、ゲージ付きのオリジナルパラメータを追加できるプラグインです。  
+ゲージが満タンや０になるときにコモンイベントを呼び出せます。
+
+### 詳しい使い方はこちら：
+
+**https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_GaugeParam**
+
+
 ## 🩸 HTN_HPDrainState
 
 ターンが終わるたびにHPを吸収されるステート（状態異常）を作成できるプラグインです。
