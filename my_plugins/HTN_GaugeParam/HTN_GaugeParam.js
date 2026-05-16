@@ -16,14 +16,14 @@
  * @author hatonekoe - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_GaugeParam
  *
- * @param GaugeMax
+ * @param MaxValue
  * @text Max Value
  * @desc Maximum value of the custom parameter.
  * @default 100
  * @type number
  * @min 1
  *
- * @param GaugeInitialValue
+ * @param InitialValue
  * @text Initial Value
  * @desc Initial value assigned to each actor at game start.
  * @default 0
@@ -48,13 +48,13 @@
  * @default EP
  * @type string
  *
- * @param GaugeIncreaseMessage
+ * @param IncreaseMessage
  * @text Increase Message
  * @desc Message when the value increases. %1=target name, %2=parameter name, %3=amount. Leave empty to hide.
  * @default %1's %2 increased by %3!
  * @type string
  *
- * @param GaugeDecreaseMessage
+ * @param DecreaseMessage
  * @text Decrease Message
  * @desc Message when the value decreases. %1=target name, %2=parameter name, %3=amount. Leave empty to hide.
  * @default %1's %2 decreased by %3!
@@ -223,14 +223,14 @@
  * @author ハトネコエ - https://hato-neko.x0.com
  * @url https://github.com/nekonenene/RPG-Maker-MZ-plugins/tree/main/my_plugins/HTN_GaugeParam
  *
- * @param GaugeMax
+ * @param MaxValue
  * @text 最大値
  * @desc 独自パラメータの最大値
  * @default 100
  * @type number
  * @min 1
  *
- * @param GaugeInitialValue
+ * @param InitialValue
  * @text 初期値
  * @desc ゲーム開始時に各アクターへ設定されるパラメータの初期値
  * @default 0
@@ -255,13 +255,13 @@
  * @default EP
  * @type string
  *
- * @param GaugeIncreaseMessage
+ * @param IncreaseMessage
  * @text 増加メッセージ
  * @desc パラメータが増加したときに表示するメッセージ。空欄にすると非表示
  * @default %1の%2が %3 増えた！
  * @type string
  *
- * @param GaugeDecreaseMessage
+ * @param DecreaseMessage
  * @text 減少メッセージ
  * @desc パラメータが減少したときに表示するメッセージ。空欄にすると非表示
  * @default %1の%2が %3 減った！
@@ -434,13 +434,13 @@
 
   const pluginName = 'HTN_GaugeParam';
   const pluginParams = PluginManager.parameters(pluginName);
-  const gaugeMax = Math.max(1, Number(pluginParams.GaugeMax || 100));
-  const gaugeInitialValue = Math.max(0, Math.min(gaugeMax, Number(pluginParams.GaugeInitialValue || 0)));
+  const paramMaxValue = Math.max(1, Number(pluginParams.MaxValue || 100));
+  const paramInitialValue = Math.max(0, Math.min(paramMaxValue, Number(pluginParams.InitialValue || 0)));
   const resetOnRecoverAll = String(pluginParams.ResetOnRecoverAll) !== 'false';
   const parameterName = String(pluginParams.ParameterName || 'EP');
   const gaugeLabel = String(pluginParams.GaugeLabel || 'EP');
-  const gaugeIncreaseMessage = String(pluginParams.GaugeIncreaseMessage ?? '');
-  const gaugeDecreaseMessage = String(pluginParams.GaugeDecreaseMessage ?? '');
+  const increaseMessage = String(pluginParams.IncreaseMessage ?? '');
+  const decreaseMessage = String(pluginParams.DecreaseMessage ?? '');
   const recoverySoundTrigger = String(pluginParams.RecoverySoundTrigger || 'increase');
   const minCommonEventId = Number(pluginParams.MinCommonEvent || 0);
   const maxCommonEventId = Number(pluginParams.MaxCommonEvent || 0);
@@ -459,7 +459,7 @@
      * @returns {number} パラメータ値
      */
     static getValue(actor) {
-      return actor._HTN_GaugeParam_Value ?? gaugeInitialValue;
+      return actor._HTN_GaugeParam_Value ?? paramInitialValue;
     }
 
     /**
@@ -468,7 +468,7 @@
      * @param {Game_Actor} actor 対象アクター
      */
     static initValue(actor) {
-      actor._HTN_GaugeParam_Value = gaugeInitialValue;
+      actor._HTN_GaugeParam_Value = paramInitialValue;
     }
 
     /**
@@ -479,7 +479,7 @@
      */
     static setValue(actor, value) {
       const oldValue = HTN_GaugeParam.getValue(actor);
-      const newValue = Math.max(0, Math.min(gaugeMax, value));
+      const newValue = Math.max(0, Math.min(paramMaxValue, value));
 
       actor._HTN_GaugeParam_Value = newValue;
 
@@ -491,7 +491,7 @@
         $gameTemp.reserveCommonEvent(minCommonEventId);
       }
 
-      if (oldValue < gaugeMax && newValue === gaugeMax && maxCommonEventId > 0) {
+      if (oldValue < paramMaxValue && newValue === paramMaxValue && maxCommonEventId > 0) {
         if (commonEventActorVariableId > 0) {
           $gameVariables.setValue(commonEventActorVariableId, actor.actorId());
         }
@@ -565,7 +565,7 @@
   Game_Actor.prototype.initMembers = function() {
     _Game_Actor_initMembers.call(this);
 
-    this._HTN_GaugeParam_Value = gaugeInitialValue;
+    this._HTN_GaugeParam_Value = paramInitialValue;
   };
 
   /**
@@ -578,7 +578,7 @@
     _Game_BattlerBase_recoverAll.call(this);
 
     if (resetOnRecoverAll && this.isActor()) {
-      this._HTN_GaugeParam_Value = gaugeInitialValue;
+      this._HTN_GaugeParam_Value = paramInitialValue;
     }
   };
 
@@ -635,7 +635,7 @@
     if (meta == null) return false;
 
     const currentValue = HTN_GaugeParam.getValue(target);
-    if (meta.GaugeParam_Increase != null && currentValue === gaugeMax) return false;
+    if (meta.GaugeParam_Increase != null && currentValue === paramMaxValue) return false;
     if (meta.GaugeParam_Decrease != null && currentValue === 0) return false;
 
     return true;
@@ -742,7 +742,7 @@
   const _Sprite_Gauge_currentMaxValue = Sprite_Gauge.prototype.currentMaxValue;
   Sprite_Gauge.prototype.currentMaxValue = function() {
     if (this._statusType === 'htn_gauge_param') {
-      return gaugeMax;
+      return paramMaxValue;
     }
 
     return _Sprite_Gauge_currentMaxValue.call(this);
@@ -809,10 +809,10 @@
 
     if (change > 0) {
       if (recoverySoundTrigger === 'increase') this.push('performRecovery', target);
-      if (gaugeIncreaseMessage !== '') this.push('addText', gaugeIncreaseMessage.format(target.name(), parameterName, amount));
+      if (increaseMessage !== '') this.push('addText', increaseMessage.format(target.name(), parameterName, amount));
     } else {
       if (recoverySoundTrigger === 'decrease') this.push('performRecovery', target);
-      if (gaugeDecreaseMessage !== '') this.push('addText', gaugeDecreaseMessage.format(target.name(), parameterName, amount));
+      if (decreaseMessage !== '') this.push('addText', decreaseMessage.format(target.name(), parameterName, amount));
     }
   };
 
@@ -835,10 +835,10 @@
 
     if (change > 0) {
       if (recoverySoundTrigger === 'increase') this.push('performRecovery', subject);
-      if (gaugeIncreaseMessage !== '') this.push('addText', gaugeIncreaseMessage.format(subject.name(), parameterName, amount));
+      if (increaseMessage !== '') this.push('addText', increaseMessage.format(subject.name(), parameterName, amount));
     } else {
       if (recoverySoundTrigger === 'decrease') this.push('performRecovery', subject);
-      if (gaugeDecreaseMessage !== '') this.push('addText', gaugeDecreaseMessage.format(subject.name(), parameterName, amount));
+      if (decreaseMessage !== '') this.push('addText', decreaseMessage.format(subject.name(), parameterName, amount));
     }
   };
 
