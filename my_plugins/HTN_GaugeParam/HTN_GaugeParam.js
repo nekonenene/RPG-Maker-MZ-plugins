@@ -18,7 +18,7 @@
  *
  * @param GaugeMax
  * @text Max Value
- * @desc Maximum value of the parameter.
+ * @desc Maximum value of the custom parameter.
  * @default 100
  * @type number
  * @min 1
@@ -36,9 +36,9 @@
  * @default true
  * @type boolean
  *
- * @param GaugeName
+ * @param ParameterName
  * @text Parameter Name
- * @desc Name of the parameter used in messages.
+ * @desc Name of the custom parameter used in messages during battle.
  * @default EP
  * @type string
  *
@@ -225,7 +225,7 @@
  *
  * @param GaugeMax
  * @text 最大値
- * @desc パラメータの最大値
+ * @desc 独自パラメータの最大値
  * @default 100
  * @type number
  * @min 1
@@ -243,9 +243,9 @@
  * @default true
  * @type boolean
  *
- * @param GaugeName
+ * @param ParameterName
  * @text パラメータ名
- * @desc メッセージで使用するパラメータの名称
+ * @desc 戦闘中のメッセージで使用される独自パラメータの名称
  * @default EP
  * @type string
  *
@@ -437,7 +437,7 @@
   const gaugeMax = Math.max(1, Number(pluginParams.GaugeMax || 100));
   const gaugeInitialValue = Math.max(0, Math.min(gaugeMax, Number(pluginParams.GaugeInitialValue || 0)));
   const resetOnRecoverAll = String(pluginParams.ResetOnRecoverAll) !== 'false';
-  const gaugeName = String(pluginParams.GaugeName || 'EP');
+  const parameterName = String(pluginParams.ParameterName || 'EP');
   const gaugeLabel = String(pluginParams.GaugeLabel || 'EP');
   const gaugeIncreaseMessage = String(pluginParams.GaugeIncreaseMessage ?? '');
   const gaugeDecreaseMessage = String(pluginParams.GaugeDecreaseMessage ?? '');
@@ -809,10 +809,10 @@
 
     if (change > 0) {
       if (recoverySoundTrigger === 'increase') this.push('performRecovery', target);
-      if (gaugeIncreaseMessage !== '') this.push('addText', gaugeIncreaseMessage.format(target.name(), gaugeName, amount));
+      if (gaugeIncreaseMessage !== '') this.push('addText', gaugeIncreaseMessage.format(target.name(), parameterName, amount));
     } else {
       if (recoverySoundTrigger === 'decrease') this.push('performRecovery', target);
-      if (gaugeDecreaseMessage !== '') this.push('addText', gaugeDecreaseMessage.format(target.name(), gaugeName, amount));
+      if (gaugeDecreaseMessage !== '') this.push('addText', gaugeDecreaseMessage.format(target.name(), parameterName, amount));
     }
   };
 
@@ -835,10 +835,10 @@
 
     if (change > 0) {
       if (recoverySoundTrigger === 'increase') this.push('performRecovery', subject);
-      if (gaugeIncreaseMessage !== '') this.push('addText', gaugeIncreaseMessage.format(subject.name(), gaugeName, amount));
+      if (gaugeIncreaseMessage !== '') this.push('addText', gaugeIncreaseMessage.format(subject.name(), parameterName, amount));
     } else {
       if (recoverySoundTrigger === 'decrease') this.push('performRecovery', subject);
-      if (gaugeDecreaseMessage !== '') this.push('addText', gaugeDecreaseMessage.format(subject.name(), gaugeName, amount));
+      if (gaugeDecreaseMessage !== '') this.push('addText', gaugeDecreaseMessage.format(subject.name(), parameterName, amount));
     }
   };
 
