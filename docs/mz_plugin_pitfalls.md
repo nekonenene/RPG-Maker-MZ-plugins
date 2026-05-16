@@ -23,7 +23,6 @@
 | [アクターの並び順は actorId とは異なる](#アクターの並び順は-actorId-とは異なる) | アクター, パーティ, 並び順, findIndex |
 | [死亡後のステート解除メッセージを正しい順序で表示する](#死亡後のステート解除メッセージを正しい順序で表示する) | 死亡, ステート解除, メッセージ順序, displayBattlerStatus |
 | [`displayRegeneration` はダメージ音を鳴らさない](#displayRegeneration-はダメージ音を鳴らさない) | リジェネ, ダメージ音, SE, performDamage |
-| [`gainSilentTp` は result に記録しない](#gainSilentTp-は-result-に記録しない) | TP, gainSilentTp, ポップアップ, リジェネ |
 | [`gainTp` だけフックしても TP 変化を完全には捕捉できない](#gainTp-だけフックしても-TP-変化を完全には捕捉できない) | TP, setTp, gainTp, フック, 他プラグイン対応 |
 | [ダメージ音のカスタマイズは SoundManager フックでおこなう](#ダメージ音のカスタマイズは-SoundManager-フックでおこなう) | ダメージ音, SE, SoundManager, performDamage |
 
@@ -401,27 +400,6 @@ Window_BattleLog.prototype.displayRegeneration = function(subject) {
     this.push('mySound'); // ポップアップより前に積む
   }
   _displayRegeneration.call(this, subject);
-};
-```
-
----
-
-## `gainSilentTp` は result に記録しない
-
-`gainTp` は `result.tpDamage` に値を記録しTPのポップアップ・メッセージが出るが、  
-`gainSilentTp` は `setTp` を直接呼ぶだけで **result に何も記録しない**。
-
-ターン終了のTPリジェネ（`regenerateTp`）は `gainSilentTp` を使うため、  
-TPリジェネをポップアップ表示させたい場合は `gainSilentTp` を `gainTp` 経由に切り替える必要がある。
-
-```javascript
-const _Game_Battler_gainSilentTp = Game_Battler.prototype.gainSilentTp;
-Game_Battler.prototype.gainSilentTp = function(value) {
-  if (/* 条件 */) {
-    this.gainTp(value); // gainTp 経由で result に記録させる
-    return;
-  }
-  _Game_Battler_gainSilentTp.call(this, value);
 };
 ```
 
