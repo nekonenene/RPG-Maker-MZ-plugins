@@ -56,8 +56,8 @@ RPGツクールMZ用のプラグインです。
 パラメータの値を変化させます。（Increase＝増加、Decrease＝減少）
 
 ```
-<GaugeParam_Increase: 数式>
-<GaugeParam_Decrease: 数式>
+<GaugeParam_Increase: 数値か数式>
+<GaugeParam_Decrease: 数値か数式>
 ```
 
 数式内で使用できる変数：
@@ -78,6 +78,8 @@ RPGツクールMZ用のプラグインです。
 <GaugeParam_Decrease: (a.mat - b.mdf) / 2>  （行動主体の魔法攻撃力と、攻撃対象の魔法防御力の差の半分だけ減少）
 <GaugeParam_Decrease: v[1]>  （変数ID 0001 の値のぶん減少）
 ```
+
+![メモ欄にタグを記述している例](./images/HTN_GaugeParam_memo.png)
 
 ### コモンイベントの発動
 
