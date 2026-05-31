@@ -76,7 +76,7 @@ HTN_MonsterMessage.registerBeforeAttack(ENEMY_ID, ({ enemy, skill, target, messa
 HTN_MonsterMessage.registerAfterAttack(ENEMY_ID, ({ enemy, skill, target, messages, callCommonEvent, comboCount, addComboAttack }) => {
   const rand = Math.random();
 
-  if (target.hp <= 0) {
+  if (target !== null && target.hp <= 0) {
     messages.push('お疲れですか？\nでは、ゆっくりお休みください……♥');
 
     messages.name = '';
