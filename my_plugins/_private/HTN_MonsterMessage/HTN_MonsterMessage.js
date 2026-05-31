@@ -617,6 +617,7 @@
 
   // 逐次ロードキュー。data/index.js 経由で各ファイルが積まれる
   const _dataFileQueue = [];
+  let _dataLoadError = null;
 
   /**
    * ブラウザ環境向けデータファイルローダー
@@ -631,40 +632,104 @@
   };
 
   /**
+   * データファイルのURLを返す
+   *
+   * @param {string} filename 拡張子のないファイルパス
+   * @returns {string}
+   */
+  function dataScriptUrl(filename) {
+    return 'js/plugins/' + filename + '.js';
+  }
+
+  /**
+   * データファイル読み込みエラーを記録する
+   *
+   * @param {string} filename 拡張子のないファイルパス
+   * @param {Error|string} reason エラー理由
+   * @returns {void}
+   */
+  function reportDataLoadError(filename, reason) {
+    const message = reason instanceof Error ? reason.message : String(reason);
+    const error = new Error('[HTN_MonsterMessage] Failed to load data script: ' + filename + ' (' + message + ')');
+
+    if (reason instanceof Error && reason.stack != null) {
+      error.stack += '\nCaused by: ' + reason.stack;
+    }
+
+    _dataLoadError = error;
+    console.error(error);
+  }
+
+  /**
+   * データファイルをブラウザ文脈で実行する
+   *
+   * @param {string} filename 拡張子のないファイルパス
+   * @param {string} source JSソース
+   * @returns {void}
+   */
+  function executeDataScript(filename, source) {
+    const sourceUrl = dataScriptUrl(filename);
+
+    // new Function でラップし、ファイル間の const/let 変数名の衝突を防ぐ
+    (new Function(source + '\n//# sourceURL=' + sourceUrl))();
+  }
+
+  /**
    * キューの先頭ファイルを XHR で取得し new Function() で実行する。
    * 完了後に次のキューを処理し、すべて終わったら _finishedDataLoading を立てる
    */
   function _processNextDataFile() {
+    if (_dataLoadError != null) {
+      return;
+    }
+
     if (_dataFileQueue.length === 0) {
       _api._finishedDataLoading = true;
       return;
     }
 
     const filename = _dataFileQueue.shift();
-    const url = 'js/plugins/' + filename + '.js';
+    const url = dataScriptUrl(filename);
     const xhr = new XMLHttpRequest();
 
     xhr.open('GET', url);
 
     xhr.onload = function() {
       if (xhr.status === 200 || xhr.status === 0) {
-        // new Function でラップし独立スコープで実行することで
-        // ファイル間の const/let 変数名の衝突を防ぐ
-        (new Function(xhr.responseText))();
+        try {
+          executeDataScript(filename, xhr.responseText);
+        } catch (e) {
+          reportDataLoadError(filename, e);
+          return;
+        }
+      } else {
+        reportDataLoadError(filename, 'HTTP status ' + xhr.status);
+        return;
       }
+
       _processNextDataFile();
     };
 
     xhr.onerror = function() {
-      _processNextDataFile();
+      reportDataLoadError(filename, 'network error');
     };
 
     xhr.send();
   }
 
+  // 全データファイルが読み込まれるまで DataManager.isDatabaseLoaded を false にする
+  const _DataManager_isDatabaseLoaded = DataManager.isDatabaseLoaded;
+  DataManager.isDatabaseLoaded = function() {
+    if (_dataLoadError != null) {
+      throw _dataLoadError;
+    }
+
+    return _DataManager_isDatabaseLoaded.call(this) && _api._finishedDataLoading;
+  };
+
   // js/plugins/HTN_MonsterMessage/data/ 以下の JS ファイルを読み込む
   if (Utils.isNwjs()) {
-    // NW.js（デスクトップ）版: require を使い、fs でスキャンして同期
+    // NW.js（デスクトップ）版: fs でスキャンし、実行はブラウザ文脈のローダーに統一
     const fs   = require('fs');
     const path = require('path');
     const dir  = path.join(process.cwd(), 'js', 'plugins', 'HTN_MonsterMessage', 'data');
@@ -675,25 +740,18 @@
 
       // 他のファイルが依存しているため constants.js は最初に読み込む
       if (files.includes(constantsFile)) {
-        require(path.join(dir, constantsFile));
+        _api.loadDataScript('HTN_MonsterMessage/data/' + constantsFile.replace(/\.js$/, ''));
       }
 
       files
         .filter(f => f !== constantsFile)
         .sort()
-        .forEach(f => require(path.join(dir, f)));
+        .forEach(f => _api.loadDataScript('HTN_MonsterMessage/data/' + f.replace(/\.js$/, '')));
     }
 
-    _api._finishedDataLoading = true; // いちおう true にしておく
+    _processNextDataFile();
   } else {
     // ブラウザ版: data/index.js に書かれたファイルを XHR + new Function() で逐次ロードしていく
-
-    // 全データファイルが読み込まれるまで DataManager.isDatabaseLoaded を false にする
-    const _DataManager_isDatabaseLoaded = DataManager.isDatabaseLoaded;
-    DataManager.isDatabaseLoaded = function() {
-      return _DataManager_isDatabaseLoaded.call(this) && _api._finishedDataLoading;
-    };
-
     _api.loadDataScript('HTN_MonsterMessage/data/index');
     _processNextDataFile();
   }
